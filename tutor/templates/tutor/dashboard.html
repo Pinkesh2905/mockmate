@@ -1,0 +1,951 @@
+{% extends "base.html" %}
+{% load static %}
+{% load form_filters %} 
+
+{% block title %}Tutor Dashboard - MockMate{% endblock %}
+
+{% block content %}
+<div class="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50">
+  <!-- Header Section -->
+  <div class="bg-white shadow-sm border-b border-gray-100">
+    <div class="max-w-7xl mx-auto py-8 px-6">
+      <div class="flex items-center justify-between">
+        <div>
+          <h1 class="text-4xl font-bold bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent">
+            Welcome back, Tutor! ✨
+          </h1>
+          <p class="text-gray-600 mt-2">Create and manage your educational content</p>
+        </div>
+        <div class="hidden md:flex items-center space-x-4">
+          <div class="bg-indigo-100 p-3 rounded-full">
+            <svg class="w-8 h-8 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.746 0 3.332.477 4.5 1.253v13C19.832 18.477 18.246 18 16.5 18c-1.746 0-3.332.477-4.5 1.253z"></path>
+            </svg>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="max-w-7xl mx-auto py-10 px-6">
+    <!-- Success/Error Messages -->
+    {% if messages %}
+      <div class="mb-6 space-y-4">
+        {% for message in messages %}
+          <div class="alert alert-{{ message.tags }} bg-{% if message.tags == 'success' %}green{% elif message.tags == 'error' %}red{% else %}blue{% endif %}-50 border-2 border-{% if message.tags == 'success' %}green{% elif message.tags == 'error' %}red{% else %}blue{% endif %}-200 rounded-xl p-4 animate-bounce-in">
+            <div class="flex items-center gap-3">
+              <i class="ri-{% if message.tags == 'success' %}check{% elif message.tags == 'error' %}error{% else %}info{% endif %}-line text-{% if message.tags == 'success' %}green{% elif message.tags == 'error' %}red{% else %}blue{% endif %}-600 text-xl"></i>
+              <p class="text-{% if message.tags == 'success' %}green{% elif message.tags == 'error' %}red{% else %}blue{% endif %}-800 font-medium">{{ message }}</p>
+            </div>
+          </div>
+        {% endfor %}
+      </div>
+    {% endif %}
+
+    <!-- === Action Buttons === -->
+    <div class="mb-12">
+      <h2 class="text-2xl font-semibold text-gray-800 mb-6 flex items-center">
+        <span class="bg-indigo-100 p-2 rounded-lg mr-3">
+          <svg class="w-6 h-6 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
+          </svg>
+        </span>
+        Quick Actions
+      </h2>
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+        <a href="?show=course" class="group relative bg-white rounded-xl shadow-md hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 overflow-hidden">
+          <div class="absolute inset-0 bg-gradient-to-r from-blue-500 to-cyan-500 opacity-0 group-hover:opacity-10 transition-opacity duration-300"></div>
+          <div class="p-6 text-center">
+            <div class="bg-blue-100 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4 group-hover:bg-blue-200 transition-colors duration-300">
+              <svg class="w-8 h-8 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.746 0 3.332.477 4.5 1.253v13C19.832 18.477 18.246 18 16.5 18c-1.746 0-3.332.477-4.5 1.253z"></path>
+              </svg>
+            </div>
+            <h3 class="font-semibold text-gray-800 mb-2">Add Course</h3>
+            <p class="text-sm text-gray-600">Create comprehensive courses</p>
+          </div>
+        </a>
+
+        <a href="?show=quiz" class="group relative bg-white rounded-xl shadow-md hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 overflow-hidden">
+          <div class="absolute inset-0 bg-gradient-to-r from-green-500 to-emerald-500 opacity-0 group-hover:opacity-10 transition-opacity duration-300"></div>
+          <div class="p-6 text-center">
+            <div class="bg-green-100 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4 group-hover:bg-green-200 transition-colors duration-300">
+              <svg class="w-8 h-8 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+              </svg>
+            </div>
+            <h3 class="font-semibold text-gray-800 mb-2">Add Quiz</h3>
+            <p class="text-sm text-gray-600">Design interactive quizzes</p>
+          </div>
+        </a>
+
+        <a href="?show=article" class="group relative bg-white rounded-xl shadow-md hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 overflow-hidden">
+          <div class="absolute inset-0 bg-gradient-to-r from-purple-500 to-pink-500 opacity-0 group-hover:opacity-10 transition-opacity duration-300"></div>
+          <div class="p-6 text-center">
+            <div class="bg-purple-100 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4 group-hover:bg-purple-200 transition-colors duration-300">
+              <svg class="w-8 h-8 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+              </svg>
+            </div>
+            <h3 class="font-semibold text-gray-800 mb-2">Add Article</h3>
+            <p class="text-sm text-gray-600">Write educational articles</p>
+          </div>
+        </a>
+
+        <a href="?show=practice" class="group relative bg-white rounded-xl shadow-md hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 overflow-hidden">
+          <div class="absolute inset-0 bg-gradient-to-r from-orange-500 to-red-500 opacity-0 group-hover:opacity-10 transition-opacity duration-300"></div>
+          <div class="p-6 text-center">
+            <div class="bg-orange-100 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4 group-hover:bg-orange-200 transition-colors duration-300">
+              <svg class="w-8 h-8 text-orange-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"></path>
+              </svg>
+            </div>
+            <h3 class="font-semibold text-gray-800 mb-2">Add Practice</h3>
+            <p class="text-sm text-gray-600">Create practice problems</p>
+          </div>
+        </a>
+
+        <a href="{% url 'tutor:mock_interview_review_list' %}" 
+          class="bg-purple-100 hover:bg-purple-200 p-6 rounded-xl shadow transition flex flex-col justify-center items-center text-center">
+        <i class="fas fa-comments text-purple-600 text-4xl mb-3"></i>
+        <h3 class="text-lg font-semibold text-purple-800">Mock Interview Reviews</h3>
+        <p class="text-sm text-purple-700 mt-2">View and review AI mock interviews submitted by students</p>
+        </a>
+
+      </div>
+
+      <form method="POST" action="{% url 'tutor:upload_csv' %}" enctype="multipart/form-data" class="mt-6 border p-4 rounded bg-white shadow">
+        {% csrf_token %}
+        <label class="block text-sm font-medium text-gray-700 mb-2">Upload CSV:</label>
+        <input type="file" name="csv_file" accept=".csv" class="mb-4 block w-full border px-3 py-2 rounded">
+        <button type="submit" class="bg-blue-600 text-white px-4 py-2 rounded">Upload</button>
+      </form>
+
+
+    </div>
+
+    <!-- === Add/Edit Forms Section === -->
+    {% if show == 'course' or edit_course_slug %}
+      <div class="relative mb-12">
+        <!-- Background decoration -->
+        <div class="absolute inset-0 bg-gradient-to-r from-blue-500/5 to-cyan-500/5 rounded-3xl transform -rotate-1"></div>
+        <div class="relative bg-white rounded-3xl shadow-xl border border-gray-100 overflow-hidden transform hover:shadow-2xl transition-shadow duration-300">
+          <!-- Header with animated gradient -->
+          <div class="relative bg-gradient-to-r from-blue-500 via-blue-600 to-cyan-500 p-8 text-white overflow-hidden">
+            <div class="absolute inset-0 bg-gradient-to-r from-blue-400/20 to-cyan-400/20 animate-pulse"></div>
+            <div class="relative flex items-center justify-between">
+              <div class="flex items-center">
+                <div class="bg-white/20 p-3 rounded-xl mr-4 backdrop-blur-sm">
+                  <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.746 0 3.332.477 4.5 1.253v13C19.832 18.477 18.246 18 16.5 18c-1.746 0-3.332.477-4.5 1.253z"></path>
+                  </svg>
+                </div>
+                <div>
+                  <h2 class="text-3xl font-bold mb-1">{{ edit_course_slug|yesno:"Edit Course,Create New Course" }}</h2>
+                  <p class="text-blue-100">{{ edit_course_slug|yesno:"Modify your existing course,Build an engaging learning experience" }}</p>
+                </div>
+              </div>
+              <div class="hidden md:block">
+                <div class="bg-white/10 px-4 py-2 rounded-full backdrop-blur-sm">
+                  <span class="text-sm font-medium">📚 Course</span>
+                </div>
+              </div>
+            </div>
+          </div>
+          
+          <!-- Course Form Content -->
+          <div class="p-10 bg-gradient-to-br from-gray-50/50 to-blue-50/30">
+            <form method="POST" enctype="multipart/form-data" action="{% url 'tutor:submit' %}" class="space-y-8">
+              {% csrf_token %}
+              <input type="hidden" name="type" value="course">
+              {% if edit_course_slug %}<input type="hidden" name="slug" value="{{ edit_course_slug }}">{% endif %}
+              
+              <!-- Course Main Form -->
+              <div class="form-enhanced">
+                {% for field in course_form %}
+                  <div class="mb-6">
+                    <label for="{{ field.id_for_label }}" class="block text-sm font-semibold text-gray-700 mb-2">{{ field.label }}</label>
+                    {{ field|add_class:"w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-blue-500 focus:ring-2 focus:ring-blue-200 focus:ring-opacity-50 transition-all duration-200 bg-white shadow-sm hover:border-gray-300 text-gray-800" }}
+                    {% if field.help_text %}<p class="text-xs text-gray-500 mt-1">{{ field.help_text }}</p>{% endif %}
+                    {% for error in field.errors %}<p class="text-red-600 text-sm mt-1">{{ error }}</p>{% endfor %}
+                  </div>
+                {% endfor %}
+                {% if course_form.non_field_errors %}
+                  <div class="text-red-600 text-sm mt-2">
+                    {% for error in course_form.non_field_errors %}<p>{{ error }}</p>{% endfor %}
+                  </div>
+                {% endif %}
+              </div>
+
+              <!-- Lessons Formset -->
+              <h3 class="text-2xl font-bold text-gray-800 mb-6 flex items-center gap-2 pt-8 border-t border-gray-200">
+                <i class="ri-play-list-line text-blue-600"></i>
+                Course Lessons
+                <span class="text-lg">🎬</span>
+              </h3>
+              <div id="lesson-formset-container" class="space-y-6">
+                {{ lesson_formset.management_form }}
+                {% for form in lesson_formset %}
+                  <div class="lesson-form-card bg-blue-50 p-6 rounded-xl shadow-md border border-blue-100 relative">
+                    {% if form.instance.pk %}
+                      <p class="text-xs text-gray-500 absolute top-3 right-6">Lesson ID: {{ form.instance.pk }}</p>
+                    {% endif %}
+                    {% for field in form %}
+                      <div class="mb-4">
+                        <label for="{{ field.id_for_label }}" class="block text-sm font-semibold text-gray-700 mb-2">{{ field.label }}</label>
+                        {{ field|add_class:"w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-blue-500 focus:ring-2 focus:ring-blue-200 focus:ring-opacity-50 transition-all duration-200 bg-white shadow-sm hover:border-gray-300 text-gray-800" }}
+                        {% if field.help_text %}<p class="text-xs text-gray-500 mt-1">{{ field.help_text }}</p>{% endif %}
+                        {% for error in field.errors %}<p class="text-red-600 text-sm mt-1">{{ error }}</p>{% endfor %}
+                      </div>
+                    {% endfor %}
+                    {% if form.non_field_errors %}
+                      <div class="text-red-600 text-sm mt-2">
+                        {% for error in form.non_field_errors %}<p>{{ error }}</p>{% endfor %}
+                      </div>
+                    {% endif %}
+                    {% if form.instance.pk %}
+                      <div class="mt-4 text-right">
+                        {{ form.DELETE }}
+                        <label for="{{ form.DELETE.id_for_label }}" class="text-red-600 hover:text-red-800 cursor-pointer text-sm font-medium ml-2">Delete Lesson</label>
+                      </div>
+                    {% endif %}
+                  </div>
+                {% endfor %}
+              </div>
+              <button type="button" id="add-lesson-button" class="mt-4 px-6 py-3 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors duration-200 flex items-center gap-2">
+                <i class="ri-add-line"></i> Add Another Lesson
+              </button>
+              
+              <!-- Enhanced Submit Button -->
+              <div class="flex items-center justify-between pt-6 border-t border-gray-200 mt-8">
+                <div class="text-sm text-gray-500">
+                  <span class="inline-flex items-center">
+                    <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                    </svg>
+                    All fields are required
+                  </span>
+                </div>
+                <button type="submit" class="group relative inline-flex items-center justify-center px-8 py-4 bg-gradient-to-r from-blue-500 to-cyan-500 text-white font-bold rounded-xl shadow-lg hover:shadow-xl transform hover:-translate-y-1 transition-all duration-200 focus:outline-none focus:ring-4 focus:ring-blue-300 focus:ring-offset-2 overflow-hidden">
+                  <span class="absolute inset-0 bg-gradient-to-r from-blue-600 to-cyan-600 opacity-0 group-hover:opacity-100 transition-opacity duration-200"></span>
+                  <svg class="w-5 h-5 mr-2 relative z-10" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                  </svg>
+                  <span class="relative z-10">{{ edit_course_slug|yesno:"Update Course,Create Course" }}</span>
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+
+    {% elif show == 'quiz' or edit_quiz_slug %}
+      <div class="relative mb-12">
+        <div class="absolute inset-0 bg-gradient-to-r from-green-500/5 to-emerald-500/5 rounded-3xl transform rotate-1"></div>
+        <div class="relative bg-white rounded-3xl shadow-xl border border-gray-100 overflow-hidden transform hover:shadow-2xl transition-shadow duration-300">
+          <div class="relative bg-gradient-to-r from-green-500 via-green-600 to-emerald-500 p-8 text-white overflow-hidden">
+            <div class="absolute inset-0 bg-gradient-to-r from-green-400/20 to-emerald-400/20 animate-pulse"></div>
+            <div class="relative flex items-center justify-between">
+              <div class="flex items-center">
+                <div class="bg-white/20 p-3 rounded-xl mr-4 backdrop-blur-sm">
+                  <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                  </svg>
+                </div>
+                <div>
+                  <h2 class="text-3xl font-bold mb-1">{{ edit_quiz_slug|yesno:"Edit Quiz,Create New Quiz" }}</h2>
+                  <p class="text-green-100">{{ edit_quiz_slug|yesno:"Update your quiz questions,Design an interactive assessment" }}</p>
+                </div>
+              </div>
+              <div class="hidden md:block">
+                <div class="bg-white/10 px-4 py-2 rounded-full backdrop-blur-sm">
+                  <span class="text-sm font-medium">📝 Quiz</span>
+                </div>
+              </div>
+            </div>
+          </div>
+          
+          <div class="p-10 bg-gradient-to-br from-gray-50/50 to-green-50/30">
+            <form method="POST" action="{% url 'tutor:submit' %}" class="space-y-8">
+              {% csrf_token %}
+              <input type="hidden" name="type" value="quiz">
+              {% if edit_quiz_slug %}<input type="hidden" name="slug" value="{{ edit_quiz_slug }}">{% endif %}
+              
+              <div class="form-enhanced">
+                {% for field in quiz_form %}
+                  <div class="mb-6">
+                    <label for="{{ field.id_for_label }}" class="block text-sm font-semibold text-gray-700 mb-2">{{ field.label }}</label>
+                    {{ field|add_class:"w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-green-500 focus:ring-2 focus:ring-green-200 focus:ring-opacity-50 transition-all duration-200 bg-white shadow-sm hover:border-gray-300 text-gray-800" }}
+                    {% if field.help_text %}<p class="text-xs text-gray-500 mt-1">{{ field.help_text }}</p>{% endif %}
+                    {% for error in field.errors %}<p class="text-red-600 text-sm mt-1">{{ error }}</p>{% endfor %}
+                  </div>
+                {% endfor %}
+                {% if quiz_form.non_field_errors %}
+                  <div class="text-red-600 text-sm mt-2">
+                    {% for error in quiz_form.non_field_errors %}<p>{{ error }}</p>{% endfor %}
+                  </div>
+                {% endif %}
+              </div>
+              
+              <div class="flex items-center justify-between pt-6 border-t border-gray-200">
+                <div class="text-sm text-gray-500">
+                  <span class="inline-flex items-center">
+                    <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                    </svg>
+                    Make it challenging but fair
+                  </span>
+                </div>
+                <button type="submit" class="group relative inline-flex items-center justify-center px-8 py-4 bg-gradient-to-r from-green-500 to-emerald-500 text-white font-bold rounded-xl shadow-lg hover:shadow-xl transform hover:-translate-y-1 transition-all duration-200 focus:outline-none focus:ring-4 focus:ring-green-300 focus:ring-offset-2 overflow-hidden">
+                  <span class="absolute inset-0 bg-gradient-to-r from-green-600 to-emerald-600 opacity-0 group-hover:opacity-100 transition-opacity duration-200"></span>
+                  <svg class="w-5 h-5 mr-2 relative z-10" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                  </svg>
+                  <span class="relative z-10">{{ edit_quiz_slug|yesno:"Update Quiz,Create Quiz" }}</span>
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+
+    {% elif show == 'article' or edit_article_slug %}
+      <div class="relative mb-12">
+        <div class="absolute inset-0 bg-gradient-to-r from-purple-500/5 to-pink-500/5 rounded-3xl transform -rotate-1"></div>
+        <div class="relative bg-white rounded-3xl shadow-xl border border-gray-100 overflow-hidden transform hover:shadow-2xl transition-shadow duration-300">
+          <div class="relative bg-gradient-to-r from-purple-500 via-purple-600 to-pink-500 p-8 text-white overflow-hidden">
+            <div class="absolute inset-0 bg-gradient-to-r from-purple-400/20 to-pink-400/20 animate-pulse"></div>
+            <div class="relative flex items-center justify-between">
+              <div class="flex items-center">
+                <div class="bg-white/20 p-3 rounded-xl mr-4 backdrop-blur-sm">
+                  <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                  </svg>
+                </div>
+                <div>
+                  <h2 class="text-3xl font-bold mb-1">{{ edit_article_slug|yesno:"Edit Article,Create New Article" }}</h2>
+                  <p class="text-purple-100">{{ edit_article_slug|yesno:"Refine your educational content,Share knowledge through writing" }}</p>
+                </div>
+              </div>
+              <div class="hidden md:block">
+                <div class="bg-white/10 px-4 py-2 rounded-full backdrop-blur-sm">
+                  <span class="text-sm font-medium">✍️ Article</span>
+                </div>
+              </div>
+            </div>
+          </div>
+          
+          <div class="p-10 bg-gradient-to-br from-gray-50/50 to-purple-50/30">
+            <form method="POST" action="{% url 'tutor:submit' %}" class="space-y-8">
+              {% csrf_token %}
+              <input type="hidden" name="type" value="article">
+              {% if edit_article_slug %}<input type="hidden" name="slug" value="{{ edit_article_slug }}">{% endif %}
+              
+              <div class="form-enhanced">
+                {% for field in article_form %}
+                  <div class="mb-6">
+                    <label for="{{ field.id_for_label }}" class="block text-sm font-semibold text-gray-700 mb-2">{{ field.label }}</label>
+                    {{ field|add_class:"w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-purple-500 focus:ring-2 focus:ring-purple-200 focus:ring-opacity-50 transition-all duration-200 bg-white shadow-sm hover:border-gray-300 text-gray-800" }}
+                    {% if field.help_text %}<p class="text-xs text-gray-500 mt-1">{{ field.help_text }}</p>{% endif %}
+                    {% for error in field.errors %}<p class="text-red-600 text-sm mt-1">{{ error }}</p>{% endfor %}
+                  </div>
+                {% endfor %}
+                {% if article_form.non_field_errors %}
+                  <div class="text-red-600 text-sm mt-2">
+                    {% for error in article_form.non_field_errors %}<p>{{ error }}</p>{% endfor %}
+                  </div>
+                {% endif %}
+              </div>
+              
+              <div class="flex items-center justify-between pt-6 border-t border-gray-200">
+                <div class="text-sm text-gray-500">
+                  <span class="inline-flex items-center">
+                    <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                    </svg>
+                    Write engaging and informative content
+                  </span>
+                </div>
+                <button type="submit" class="group relative inline-flex items-center justify-center px-8 py-4 bg-gradient-to-r from-purple-500 to-pink-500 text-white font-bold rounded-xl shadow-lg hover:shadow-xl transform hover:-translate-y-1 transition-all duration-200 focus:outline-none focus:ring-4 focus:ring-purple-300 focus:ring-offset-2 overflow-hidden">
+                  <span class="absolute inset-0 bg-gradient-to-r from-purple-600 to-pink-600 opacity-0 group-hover:opacity-100 transition-opacity duration-200"></span>
+                  <svg class="w-5 h-5 mr-2 relative z-10" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                  </svg>
+                  <span class="relative z-10">{{ edit_article_slug|yesno:"Update Article,Publish Article" }}</span>
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+
+    {% elif show == 'practice' or edit_practice_slug %}
+      <div class="relative mb-12">
+        <div class="absolute inset-0 bg-gradient-to-r from-orange-500/5 to-red-500/5 rounded-3xl transform rotate-1"></div>
+        <div class="relative bg-white rounded-3xl shadow-xl border border-gray-100 overflow-hidden transform hover:shadow-2xl transition-shadow duration-300">
+          <div class="relative bg-gradient-to-r from-orange-500 via-orange-600 to-red-500 p-8 text-white overflow-hidden">
+            <div class="absolute inset-0 bg-gradient-to-r from-orange-400/20 to-red-400/20 animate-pulse"></div>
+            <div class="relative flex items-center justify-between">
+              <div class="flex items-center">
+                <div class="bg-white/20 p-3 rounded-xl mr-4 backdrop-blur-sm">
+                  <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"></path>
+                  </svg>
+                </div>
+                <div>
+                  <h2 class="text-3xl font-bold mb-1">{{ edit_practice_slug|yesno:"Edit Problem,Create Practice Problem" }}</h2>
+                  <p class="text-orange-100">{{ edit_practice_slug|yesno:"Improve your practice exercise,Challenge students with hands-on problems" }}</p>
+                </div>
+              </div>
+              <div class="hidden md:block">
+                <div class="bg-white/10 px-4 py-2 rounded-full backdrop-blur-sm">
+                  <span class="text-sm font-medium">💡 Practice</span>
+                </div>
+              </div>
+            </div>
+          </div>
+          
+          <div class="p-10 bg-gradient-to-br from-gray-50/50 to-orange-50/30">
+            <form method="POST" action="{% url 'tutor:submit' %}" class="space-y-8">
+              {% csrf_token %}
+              <input type="hidden" name="type" value="practice">
+              {% if edit_practice_slug %}<input type="hidden" name="slug" value="{{ edit_practice_slug }}">{% endif %}
+              
+              <!-- Practice Problem Main Form -->
+              <div class="form-enhanced">
+                {% for field in practice_form %}
+                  <div class="mb-6">
+                    <label for="{{ field.id_for_label }}" class="block text-sm font-semibold text-gray-700 mb-2">{{ field.label }}</label>
+                    {{ field|add_class:"w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-orange-500 focus:ring-2 focus:ring-orange-200 focus:ring-opacity-50 transition-all duration-200 bg-white shadow-sm hover:border-gray-300 text-gray-800" }}
+                    {% if field.help_text %}<p class="text-xs text-gray-500 mt-1">{{ field.help_text }}</p>{% endif %}
+                    {% for error in field.errors %}<p class="text-red-600 text-sm mt-1">{{ error }}</p>{% endfor %}
+                  </div>
+                {% endfor %}
+                {% if practice_form.non_field_errors %}
+                  <div class="text-red-600 text-sm mt-2">
+                    {% for error in practice_form.non_field_errors %}<p>{{ error }}</p>{% endfor %}
+                  </div>
+                {% endif %}
+              </div>
+
+              <!-- Test Cases Formset -->
+              <h3 class="text-2xl font-bold text-gray-800 mb-6 flex items-center gap-2 pt-8 border-t border-gray-200">
+                <i class="ri-flask-line text-orange-600"></i>
+                Test Cases
+                <span class="text-lg">🧪</span>
+              </h3>
+              <div id="testcase-formset-container" class="space-y-6">
+                {{ testcase_formset.management_form }}
+                {% for form in testcase_formset %}
+                  <div class="testcase-form-card bg-orange-50 p-6 rounded-xl shadow-md border border-orange-100 relative">
+                    {% if form.instance.pk %}
+                      <p class="text-xs text-gray-500 absolute top-3 right-6">Test Case ID: {{ form.instance.pk }}</p>
+                    {% endif %}
+                    {% for field in form %}
+                      <div class="mb-4">
+                        <label for="{{ field.id_for_label }}" class="block text-sm font-semibold text-gray-700 mb-2">{{ field.label }}</label>
+                        {{ field|add_class:"w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-orange-500 focus:ring-2 focus:ring-orange-200 focus:ring-opacity-50 transition-all duration-200 bg-white shadow-sm hover:border-gray-300 text-gray-800" }}
+                        {% if field.help_text %}<p class="text-xs text-gray-500 mt-1">{{ field.help_text }}</p>{% endif %}
+                        {% for error in field.errors %}<p class="text-red-600 text-sm mt-1">{{ error }}</p>{% endfor %}
+                      </div>
+                    {% endfor %}
+                    {% if form.non_field_errors %}
+                      <div class="text-red-600 text-sm mt-2">
+                        {% for error in form.non_field_errors %}<p>{{ error }}</p>{% endfor %}
+                      </div>
+                    {% endif %}
+                    {% if form.instance.pk %}
+                      <div class="mt-4 text-right">
+                        {{ form.DELETE }}
+                        <label for="{{ form.DELETE.id_for_label }}" class="text-red-600 hover:text-red-800 cursor-pointer text-sm font-medium ml-2">Delete Test Case</label>
+                      </div>
+                    {% endif %}
+                  </div>
+                {% endfor %}
+              </div>
+              <button type="button" id="add-testcase-button" class="mt-4 px-6 py-3 bg-orange-500 text-white rounded-lg hover:bg-orange-600 transition-colors duration-200 flex items-center gap-2">
+                <i class="ri-add-line"></i> Add Another Test Case
+              </button>
+              
+              <!-- Enhanced Submit Button -->
+              <div class="flex items-center justify-between pt-6 border-t border-gray-200 mt-8">
+                <div class="text-sm text-gray-500">
+                  <span class="inline-flex items-center">
+                    <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                    </svg>
+                    Provide clear instructions and solutions
+                  </span>
+                </div>
+                <button type="submit" class="group relative inline-flex items-center justify-center px-8 py-4 bg-gradient-to-r from-orange-500 to-red-500 text-white font-bold rounded-xl shadow-lg hover:shadow-xl transform hover:-translate-y-1 transition-all duration-200 focus:outline-none focus:ring-4 focus:ring-orange-300 focus:ring-offset-2 overflow-hidden">
+                  <span class="absolute inset-0 bg-gradient-to-r from-orange-600 to-red-600 opacity-0 group-hover:opacity-100 transition-opacity duration-200"></span>
+                  <svg class="w-5 h-5 mr-2 relative z-10" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                  </svg>
+                  <span class="relative z-10">{{ edit_practice_slug|yesno:"Update Problem,Create Problem" }}</span>
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+    {% endif %}
+
+    <!-- Content Grid (Lists of existing content) -->
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+      <!-- === Course List === -->
+      <div class="bg-white rounded-2xl shadow-lg border border-gray-100 overflow-hidden">
+        <div class="bg-gradient-to-r from-blue-500 to-cyan-500 p-6 text-white">
+          <h2 class="text-xl font-bold flex items-center">
+            <svg class="w-6 h-6 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.746 0 3.332.477 4.5 1.253v13C19.832 18.477 18.246 18 16.5 18c-1.746 0-3.332.477-4.5 1.253z"></path>
+            </svg>
+            Your Courses
+          </h2>
+        </div>
+        <div class="p-6">
+          {% if courses %}
+            <div class="space-y-3">
+              {% for course in courses %}
+                <div class="flex items-center justify-between p-4 bg-blue-50 rounded-lg border border-blue-100 hover:bg-blue-100 transition-colors duration-200">
+                  <span class="font-medium text-gray-800">{{ course.title }}</span>
+                  <a href="?edit_course={{ course.slug }}" class="text-blue-600 hover:text-blue-800 text-sm font-medium hover:underline transition-colors duration-200">
+                    Edit
+                  </a>
+                </div>
+              {% endfor %}
+            </div>
+          {% else %}
+            <div class="text-center py-8">
+              <div class="bg-gray-100 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
+                <svg class="w-8 h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.746 0 3.332.477 4.5 1.253v13C19.832 18.477 18.246 18 16.5 18c-1.746 0-3.332.477-4.5 1.253z"></path>
+                </svg>
+              </div>
+              <p class="text-gray-500">No courses added yet.</p>
+            </div>
+          {% endif %}
+        </div>
+      </div>
+
+      <!-- === Quiz List === -->
+      <div class="bg-white rounded-2xl shadow-lg border border-gray-100 overflow-hidden">
+        <div class="bg-gradient-to-r from-green-500 to-emerald-500 p-6 text-white">
+          <h2 class="text-xl font-bold flex items-center">
+            <svg class="w-6 h-6 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+            </svg>
+            Your Quizzes
+          </h2>
+        </div>
+        <div class="p-6">
+          {% if quizzes %}
+            <div class="space-y-3">
+              {% for quiz in quizzes %}
+                <div class="flex items-center justify-between p-4 bg-green-50 rounded-lg border border-green-100 hover:bg-green-100 transition-colors duration-200">
+                  <span class="font-medium text-gray-800">{{ quiz.title }}</span>
+                  <a href="?edit_quiz={{ quiz.slug }}" class="text-green-600 hover:text-green-800 text-sm font-medium hover:underline transition-colors duration-200">
+                    Edit
+                  </a>
+                </div>
+              {% endfor %}
+            </div>
+          {% else %}
+            <div class="text-center py-8">
+              <div class="bg-gray-100 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
+                <svg class="w-8 h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                </svg>
+              </div>
+              <p class="text-gray-500">No quizzes added yet.</p>
+            </div>
+          {% endif %}
+        </div>
+      </div>
+
+      <!-- === Article List === -->
+      <div class="bg-white rounded-2xl shadow-lg border border-gray-100 overflow-hidden">
+        <div class="bg-gradient-to-r from-purple-500 to-pink-500 p-6 text-white">
+          <h2 class="text-xl font-bold flex items-center">
+            <svg class="w-6 h-6 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+            </svg>
+            Your Articles
+          </h2>
+        </div>
+        <div class="p-6">
+          {% if articles %}
+            <div class="space-y-3">
+              {% for article in articles %}
+                <div class="flex items-center justify-between p-4 bg-purple-50 rounded-lg border border-purple-100 hover:bg-purple-100 transition-colors duration-200">
+                  <span class="font-medium text-gray-800">{{ article.title }}</span>
+                  <a href="?edit_article={{ article.slug }}" class="text-purple-600 hover:text-purple-800 text-sm font-medium hover:underline transition-colors duration-200">
+                    Edit
+                  </a>
+                </div>
+              {% endfor %}
+            </div>
+          {% else %}
+            <div class="text-center py-8">
+              <div class="bg-gray-100 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
+                <svg class="w-8 h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                </svg>
+              </div>
+              <p class="text-gray-500">No articles added yet.</p>
+            </div>
+          {% endif %}
+        </div>
+      </div>
+
+      <!-- === Practice Problem List === -->
+      <div class="bg-white rounded-2xl shadow-lg border border-gray-100 overflow-hidden">
+        <div class="bg-gradient-to-r from-orange-500 to-red-500 p-6 text-white">
+          <h2 class="text-xl font-bold flex items-center">
+            <svg class="w-6 h-6 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"></path>
+            </svg>
+            Your Practice Problems
+          </h2>
+        </div>
+        <div class="p-6">
+          {% if practice_problems %}
+            <div class="space-y-3">
+              {% for prob in practice_problems %}
+                <div class="flex items-center justify-between p-4 bg-orange-50 rounded-lg border border-orange-100 hover:bg-orange-100 transition-colors duration-200">
+                  <span class="font-medium text-gray-800">{{ prob.title }}</span>
+                  <a href="?edit_practice={{ prob.slug }}" class="text-orange-600 hover:text-orange-800 text-sm font-medium hover:underline transition-colors duration-200">
+                    Edit
+                  </a>
+                </div>
+              {% endfor %}
+            </div>
+          {% else %}
+            <div class="text-center py-8">
+              <div class="bg-gray-100 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
+                <svg class="w-8 h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"></path>
+                </svg>
+              </div>
+              <p class="text-gray-500">No practice problems added yet.</p>
+            </div>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+{% block extra_styles %}
+<style>
+  /* General form field styling */
+  .form-enhanced p {
+    @apply mb-6 relative;
+  }
+
+  .form-enhanced label {
+    @apply block text-sm font-semibold text-gray-700 mb-2 px-1;
+    line-height: 1.4;
+  }
+
+  .form-enhanced input[type="text"],
+  .form-enhanced input[type="email"],
+  .form-enhanced input[type="url"],
+  .form-enhanced input[type="number"],
+  .form-enhanced input[type="password"],
+  .form-enhanced textarea,
+  .form-enhanced select {
+    @apply w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-blue-500 focus:ring-2 focus:ring-blue-200 focus:ring-opacity-50 transition-all duration-200 bg-white shadow-sm hover:border-gray-300 text-gray-800;
+    font-size: 14px;
+    line-height: 1.5;
+  }
+
+  .form-enhanced textarea {
+    @apply min-h-[120px] resize-y;
+  }
+
+  .form-enhanced input[type="file"] {
+    @apply w-full px-4 py-3 border-2 border-dashed border-gray-200 rounded-xl focus:border-blue-500 focus:ring-2 focus:ring-blue-200 focus:ring-opacity-50 transition-all duration-200 bg-gray-50 hover:bg-gray-100 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-medium file:bg-blue-500 file:text-white hover:file:bg-blue-600;
+  }
+
+  .form-enhanced input:focus,
+  .form-enhanced textarea:focus,
+  .form-enhanced select:focus {
+    @apply outline-none;
+    transform: scale(1.01);
+  }
+
+  /* Remove default Django form styling issues */
+  .form-enhanced p {
+    overflow: visible;
+  }
+
+  .form-enhanced br {
+    display: none;
+  }
+
+  /* Style help text if present */
+  .form-enhanced .helptext {
+    @apply text-xs text-gray-500 mt-1 px-1;
+  }
+
+  /* Style error messages */
+  .form-enhanced .errorlist {
+    @apply text-red-600 text-sm mt-1 px-1;
+  }
+
+  .form-enhanced .errorlist li {
+    @apply list-none;
+  }
+
+  /* Animated background for forms */
+  @keyframes float {
+    0%, 100% { transform: translateY(0px) rotate(0deg); }
+    50% { transform: translateY(-10px) rotate(1deg); }
+  }
+
+  /* Animations for messages */
+  @keyframes bounce-in {
+    0% { opacity: 0; transform: scale(0.3) translateY(-20px); }
+    50% { opacity: 1; transform: scale(1.05) translateY(0); }
+    70% { transform: scale(0.9); }
+    100% { opacity: 1; transform: scale(1); }
+  }
+  .animate-bounce-in { animation: bounce-in 0.6s ease-out; }
+
+  /* Lesson form card specific styling */
+  .lesson-form-card, .testcase-form-card {
+    transition: all 0.3s ease-in-out;
+  }
+  .lesson-form-card:hover, .testcase-form-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+  }
+</style>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Auto-hide success/error messages after 5 seconds
+    const messages = document.querySelectorAll('.alert');
+    messages.forEach(message => {
+        setTimeout(() => {
+            message.style.transition = 'opacity 0.5s ease';
+            message.style.opacity = '0';
+            setTimeout(() => {
+                message.remove();
+            }, 500);
+        }, 5000);
+    });
+
+    // --- Lesson Formset Management ---
+    const addLessonButton = document.getElementById('add-lesson-button');
+    const lessonFormsetContainer = document.getElementById('lesson-formset-container');
+    const totalLessonFormsInput = document.querySelector('input[name="lesson_set-TOTAL_FORMS"]');
+
+    // Function to update form indices for lesson forms
+    function updateLessonFormIndices() {
+        const forms = lessonFormsetContainer.querySelectorAll('.lesson-form-card');
+        forms.forEach((form, index) => {
+            form.querySelectorAll('[id^="id_lesson_set-"], [name^="lesson_set-"], [for^="id_lesson_set-"]').forEach(element => {
+                const oldId = element.id || '';
+                const oldName = element.name || '';
+                const oldFor = element.htmlFor || '';
+
+                if (oldId.includes('__prefix__')) {
+                    element.id = oldId.replace('__prefix__', index);
+                } else {
+                    element.id = oldId.replace(/lesson_set-\d+-/, `lesson_set-${index}-`);
+                }
+
+                if (oldName.includes('__prefix__')) {
+                    element.name = oldName.replace('__prefix__', index);
+                } else {
+                    element.name = oldName.replace(/lesson_set-\d+-/, `lesson_set-${index}-`);
+                }
+
+                if (oldFor.includes('__prefix__')) {
+                    element.htmlFor = oldFor.replace('__prefix__', index);
+                } else {
+                    element.htmlFor = oldFor.replace(/lesson_set-\d+-/, `lesson_set-${index}-`);
+                }
+            });
+        });
+    }
+
+    // Add new lesson form
+    if (addLessonButton) {
+        addLessonButton.addEventListener('click', function() {
+            const currentTotalForms = parseInt(totalLessonFormsInput.value);
+            const newFormIndex = currentTotalForms;
+
+            // Get the empty form template from Django's formset rendering (usually hidden)
+            const emptyFormHtml = `
+                <div class="lesson-form-card bg-blue-50 p-6 rounded-xl shadow-md border border-blue-100 relative">
+                    <div class="mb-4">
+                        <label for="id_lesson_set-__prefix__-title" class="block text-sm font-semibold text-gray-700 mb-2">Title</label>
+                        <input type="text" name="lesson_set-__prefix__-title" id="id_lesson_set-__prefix__-title" class="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-blue-500 focus:ring-2 focus:ring-blue-200 focus:ring-opacity-50 transition-all duration-200 bg-white shadow-sm hover:border-gray-300 text-gray-800">
+                    </div>
+                    <div class="mb-4">
+                        <label for="id_lesson_set-__prefix__-order" class="block text-sm font-semibold text-gray-700 mb-2">Order</label>
+                        <input type="number" name="lesson_set-__prefix__-order" id="id_lesson_set-__prefix__-order" class="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-blue-500 focus:ring-2 focus:ring-blue-200 focus:ring-opacity-50 transition-all duration-200 bg-white shadow-sm hover:border-gray-300 text-gray-800">
+                    </div>
+                    <div class="mb-4">
+                        <label for="id_lesson_set-__prefix__-video_url" class="block text-sm font-semibold text-gray-700 mb-2">Lesson Video Link</label>
+                        <input type="url" name="lesson_set-__prefix__-video_url" id="id_lesson_set-__prefix__-video_url" class="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-blue-500 focus:ring-2 focus:ring-blue-200 focus:ring-opacity-50 transition-all duration-200 bg-white shadow-sm hover:border-gray-300 text-gray-800" placeholder="e.g., https://www.youtube.com/embed/VIDEO_ID">
+                    </div>
+                    <div class="mb-4">
+                        <label for="id_lesson_set-__prefix__-content" class="block text-sm font-semibold text-gray-700 mb-2">Content</label>
+                        <textarea name="lesson_set-__prefix__-content" id="id_lesson_set-__prefix__-content" rows="10" class="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-blue-500 focus:ring-2 focus:ring-blue-200 focus:ring-opacity-50 transition-all duration-200 bg-white shadow-sm hover:border-gray-300 text-gray-800 min-h-[120px] resize-y"></textarea>
+                    </div>
+                    <div class="mb-4">
+                        <label for="id_lesson_set-__prefix__-duration_minutes" class="block text-sm font-semibold text-gray-700 mb-2">Duration (minutes)</label>
+                        <input type="number" name="lesson_set-__prefix__-duration_minutes" id="id_lesson_set-__prefix__-duration_minutes" class="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-blue-500 focus:ring-2 focus:ring-blue-200 focus:ring-opacity-50 transition-all duration-200 bg-white shadow-sm hover:border-gray-300 text-gray-800">
+                    </div>
+                    <div class="mb-4 flex items-center">
+                        <input type="checkbox" name="lesson_set-__prefix__-is_video_required" id="id_lesson_set-__prefix__-is_video_required" class="form-checkbox h-5 w-5 text-blue-600 rounded">
+                        <label for="id_lesson_set-__prefix__-is_video_required" class="ml-2 text-sm font-semibold text-gray-700">Is Video Required?</label>
+                    </div>
+                    <div class="mb-4 flex items-center">
+                        <input type="checkbox" name="lesson_set-__prefix__-is_free_preview" id="id_lesson_set-__prefix__-is_free_preview" class="form-checkbox h-5 w-5 text-blue-600 rounded">
+                        <label for="id_lesson_set-__prefix__-is_free_preview" class="ml-2 text-sm font-semibold text-gray-700">Is Free Preview?</label>
+                    </div>
+                    <div class="mb-4">
+                        <label for="id_lesson_set-__prefix__-topic" class="block text-sm font-semibold text-gray-700 mb-2">Topic</label>
+                        <select name="lesson_set-__prefix__-topic" id="id_lesson_set-__prefix__-topic" class="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-blue-500 focus:ring-2 focus:ring-blue-200 focus:ring-opacity-50 transition-all duration-200 bg-white shadow-sm hover:border-gray-300 text-gray-800">
+                            {# Options will be dynamically added or pre-rendered by Django #}
+                            {% for topic_id, topic_name in lesson_formset.forms.0.fields.topic.choices %}
+                                <option value="{{ topic_id }}">{{ topic_name }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <input type="hidden" name="lesson_set-__prefix__-id" id="id_lesson_set-__prefix__-id">
+                    <input type="hidden" name="lesson_set-__prefix__-course" id="id_lesson_set-__prefix__-course" value="{{ course_form.instance.pk }}">
+                    <input type="hidden" name="lesson_set-__prefix__-DELETE" id="id_lesson_set-__prefix__-DELETE">
+                    <div class="mt-4 text-right">
+                        <label for="id_lesson_set-__prefix__-DELETE" class="text-red-600 hover:text-red-800 cursor-pointer text-sm font-medium ml-2 delete-lesson-button">Delete Lesson</label>
+                    </div>
+                </div>
+            `;
+            const newFormElement = document.createElement('div');
+            newFormElement.innerHTML = emptyFormHtml.replace(/__prefix__/g, newFormIndex);
+            lessonFormsetContainer.appendChild(newFormElement.firstElementChild); // Append the card directly
+
+            totalLessonFormsInput.value = currentTotalForms + 1;
+            updateLessonFormIndices(); // Re-index all forms after adding
+
+            // Attach delete listener to the new form's delete button
+            newFormElement.querySelector('.delete-lesson-button').addEventListener('click', function() {
+                deleteForm(this, 'lesson_set');
+            });
+        });
+    }
+
+    // --- Test Case Formset Management ---
+    const addTestcaseButton = document.getElementById('add-testcase-button');
+    const testcaseFormsetContainer = document.getElementById('testcase-formset-container');
+    const totalTestcaseFormsInput = document.querySelector('input[name="testcase_set-TOTAL_FORMS"]');
+
+    // Function to update form indices for test case forms
+    function updateTestcaseFormIndices() {
+        const forms = testcaseFormsetContainer.querySelectorAll('.testcase-form-card');
+        forms.forEach((form, index) => {
+            form.querySelectorAll('[id^="id_testcase_set-"], [name^="testcase_set-"], [for^="id_testcase_set-"]').forEach(element => {
+                const oldId = element.id || '';
+                const oldName = element.name || '';
+                const oldFor = element.htmlFor || '';
+
+                if (oldId.includes('__prefix__')) {
+                    element.id = oldId.replace('__prefix__', index);
+                } else {
+                    element.id = oldId.replace(/testcase_set-\d+-/, `testcase_set-${index}-`);
+                }
+
+                if (oldName.includes('__prefix__')) {
+                    element.name = oldName.replace('__prefix__', index);
+                } else {
+                    element.name = oldName.replace(/testcase_set-\d+-/, `testcase_set-${index}-`);
+                }
+
+                if (oldFor.includes('__prefix__')) {
+                    element.htmlFor = oldFor.replace('__prefix__', index);
+                } else {
+                    element.htmlFor = oldFor.replace(/testcase_set-\d+-/, `testcase_set-${index}-`);
+                }
+            });
+        });
+    }
+
+    // Add new test case form
+    if (addTestcaseButton) {
+        addTestcaseButton.addEventListener('click', function() {
+            const currentTotalForms = parseInt(totalTestcaseFormsInput.value);
+            const newFormIndex = currentTotalForms;
+
+            const emptyFormHtml = `
+                <div class="testcase-form-card bg-orange-50 p-6 rounded-xl shadow-md border border-orange-100 relative">
+                    <div class="mb-4">
+                        <label for="id_testcase_set-__prefix__-input" class="block text-sm font-semibold text-gray-700 mb-2">Input</label>
+                        <textarea name="testcase_set-__prefix__-input" id="id_testcase_set-__prefix__-input" rows="3" class="w-full px-3 py-2 border rounded-lg"></textarea>
+                    </div>
+                    <div class="mb-4">
+                        <label for="id_testcase_set-__prefix__-expected_output" class="block text-sm font-semibold text-gray-700 mb-2">Expected Output</label>
+                        <textarea name="testcase_set-__prefix__-expected_output" id="id_testcase_set-__prefix__-expected_output" rows="3" class="w-full px-3 py-2 border rounded-lg"></textarea>
+                    </div>
+                    <div class="mb-4 flex items-center">
+                        <input type="checkbox" name="testcase_set-__prefix__-is_sample" id="id_testcase_set-__prefix__-is_sample" class="form-checkbox h-5 w-5 text-blue-600 rounded">
+                        <label for="id_testcase_set-__prefix__-is_sample" class="ml-2 text-sm font-semibold text-gray-700">Is Sample?</label>
+                    </div>
+                    <input type="hidden" name="testcase_set-__prefix__-id" id="id_testcase_set-__prefix__-id">
+                    <input type="hidden" name="testcase_set-__prefix__-DELETE" id="id_testcase_set-__prefix__-DELETE">
+                    <div class="mt-4 text-right">
+                        <label for="id_testcase_set-__prefix__-DELETE" class="text-red-600 hover:text-red-800 cursor-pointer text-sm font-medium ml-2 delete-testcase-button">Delete Test Case</label>
+                    </div>
+                </div>
+            `;
+            const newFormElement = document.createElement('div');
+            newFormElement.innerHTML = emptyFormHtml.replace(/__prefix__/g, newFormIndex);
+            testcaseFormsetContainer.appendChild(newFormElement.firstElementChild);
+
+            totalTestcaseFormsInput.value = currentTotalForms + 1;
+            updateTestcaseFormIndices();
+
+            // Attach delete listener to the new form's delete button
+            newFormElement.querySelector('.delete-testcase-button').addEventListener('click', function() {
+                deleteForm(this, 'testcase_set');
+            });
+        });
+    }
+
+    // General function to handle form deletion in formsets
+    function deleteForm(button, prefix) {
+        const formCard = button.closest(`.${prefix}-form-card`);
+        if (formCard) {
+            const deleteInput = formCard.querySelector(`input[name$="-DELETE"]`);
+            if (deleteInput) {
+                deleteInput.checked = true; // Mark for deletion
+                formCard.style.display = 'none'; // Hide the form visually
+                // No need to update TOTAL_FORMS for deletion, Django handles it
+            }
+        }
+    }
+
+    // Attach delete listeners to initially rendered forms
+    document.querySelectorAll('.delete-lesson-button').forEach(button => {
+        button.addEventListener('click', function() {
+            deleteForm(this, 'lesson_set');
+        });
+    });
+    document.querySelectorAll('.delete-testcase-button').forEach(button => {
+        button.addEventListener('click', function() {
+            deleteForm(this, 'testcase_set');
+        });
+    });
+
+    // Initial indexing for existing forms
+    updateLessonFormIndices();
+    updateTestcaseFormIndices();
+});
+</script>
+{% endblock %}

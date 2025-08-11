@@ -1,0 +1,335 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}{{ problem.title }} | Practice{% endblock %}
+
+{% block content %}
+<div class="max-w-7xl mx-auto py-12 px-4 sm:px-6 lg:px-8">
+  <div class="bg-white shadow-xl rounded-lg overflow-hidden">
+    <div class="px-6 py-8 md:flex md:items-start md:justify-between">
+      <div class="md:w-1/2 pr-8">
+        <h1 class="text-4xl font-extrabold text-gray-900 mb-4">{{ problem.title }}</h1>
+        <div class="mb-6">
+          <span class="inline-block bg-blue-100 text-blue-800 text-sm font-medium px-3 py-1 rounded-full mr-2">
+            {{ problem.difficulty }}
+          </span>
+          {% if problem.companies %}
+            <span class="inline-block bg-purple-100 text-purple-800 text-sm font-medium px-3 py-1 rounded-full">
+              {{ problem.companies }}
+            </span>
+          {% endif %}
+        </div>
+
+        <h2 class="text-2xl font-semibold text-gray-800 mb-3">Problem Statement</h2>
+        <div class="prose max-w-none text-gray-700 leading-relaxed mb-6">
+          {{ problem.statement|linebreaks }}
+        </div>
+
+        <h2 class="text-2xl font-semibold text-gray-800 mb-3">Sample Test Cases</h2>
+        <div id="sample-test-cases" class="space-y-4 mb-6">
+          {% for test_case in sample_test_cases %}
+            <div class="bg-gray-50 p-4 rounded-lg border border-gray-200">
+              <p class="font-medium text-gray-800 mb-2">
+                Test Case {{ forloop.counter }}: {% if test_case.description %}{{ test_case.description }}{% else %}Example{% endif %}
+              </p>
+              <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <h3 class="text-sm font-semibold text-gray-600 mb-1">Input:</h3>
+                  <pre class="bg-white p-3 rounded text-sm font-mono border border-gray-300 overflow-x-auto">{{ test_case.input }}</pre>
+                </div>
+                <div>
+                  <h3 class="text-sm font-semibold text-gray-600 mb-1">Expected Output:</h3>
+                  <pre class="bg-white p-3 rounded text-sm font-mono border border-gray-300 overflow-x-auto">{{ test_case.expected_output }}</pre>
+                </div>
+              </div>
+              <div class="mt-3 text-sm font-medium" id="sample-output-{{ test_case.id }}">
+                <!-- Actual output for sample test case will be displayed here -->
+              </div>
+            </div>
+          {% empty %}
+            <p class="text-gray-600">No sample test cases available.</p>
+          {% endfor %}
+        </div>
+      </div>
+
+      <div class="md:w-1/2 md:pl-8 mt-8 md:mt-0">
+        <div class="flex items-center justify-between mb-4">
+          <label for="language" class="font-medium text-gray-700">Language:</label>
+          <select id="language" name="language" class="border rounded-md px-3 py-2 text-gray-700 shadow-sm focus:ring-blue-500 focus:border-blue-500"
+                  onchange="changeLanguage(this.value)">
+            <option value="python3" {% if language == 'python3' %}selected{% endif %}>Python</option>
+            <option value="cpp" {% if language == 'cpp' %}selected{% endif %}>C++</option>
+            <option value="java" {% if language == 'java' %}selected{% endif %}>Java</option>
+          </select>
+        </div>
+
+        <div id="editor" class="w-full h-96 border border-gray-300 rounded-lg shadow-inner mb-4"></div>
+
+        <div class="flex space-x-4 mt-4">
+          <button onclick="runCode()" class="flex-1 bg-green-600 text-white px-6 py-3 rounded-lg shadow-md hover:bg-green-700 transition duration-300 ease-in-out transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-opacity-50">
+            <i class="fas fa-play mr-2"></i> Run Code
+          </button>
+          <button onclick="submitSolution()" class="flex-1 bg-blue-600 text-white px-6 py-3 rounded-lg shadow-md hover:bg-blue-700 transition duration-300 ease-in-out transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50">
+            <i class="fas fa-paper-plane mr-2"></i> Submit
+          </button>
+        </div>
+
+        <div id="loading-indicator" class="mt-4 text-center text-blue-600 font-medium hidden">
+          <i class="fas fa-spinner fa-spin mr-2"></i> Running tests...
+        </div>
+
+        <h2 class="text-2xl font-semibold text-gray-800 mt-8 mb-3">Output/Results:</h2>
+        <div id="output-container" class="bg-gray-100 p-6 rounded-lg border border-gray-300 shadow-inner min-h-[100px]">
+          <pre id="output" class="text-sm font-mono text-gray-800 overflow-auto whitespace-pre-wrap"></pre>
+          <div id="submission-summary" class="mt-4 hidden">
+            <h3 class="text-lg font-semibold mb-2">Submission Summary:</h3>
+            <p id="overall-status" class="text-lg font-bold"></p>
+            <p class="text-sm text-gray-600">CPU Time: <span id="cpu-time"></span></p>
+            <p class="text-sm text-gray-600">Memory: <span id="memory-usage"></span></p>
+            <div id="detailed-test-results" class="mt-4 space-y-2"></div>
+            <a href="{% url 'practice:my_submissions' problem.slug %}" class="inline-block mt-4 text-blue-600 font-medium hover:underline">
+              View All Submissions →
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Font Awesome for icons -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+<!-- Monaco Editor CDN -->
+<script src="https://cdn.jsdelivr.net/npm/monaco-editor@0.49.0/min/vs/loader.js"></script>
+
+<script>
+  let editor; // Global variable for Monaco Editor instance
+
+  require.config({ paths: { 'vs': 'https://cdn.jsdelivr.net/npm/monaco-editor@0.49.0/min/vs' }});
+  require(['vs/editor/editor.main'], function() {
+    editor = monaco.editor.create(document.getElementById('editor'), {
+      value: `{{ starter_code|escapejs }}`, // Use escapejs to properly escape Django template variables
+      language: '{{ language }}',
+      theme: 'vs-light', // You can change to 'vs-dark' or 'hc-black'
+      automaticLayout: true, // Resizes editor automatically
+      minimap: { enabled: false },
+      fontSize: 14,
+      scrollBeyondLastLine: false,
+      wordWrap: 'on',
+      fontFamily: 'Fira Code, monospace', // Consider a coding font if available
+      lineNumbersMinChars: 3,
+      padding: { top: 10, bottom: 10 },
+      tabSize: 4,
+      insertSpaces: true,
+    });
+
+    // Update editor language when select box changes
+    document.getElementById('language').addEventListener('change', function() {
+      const lang = this.value;
+      let monacoLang = 'python'; // Default
+      if (lang === 'cpp') {
+        monacoLang = 'cpp';
+      } else if (lang === 'java') {
+        monacoLang = 'java';
+      }
+      monaco.editor.setModelLanguage(editor.getModel(), monacoLang);
+      changeLanguage(lang); // Call Django view to get new starter code
+    });
+
+    // Handle initial language setting for Monaco
+    const initialLang = document.getElementById('language').value;
+    let initialMonacoLang = 'python';
+    if (initialLang === 'cpp') {
+      initialMonacoLang = 'cpp';
+    } else if (initialLang === 'java') {
+      initialMonacoLang = 'java';
+    }
+    monaco.editor.setModelLanguage(editor.getModel(), initialMonacoLang);
+  });
+
+  function changeLanguage(lang) {
+    const params = new URLSearchParams(window.location.search);
+    params.set('language', lang);
+    window.location.search = params.toString(); // Reloads page with new language starter code
+  }
+
+  function showLoading(message) {
+    document.getElementById('loading-indicator').textContent = message;
+    document.getElementById('loading-indicator').classList.remove('hidden');
+    document.getElementById('output').textContent = ''; // Clear previous output
+    document.getElementById('submission-summary').classList.add('hidden'); // Hide submission summary
+  }
+
+  function hideLoading() {
+    document.getElementById('loading-indicator').classList.add('hidden');
+  }
+
+  function displayOutput(output, isError = false) {
+    const outputElement = document.getElementById('output');
+    outputElement.textContent = output;
+    if (isError) {
+      outputElement.classList.remove('bg-gray-100');
+      outputElement.classList.add('bg-red-100', 'text-red-800');
+    } else {
+      outputElement.classList.remove('bg-red-100', 'text-red-800');
+      outputElement.classList.add('bg-gray-100');
+    }
+  }
+
+  function runCode() {
+    const code = editor.getValue();
+    const language = document.getElementById('language').value;
+    const sampleTestCases = {% json_script "sample_test_cases_json" sample_test_cases %};
+    const sampleOutputsDiv = document.getElementById('sample-test-cases');
+
+    showLoading('Running code against sample input...');
+
+    // Clear previous sample test case outputs
+    document.querySelectorAll('[id^="sample-output-"]').forEach(el => {
+      el.innerHTML = '';
+      el.classList.remove('text-green-700', 'text-red-700');
+    });
+
+    // For 'Run Code', we run against the *first* sample input for quick check
+    // If there are multiple, user can manually copy-paste or we can run all
+    // For now, let's run against all sample test cases and display their individual outputs
+    let promises = [];
+    sampleTestCases.forEach(testCase => {
+      promises.push(
+        fetch("{% url 'practice:run_submission' problem.slug %}", {
+          method: 'POST',
+          headers: {
+            'X-CSRFToken': '{{ csrf_token }}',
+            'Content-Type': 'application/x-www-form-urlencoded'
+          },
+          body: new URLSearchParams({
+            'code': code,
+            'language': language,
+            'input': testCase.input // Send the specific test case input
+          })
+        })
+        .then(res => res.json())
+        .then(data => {
+          const sampleOutputElement = document.getElementById(`sample-output-${testCase.id}`);
+          if (data.error) {
+            sampleOutputElement.innerHTML = `<strong class="text-red-700">Error:</strong> ${data.error}`;
+            sampleOutputElement.classList.add('text-red-700');
+          } else {
+            const actualOutput = data.output || 'No output';
+            const expectedOutput = testCase.expected_output.trim().replace(/\r\n/g, '\n');
+            const passed = actualOutput.trim().replace(/\r\n/g, '\n') === expectedOutput;
+
+            sampleOutputElement.innerHTML = `
+              <strong class="${passed ? 'text-green-700' : 'text-red-700'}">
+                ${passed ? '<i class="fas fa-check-circle"></i> Passed' : '<i class="fas fa-times-circle"></i> Failed'}
+              </strong><br>
+              Your Output: <pre class="inline-block bg-white p-2 rounded text-sm font-mono border border-gray-300">${actualOutput}</pre>
+            `;
+            if (!passed) {
+              sampleOutputElement.innerHTML += `<br>Expected: <pre class="inline-block bg-white p-2 rounded text-sm font-mono border border-gray-300">${expectedOutput}</pre>`;
+            }
+            sampleOutputElement.classList.add(passed ? 'text-green-700' : 'text-red-700');
+          }
+          return data; // Pass data along for Promise.all
+        })
+        .catch(err => {
+          const sampleOutputElement = document.getElementById(`sample-output-${testCase.id}`);
+          sampleOutputElement.innerHTML = `<strong class="text-red-700">Error:</strong> ${err}`;
+          sampleOutputElement.classList.add('text-red-700');
+          return { error: err };
+        })
+      );
+    });
+
+    Promise.all(promises)
+      .then(results => {
+        hideLoading();
+        // You can aggregate results here if needed, or just rely on individual updates
+        displayOutput("Finished running sample tests. Check individual test case outputs above.");
+      })
+      .catch(err => {
+        hideLoading();
+        displayOutput(`Error running all sample tests: ${err}`, true);
+      });
+  }
+
+  function submitSolution() {
+    const code = editor.getValue();
+    const language = document.getElementById('language').value;
+
+    showLoading('Submitting solution and running all tests...');
+
+    fetch("{% url 'practice:submit_solution' problem.slug %}", {
+      method: 'POST',
+      headers: {
+        'X-CSRFToken': '{{ csrf_token }}',
+        'Content-Type': 'application/x-www-form-urlencoded'
+      },
+      body: new URLSearchParams({
+        'code': code,
+        'language': language
+      })
+    })
+    .then(res => res.json())
+    .then(data => {
+      hideLoading();
+      document.getElementById('output').textContent = ''; // Clear raw output area
+      document.getElementById('submission-summary').classList.remove('hidden');
+
+      const overallStatusElement = document.getElementById('overall-status');
+      const cpuTimeElement = document.getElementById('cpu-time');
+      const memoryUsageElement = document.getElementById('memory-usage');
+      const detailedResultsDiv = document.getElementById('detailed-test-results');
+
+      overallStatusElement.textContent = `Status: ${data.status.replace(/_/g, ' ')}`;
+      if (data.status === 'ACCEPTED') {
+        overallStatusElement.classList.add('text-green-600');
+        overallStatusElement.classList.remove('text-red-600', 'text-orange-600');
+      } else if (data.status === 'PENDING') {
+        overallStatusElement.classList.add('text-orange-600');
+        overallStatusElement.classList.remove('text-green-600', 'text-red-600');
+      }
+      else {
+        overallStatusElement.classList.add('text-red-600');
+        overallStatusElement.classList.remove('text-green-600', 'text-orange-600');
+      }
+
+      cpuTimeElement.textContent = data.cpuTime || 'N/A';
+      memoryUsageElement.textContent = data.memory || 'N/A';
+
+      detailedResultsDiv.innerHTML = ''; // Clear previous results
+
+      if (data.test_results && data.test_results.length > 0) {
+        data.test_results.forEach((result, index) => {
+          const statusIcon = result.status === 'PASS' ? '<i class="fas fa-check-circle text-green-500"></i>' : '<i class="fas fa-times-circle text-red-500"></i>';
+          const statusTextClass = result.status === 'PASS' ? 'text-green-700' : 'text-red-700';
+          const testCaseHtml = `
+            <div class="p-3 rounded-md ${result.status === 'PASS' ? 'bg-green-50' : 'bg-red-50'} border ${result.status === 'PASS' ? 'border-green-200' : 'border-red-200'}">
+              <p class="font-semibold text-gray-800">Test Case ${index + 1}: ${statusIcon} <span class="${statusTextClass}">${result.status.replace(/_/g, ' ')}</span></p>
+              ${result.input !== 'Hidden' ? `<p class="text-sm text-gray-600 mt-1">Input: <pre class="inline-block bg-white p-1 rounded text-xs font-mono border border-gray-300">${result.input}</pre></p>` : ''}
+              ${result.expected_output !== 'Hidden' ? `<p class="text-sm text-gray-600">Expected: <pre class="inline-block bg-white p-1 rounded text-xs font-mono border border-gray-300">${result.expected_output}</pre></p>` : ''}
+              <p class="text-sm text-gray-600">Your Output: <pre class="inline-block bg-white p-1 rounded text-xs font-mono border border-gray-300">${result.actual_output}</pre></p>
+              ${result.error ? `<p class="text-sm text-red-700 font-medium">Error: ${result.error}</p>` : ''}
+              <p class="text-xs text-gray-500">Time: ${result.cpuTime}s, Memory: ${result.memory}KB</p>
+            </div>
+          `;
+          detailedResultsDiv.innerHTML += testCaseHtml;
+        });
+      } else {
+        detailedResultsDiv.innerHTML = '<p class="text-gray-600">No detailed test results available.</p>';
+      }
+
+      // Redirect if provided by the backend (e.g., to submissions page)
+      if (data.redirect_url) {
+        // Optional: Add a small delay or confirmation before redirecting
+        // setTimeout(() => { window.location.href = data.redirect_url; }, 2000);
+      }
+    })
+    .catch(err => {
+      hideLoading();
+      displayOutput(`Error submitting solution: ${err}`, true);
+      document.getElementById('submission-summary').classList.add('hidden');
+    });
+  }
+</script>
+{% endblock %}

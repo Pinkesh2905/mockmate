@@ -1,0 +1,229 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}
+  {% if is_new %}Add New Problem{% else %}Edit Problem: {{ problem.title }}{% endif %} | MockMate
+{% endblock %}
+
+{% block content %}
+<div class="max-w-7xl mx-auto py-12 px-4 sm:px-6 lg:px-8">
+  <h1 class="text-4xl font-extrabold mb-8 text-gray-900">
+    {% if is_new %}Add New Problem{% else %}Edit Problem: {{ problem.title }}{% endif %}
+  </h1>
+
+  <div class="bg-white shadow-xl rounded-lg p-8">
+    <form method="POST">
+      {% csrf_token %}
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+        <div>
+          <h2 class="text-2xl font-semibold text-gray-800 mb-4">Problem Details</h2>
+          {% for field in form %}
+            {% if field.name != 'status' and field.name != 'created_by' %} {# Hide status and created_by from tutor form #}
+              <div class="mb-4">
+                <label for="{{ field.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-1">
+                  {{ field.label }}
+                  {% if field.field.required %}<span class="text-red-500">*</span>{% endif %}
+                </label>
+                {{ field }}
+                {% if field.help_text %}
+                  <p class="mt-1 text-sm text-gray-500">{{ field.help_text }}</p>
+                {% endif %}
+                {% if field.errors %}
+                  <p class="mt-2 text-sm text-red-600">{{ field.errors }}</p>
+                {% endif %}
+              </div>
+            {% endif %}
+          {% endfor %}
+        </div>
+
+        <div>
+          <h2 class="text-2xl font-semibold text-gray-800 mb-4">Starter Code Templates</h2>
+          <div class="mb-4">
+            <label for="{{ form.template_python.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-1">
+              {{ form.template_python.label }}
+            </label>
+            {{ form.template_python }}
+            {% if form.template_python.errors %}
+              <p class="mt-2 text-sm text-red-600">{{ form.template_python.errors }}</p>
+            {% endif %}
+          </div>
+          <div class="mb-4">
+            <label for="{{ form.template_cpp.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-1">
+              {{ form.template_cpp.label }}
+            </label>
+            {{ form.template_cpp }}
+            {% if form.template_cpp.errors %}
+              <p class="mt-2 text-sm text-red-600">{{ form.template_cpp.errors }}</p>
+            {% endif %}
+          </div>
+          <div class="mb-4">
+            <label for="{{ form.template_java.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-1">
+              {{ form.template_java.label }}
+            </label>
+            {{ form.template_java }}
+            {% if form.template_java.errors %}
+              <p class="mt-2 text-sm text-red-600">{{ form.template_java.errors }}</p>
+            {% endif %}
+          </div>
+        </div>
+      </div>
+
+      <h2 class="text-2xl font-semibold text-gray-800 mb-4">Test Cases</h2>
+      {{ formset.management_form }}
+      <div id="testcase-form-container" class="space-y-6 mb-8">
+        {% for testcase_form in formset %}
+          <div class="bg-gray-50 p-6 rounded-lg border border-gray-200 shadow-sm testcase-form-row">
+            <h3 class="text-lg font-medium text-gray-800 mb-3">Test Case {{ forloop.counter }}</h3>
+            {% for hidden_field in testcase_form.hidden_fields %}
+              {{ hidden_field }}
+            {% endfor %}
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <label for="{{ testcase_form.input.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-1">
+                  {{ testcase_form.input.label }}
+                </label>
+                {{ testcase_form.input }}
+                {% if testcase_form.input.errors %}
+                  <p class="mt-1 text-sm text-red-600">{{ testcase_form.input.errors }}</p>
+                {% endif %}
+              </div>
+              <div>
+                <label for="{{ testcase_form.expected_output.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-1">
+                  {{ testcase_form.expected_output.label }}
+                </label>
+                {{ testcase_form.expected_output }}
+                {% if testcase_form.expected_output.errors %}
+                  <p class="mt-1 text-sm text-red-600">{{ testcase_form.expected_output.errors }}</p>
+                {% endif %}
+              </div>
+            </div>
+            <div class="mt-4">
+              <label for="{{ testcase_form.is_sample.id_for_label }}" class="inline-flex items-center">
+                {{ testcase_form.is_sample }}
+                <span class="ml-2 text-sm text-gray-700">{{ testcase_form.is_sample.label }}</span>
+              </label>
+              {% if testcase_form.is_sample.errors %}
+                <p class="mt-1 text-sm text-red-600">{{ testcase_form.is_sample.errors }}</p>
+              {% endif %}
+            </div>
+            <div class="mt-4">
+              <label for="{{ testcase_form.description.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-1">
+                {{ testcase_form.description.label }}
+              </label>
+              {{ testcase_form.description }}
+              {% if testcase_form.description.errors %}
+                <p class="mt-1 text-sm text-red-600">{{ testcase_form.description.errors }}</p>
+              {% endif %}
+            </div>
+            {% if formset.can_delete %}
+              <div class="mt-4 text-right">
+                <label for="{{ testcase_form.DELETE.id_for_label }}" class="inline-flex items-center text-red-600 hover:text-red-800 cursor-pointer">
+                  {{ testcase_form.DELETE }}
+                  <span class="ml-2">Delete Test Case</span>
+                </label>
+              </div>
+            {% endif %}
+          </div>
+        {% endfor %}
+      </div>
+
+      <button type="button" id="add-testcase-button" class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-indigo-700 bg-indigo-100 hover:bg-indigo-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+        <i class="fas fa-plus mr-2"></i> Add Another Test Case
+      </button>
+
+      <div class="mt-8 flex justify-end space-x-4">
+        <a href="{% url 'practice:tutor_dashboard' %}" class="inline-flex items-center px-6 py-3 border border-gray-300 shadow-sm text-base font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+          Cancel
+        </a>
+        <button type="submit"
+                class="inline-flex items-center px-6 py-3 border border-transparent text-base font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+          {% if is_new %}Create Problem{% else %}Save Changes{% endif %}
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- Font Awesome for icons -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+
+<script>
+  // JavaScript for adding new test case forms dynamically
+  document.addEventListener('DOMContentLoaded', function() {
+    const addTestCaseButton = document.getElementById('add-testcase-button');
+    const formContainer = document.getElementById('testcase-form-container');
+    const totalForms = document.getElementById('id_testcase_set-TOTAL_FORMS');
+
+    addTestCaseButton.addEventListener('click', function() {
+      const currentForms = parseInt(totalForms.value);
+      const newFormIndex = currentForms;
+
+      const emptyFormHtml = `
+        <div class="bg-gray-50 p-6 rounded-lg border border-gray-200 shadow-sm testcase-form-row">
+          <h3 class="text-lg font-medium text-gray-800 mb-3">Test Case ${newFormIndex + 1}</h3>
+          <input type="hidden" name="testcase_set-${newFormIndex}-id" id="id_testcase_set-${newFormIndex}-id">
+          <input type="hidden" name="testcase_set-${newFormIndex}-problem" id="id_testcase_set-${newFormIndex}-problem">
+          <input type="hidden" name="testcase_set-${newFormIndex}-ORDER" id="id_testcase_set-${newFormIndex}-ORDER">
+          <input type="hidden" name="testcase_set-${newFormIndex}-DELETE" id="id_testcase_set-${newFormIndex}-DELETE" value="off">
+
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <label for="id_testcase_set-${newFormIndex}-input" class="block text-sm font-medium text-gray-700 mb-1">
+                Input:
+              </label>
+              <textarea name="testcase_set-${newFormIndex}-input" cols="40" rows="4" class="w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500" id="id_testcase_set-${newFormIndex}-input"></textarea>
+            </div>
+            <div>
+              <label for="id_testcase_set-${newFormIndex}-expected_output" class="block text-sm font-medium text-gray-700 mb-1">
+                Expected Output:
+              </label>
+              <textarea name="testcase_set-${newFormIndex}-expected_output" cols="40" rows="4" class="w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500" id="id_testcase_set-${newFormIndex}-expected_output"></textarea>
+            </div>
+          </div>
+          <div class="mt-4">
+            <label for="id_testcase_set-${newFormIndex}-is_sample" class="inline-flex items-center">
+              <input type="checkbox" name="testcase_set-${newFormIndex}-is_sample" class="rounded border-gray-300 text-blue-600 shadow-sm focus:ring-blue-500" id="id_testcase_set-${newFormIndex}-is_sample">
+              <span class="ml-2 text-sm text-gray-700">Is Sample</span>
+            </label>
+          </div>
+          <div class="mt-4">
+            <label for="id_testcase_set-${newFormIndex}-description" class="block text-sm font-medium text-gray-700 mb-1">
+              Description:
+            </label>
+            <input type="text" name="testcase_set-${newFormIndex}-description" maxlength="255" class="w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500" id="id_testcase_set-${newFormIndex}-description">
+          </div>
+          <div class="mt-4 text-right">
+            <label for="id_testcase_set-${newFormIndex}-DELETE" class="inline-flex items-center text-red-600 hover:text-red-800 cursor-pointer">
+              <input type="checkbox" name="testcase_set-${newFormIndex}-DELETE" class="rounded border-gray-300 text-red-600 shadow-sm focus:ring-red-500" id="id_testcase_set-${newFormIndex}-DELETE">
+              <span class="ml-2">Delete Test Case</span>
+            </label>
+          </div>
+        </div>
+      `;
+
+      formContainer.insertAdjacentHTML('beforeend', emptyFormHtml);
+      totalForms.value = newFormIndex + 1;
+    });
+
+    // Optional: Auto-generate slug from title
+    const titleInput = document.getElementById('id_title');
+    const slugInput = document.getElementById('id_slug');
+
+    if (titleInput && slugInput) {
+      titleInput.addEventListener('input', function() {
+        if (!slugInput.value || slugInput.dataset.autoGenerated === 'true') {
+          const title = this.value;
+          const slug = title.toLowerCase().replace(/[^a-z0-9 -]/g, '').replace(/\s+/g, '-').replace(/-+/g, '-');
+          slugInput.value = slug;
+          slugInput.dataset.autoGenerated = 'true';
+        }
+      });
+      // If user manually edits slug, disable auto-generation
+      slugInput.addEventListener('input', function() {
+        slugInput.dataset.autoGenerated = 'false';
+      });
+    }
+  });
+</script>
+{% endblock %}

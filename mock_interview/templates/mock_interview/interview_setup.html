@@ -1,0 +1,390 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Setup Mock Interview | MockMate{% endblock %}
+
+{% block content %}
+<!-- Custom Styles -->
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+  
+  .bg-animated {
+    background: linear-gradient(-45deg, #667eea, #764ba2, #f093fb, #f5576c);
+    background-size: 400% 400%;
+    animation: gradientShift 15s ease infinite;
+  }
+  
+  @keyframes gradientShift {
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+  }
+  
+  .glassmorphism {
+    background: rgba(255, 255, 255, 0.25);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.18);
+  }
+  
+  .form-input {
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    border: 2px solid transparent;
+    background: rgba(255, 255, 255, 0.9);
+  }
+  
+  .form-input:focus {
+    border-color: #667eea;
+    background: rgba(255, 255, 255, 1);
+    box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.1);
+    transform: translateY(-1px);
+  }
+  
+  .floating-element {
+    animation: float 6s ease-in-out infinite;
+  }
+  
+  .floating-element-delayed {
+    animation: float 6s ease-in-out infinite;
+    animation-delay: -2s;
+  }
+  
+  @keyframes float {
+    0%, 100% { transform: translateY(0px); }
+    50% { transform: translateY(-20px); }
+  }
+  
+  .pulse-ring {
+    animation: pulse-ring 2s cubic-bezier(0.455, 0.03, 0.515, 0.955) infinite;
+  }
+  
+  @keyframes pulse-ring {
+    0% {
+      transform: scale(0.33);
+      opacity: 1;
+    }
+    80%, 100% {
+      transform: scale(2.33);
+      opacity: 0;
+    }
+  }
+  
+  .button-hover {
+    position: relative;
+    overflow: hidden;
+  }
+  
+  .button-hover::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+    transition: left 0.5s;
+  }
+  
+  .button-hover:hover::before {
+    left: 100%;
+  }
+  
+  .skill-tag {
+    display: inline-block;
+    background: linear-gradient(135deg, #667eea, #764ba2);
+    color: white;
+    padding: 2px 8px;
+    border-radius: 12px;
+    font-size: 10px;
+    margin: 2px;
+    opacity: 0;
+    animation: fadeInUp 0.5s ease forwards;
+  }
+  
+  @keyframes fadeInUp {
+    from {
+      opacity: 0;
+      transform: translateY(10px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+  
+  .message-slide {
+    animation: slideInFromTop 0.5s ease-out;
+  }
+  
+  @keyframes slideInFromTop {
+    from {
+      opacity: 0;
+      transform: translateY(-20px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+</style>
+
+<section class="bg-animated min-h-screen py-10 relative overflow-hidden" style="font-family: 'Inter', sans-serif;">
+  
+  <!-- Floating Background Elements -->
+  <div class="absolute inset-0 overflow-hidden pointer-events-none">
+    <div class="floating-element absolute top-20 left-10 w-20 h-20 bg-white bg-opacity-10 rounded-full blur-xl"></div>
+    <div class="floating-element-delayed absolute top-40 right-20 w-32 h-32 bg-white bg-opacity-5 rounded-full blur-2xl"></div>
+    <div class="floating-element absolute bottom-32 left-1/4 w-24 h-24 bg-white bg-opacity-10 rounded-full blur-xl"></div>
+    <div class="floating-element-delayed absolute bottom-20 right-1/3 w-40 h-40 bg-white bg-opacity-5 rounded-full blur-2xl"></div>
+  </div>
+
+  <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+    
+    <!-- Header with Enhanced Animation -->
+    <div class="text-center mb-12">
+      <div class="relative inline-block mb-4">
+        <div class="absolute inset-0 pulse-ring bg-white rounded-full"></div>
+        <div class="relative bg-white bg-opacity-20 p-4 rounded-full backdrop-blur-sm">
+          <i class="fas fa-robot text-4xl text-white"></i>
+        </div>
+      </div>
+      
+      <h1 class="text-5xl font-extrabold text-white mb-4 tracking-tight">
+        AI Mock Interview
+        <span class="block text-3xl font-medium text-white text-opacity-90 mt-2">Setup</span>
+      </h1>
+      
+      <p class="text-white text-opacity-80 text-lg max-w-2xl mx-auto leading-relaxed">
+        🚀 Upload your resume or enter details manually to get a 
+        <span class="font-semibold text-white">personalized interview experience</span> 
+        powered by cutting-edge AI technology
+      </p>
+    </div>
+
+    <!-- Messages with Animation -->
+    {% if messages %}
+      <div class="mb-8">
+        {% for message in messages %}
+          <div class="message-slide p-4 mb-3 rounded-2xl backdrop-blur-md border {% if message.tags == 'error' %}bg-red-500 bg-opacity-20 text-red-100 border-red-300 border-opacity-30{% elif message.tags == 'success' %}bg-green-500 bg-opacity-20 text-green-100 border-green-300 border-opacity-30{% else %}bg-white bg-opacity-20 text-white border-white border-opacity-30{% endif %}">
+            <div class="flex items-center">
+              {% if message.tags == 'error' %}
+                <i class="fas fa-exclamation-triangle mr-3 text-lg"></i>
+              {% elif message.tags == 'success' %}
+                <i class="fas fa-check-circle mr-3 text-lg"></i>
+              {% else %}
+                <i class="fas fa-info-circle mr-3 text-lg"></i>
+              {% endif %}
+              {{ message }}
+            </div>
+          </div>
+        {% endfor %}
+      </div>
+    {% endif %}
+
+    <!-- Enhanced Form -->
+    <div class="glassmorphism rounded-3xl shadow-2xl p-8 relative">
+      <!-- Decorative Elements -->
+      <div class="absolute -top-6 -right-6 w-12 h-12 bg-gradient-to-br from-pink-400 to-purple-600 rounded-full opacity-80"></div>
+      <div class="absolute -bottom-4 -left-4 w-8 h-8 bg-gradient-to-br from-blue-400 to-cyan-600 rounded-full opacity-60"></div>
+      
+      <form method="POST" enctype="multipart/form-data" class="space-y-8">
+        {% csrf_token %}
+
+        <!-- Resume Upload Section -->
+        <div class="relative">
+          <label class="flex items-center text-lg font-semibold text-gray-800 mb-4">
+            <div class="w-8 h-8 bg-gradient-to-r from-blue-500 to-purple-600 rounded-full flex items-center justify-center mr-3">
+              <i class="fas fa-file-upload text-white text-sm"></i>
+            </div>
+            Upload Resume
+            <span class="ml-2 text-sm font-normal text-gray-600 bg-gray-200 px-2 py-1 rounded-full">Optional</span>
+          </label>
+          
+          <div class="relative">
+            {{ form.resume_file }}
+            <div class="absolute inset-0 border-2 border-dashed border-gray-300 rounded-xl flex items-center justify-center bg-gray-50 hover:bg-gray-100 transition-colors cursor-pointer" 
+                 onclick="document.querySelector('input[type=file]').click()">
+              <div class="text-center">
+                <i class="fas fa-cloud-upload-alt text-3xl text-gray-400 mb-2"></i>
+                <p class="text-gray-600 font-medium">Click to upload your resume</p>
+                <p class="text-xs text-gray-500 mt-1">PDF, DOCX up to 10MB</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Job Role Section -->
+        <div class="relative">
+          <label class="flex items-center text-lg font-semibold text-gray-800 mb-4">
+            <div class="w-8 h-8 bg-gradient-to-r from-green-500 to-teal-600 rounded-full flex items-center justify-center mr-3">
+              <i class="fas fa-briefcase text-white text-sm"></i>
+            </div>
+            Target Job Role
+          </label>
+          
+          <div class="relative">
+            {{ form.job_role }}
+            <div class="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400">
+              <i class="fas fa-search"></i>
+            </div>
+          </div>
+          
+          <!-- Popular Roles Suggestions -->
+          <div class="mt-3 flex flex-wrap gap-2">
+            <span class="text-xs text-gray-600 font-medium mr-2">Popular:</span>
+            <button type="button" class="skill-tag" onclick="fillJobRole('Software Engineer')">Software Engineer</button>
+            <button type="button" class="skill-tag" onclick="fillJobRole('Data Scientist')">Data Scientist</button>
+            <button type="button" class="skill-tag" onclick="fillJobRole('Product Manager')">Product Manager</button>
+            <button type="button" class="skill-tag" onclick="fillJobRole('UX Designer')">UX Designer</button>
+          </div>
+        </div>
+
+        <!-- Skills Section -->
+        <div class="relative">
+          <label class="flex items-center text-lg font-semibold text-gray-800 mb-4">
+            <div class="w-8 h-8 bg-gradient-to-r from-purple-500 to-pink-600 rounded-full flex items-center justify-center mr-3">
+              <i class="fas fa-cogs text-white text-sm"></i>
+            </div>
+            Key Skills
+          </label>
+          
+          {{ form.key_skills }}
+          
+          <p class="mt-3 text-sm text-gray-600 flex items-center">
+            <i class="fas fa-lightbulb text-yellow-500 mr-2"></i>
+            Separate skills with commas (e.g., Python, Django, React, SQL)
+          </p>
+        </div>
+
+        <!-- Enhanced Submit Button -->
+        <div class="pt-6">
+          <div class="flex flex-col sm:flex-row gap-4 items-center justify-between">
+            <div class="flex items-center text-sm text-gray-600">
+              <i class="fas fa-shield-alt text-green-500 mr-2"></i>
+              Your data is secure and encrypted
+            </div>
+            
+            <button type="submit" class="button-hover group relative inline-flex items-center px-8 py-4 bg-gradient-to-r from-blue-600 via-purple-600 to-blue-800 text-white rounded-2xl font-bold shadow-2xl transform hover:scale-105 transition-all duration-300 text-lg">
+              <div class="absolute inset-0 bg-gradient-to-r from-blue-600 to-purple-600 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+              <div class="relative flex items-center">
+                <i class="fas fa-rocket mr-3 text-xl"></i>
+                <span>Start AI Interview</span>
+                <div class="ml-3 w-6 h-6 border-2 border-white border-t-transparent rounded-full animate-spin opacity-0 group-hover:opacity-100 transition-opacity"></div>
+              </div>
+            </button>
+          </div>
+        </div>
+
+        <!-- Progress Indicator -->
+        <div class="mt-6 p-4 bg-white bg-opacity-50 rounded-xl">
+          <div class="flex items-center justify-between text-sm">
+            <div class="flex items-center text-gray-700">
+              <div class="w-2 h-2 bg-blue-500 rounded-full mr-2"></div>
+              Step 1: Setup
+            </div>
+            <div class="flex items-center text-gray-400">
+              <div class="w-2 h-2 bg-gray-300 rounded-full mr-2"></div>
+              Step 2: Interview
+            </div>
+            <div class="flex items-center text-gray-400">
+              <div class="w-2 h-2 bg-gray-300 rounded-full mr-2"></div>
+              Step 3: Results
+            </div>
+          </div>
+          <div class="mt-2 w-full bg-gray-200 rounded-full h-1">
+            <div class="bg-gradient-to-r from-blue-500 to-purple-600 h-1 rounded-full" style="width: 33%"></div>
+          </div>
+        </div>
+      </form>
+    </div>
+
+    <!-- Features Preview -->
+    <div class="mt-12 grid grid-cols-1 md:grid-cols-3 gap-6">
+      <div class="glassmorphism p-6 rounded-2xl text-center">
+        <div class="w-12 h-12 bg-gradient-to-r from-blue-500 to-cyan-500 rounded-full flex items-center justify-center mx-auto mb-4">
+          <i class="fas fa-brain text-white text-xl"></i>
+        </div>
+        <h3 class="font-bold text-white mb-2">AI-Powered</h3>
+        <p class="text-white text-opacity-80 text-sm">Smart questions tailored to your profile</p>
+      </div>
+      
+      <div class="glassmorphism p-6 rounded-2xl text-center">
+        <div class="w-12 h-12 bg-gradient-to-r from-green-500 to-teal-500 rounded-full flex items-center justify-center mx-auto mb-4">
+          <i class="fas fa-chart-line text-white text-xl"></i>
+        </div>
+        <h3 class="font-bold text-white mb-2">Real-time Feedback</h3>
+        <p class="text-white text-opacity-80 text-sm">Instant analysis and improvement tips</p>
+      </div>
+      
+      <div class="glassmorphism p-6 rounded-2xl text-center">
+        <div class="w-12 h-12 bg-gradient-to-r from-purple-500 to-pink-500 rounded-full flex items-center justify-center mx-auto mb-4">
+          <i class="fas fa-trophy text-white text-xl"></i>
+        </div>
+        <h3 class="font-bold text-white mb-2">Track Progress</h3>
+        <p class="text-white text-opacity-80 text-sm">Monitor your interview skills over time</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<script>
+// Enhanced form interactions
+function fillJobRole(role) {
+  document.querySelector('input[name="job_role"]').value = role;
+  
+  // Add a subtle animation
+  const input = document.querySelector('input[name="job_role"]');
+  input.style.transform = 'scale(1.02)';
+  setTimeout(() => {
+    input.style.transform = 'scale(1)';
+  }, 200);
+}
+
+// File upload enhancement
+document.addEventListener('DOMContentLoaded', function() {
+  const fileInput = document.querySelector('input[type="file"]');
+  const uploadArea = document.querySelector('.border-dashed');
+  
+  if (fileInput && uploadArea) {
+    fileInput.addEventListener('change', function(e) {
+      if (e.target.files.length > 0) {
+        uploadArea.classList.add('bg-blue-50', 'border-blue-300');
+        uploadArea.querySelector('p').textContent = `Selected: ${e.target.files[0].name}`;
+        uploadArea.querySelector('i').className = 'fas fa-check-circle text-3xl text-green-500 mb-2';
+      }
+    });
+    
+    // Drag and drop functionality
+    uploadArea.addEventListener('dragover', function(e) {
+      e.preventDefault();
+      uploadArea.classList.add('bg-blue-50', 'border-blue-400');
+    });
+    
+    uploadArea.addEventListener('dragleave', function(e) {
+      uploadArea.classList.remove('bg-blue-50', 'border-blue-400');
+    });
+    
+    uploadArea.addEventListener('drop', function(e) {
+      e.preventDefault();
+      uploadArea.classList.remove('bg-blue-50', 'border-blue-400');
+      if (e.dataTransfer.files.length > 0) {
+        fileInput.files = e.dataTransfer.files;
+        uploadArea.classList.add('bg-green-50', 'border-green-300');
+        uploadArea.querySelector('p').textContent = `Selected: ${e.dataTransfer.files[0].name}`;
+        uploadArea.querySelector('i').className = 'fas fa-check-circle text-3xl text-green-500 mb-2';
+      }
+    });
+  }
+  
+  // Add focus effects to form inputs
+  const inputs = document.querySelectorAll('input, textarea');
+  inputs.forEach(input => {
+    if (!input.classList.contains('form-input')) {
+      input.classList.add('form-input', 'w-full', 'px-4', 'py-3', 'rounded-xl', 'focus:outline-none', 'text-gray-800', 'placeholder-gray-500');
+    }
+  });
+});
+</script>
+
+<!-- Font Awesome for icons -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+{% endblock %}

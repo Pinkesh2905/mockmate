@@ -1,0 +1,246 @@
+<!-- Enhanced Post Modal Content -->
+<div class="space-y-6">
+  
+  <!-- Post Header -->
+  <div class="flex items-center justify-between">
+    <div class="flex items-center">
+      {% if post.author.profile.avatar %}
+        <img src="{{ post.author.profile.avatar.url }}" 
+             class="w-16 h-16 rounded-full object-cover mr-5 ring-4 ring-purple-200 shadow-lg" />
+      {% else %}
+        <div class="w-16 h-16 rounded-full mr-5 ring-4 ring-purple-200 shadow-lg bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center text-white font-bold text-xl">
+          {{ post.author.username|first|upper }}
+        </div>
+      {% endif %}
+      <div>
+        <a href="{% url 'posts:user_profile' post.author.username %}" 
+           class="text-xl font-bold text-gray-800 hover:text-purple-600 transition-colors">
+          {{ post.author.get_full_name|default:post.author.username }}
+        </a>
+        <div class="flex items-center text-gray-500 mt-1">
+          <i class="ri-time-line mr-2"></i>
+          <span class="font-medium">{{ post.created_at|timesince }} ago</span>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Post Actions for Author -->
+    {% if post.author == request.user %}
+      <div class="flex items-center space-x-2">
+        <a href="{% url 'posts:edit_post' post.id %}" 
+           class="p-3 text-blue-600 hover:bg-blue-50 rounded-full transition-all duration-200">
+          <i class="ri-edit-2-line text-xl"></i>
+        </a>
+        <form method="post" action="{% url 'posts:delete_post' post.id %}" 
+              onsubmit="return confirm('Are you sure you want to delete this post?');" class="inline">
+          {% csrf_token %}
+          <button type="submit" 
+                  class="p-3 text-red-600 hover:bg-red-50 rounded-full transition-all duration-200">
+            <i class="ri-delete-bin-2-line text-xl"></i>
+          </button>
+        </form>
+      </div>
+    {% endif %}
+  </div>
+
+  <!-- Post Content -->
+  <div class="bg-gray-50 rounded-2xl p-6">
+    <div class="text-gray-800 text-lg leading-relaxed whitespace-pre-line mb-4">
+      {{ post.content }}
+    </div>
+    
+    {% if post.image %}
+      <div class="rounded-xl overflow-hidden shadow-lg">
+        <img src="{{ post.image.url }}" 
+             class="w-full h-auto object-cover hover:scale-105 transition-transform duration-300" 
+             alt="Post Image" />
+      </div>
+    {% endif %}
+  </div>
+
+  <!-- Engagement Stats -->
+  <div class="flex items-center justify-between p-4 bg-gradient-to-r from-purple-50 to-pink-50 rounded-xl">
+    <div class="flex items-center space-x-6">
+      <div class="flex items-center bg-white rounded-full px-4 py-2 shadow-sm">
+        <i class="ri-heart-3-fill text-red-500 mr-2 text-xl"></i>
+        <span class="font-bold text-gray-700">{{ post.likes.count }} likes</span>
+      </div>
+      <div class="flex items-center bg-white rounded-full px-4 py-2 shadow-sm">
+        <i class="ri-chat-3-fill text-blue-500 mr-2 text-xl"></i>
+        <span class="font-bold text-gray-700">{{ post.comments.count }} comments</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Action Buttons -->
+  <div class="flex items-center justify-around p-4 border-y border-gray-100">
+    
+    <!-- Like Button -->
+    <button type="button" onclick="toggleLike('{{ post.id }}')" 
+            class="flex items-center px-6 py-3 rounded-full hover:bg-red-50 text-gray-600 hover:text-red-600 transition-all duration-200 group">
+      <i class="ri-heart-3-line mr-3 text-2xl group-hover:scale-110 transition-transform"></i>
+      <span class="font-medium">Like</span>
+    </button>
+
+    <!-- Comment Button -->
+    <button type="button" onclick="focusCommentInput()" 
+            class="flex items-center px-6 py-3 rounded-full hover:bg-blue-50 text-gray-600 hover:text-blue-600 transition-all duration-200 group">
+      <i class="ri-chat-3-line mr-3 text-2xl group-hover:scale-110 transition-transform"></i>
+      <span class="font-medium">Comment</span>
+    </button>
+
+    <!-- Repost Button -->
+    <form method="post" action="{% url 'posts:repost' post.id %}" class="inline">
+      {% csrf_token %}
+      <button type="submit" 
+              class="flex items-center px-6 py-3 rounded-full hover:bg-purple-50 text-gray-600 hover:text-purple-600 transition-all duration-200 group">
+        <i class="ri-repeat-line mr-3 text-2xl group-hover:scale-110 transition-transform"></i>
+        <span class="font-medium">Repost</span>
+      </button>
+    </form>
+
+    <!-- Share Button -->
+    <button class="flex items-center px-6 py-3 rounded-full hover:bg-green-50 text-gray-600 hover:text-green-600 transition-all duration-200 group">
+      <i class="ri-share-forward-line mr-3 text-2xl group-hover:scale-110 transition-transform"></i>
+      <span class="font-medium">Share</span>
+    </button>
+
+  </div>
+
+  <!-- Comments Section -->
+  <div class="space-y-6">
+    <div class="flex items-center justify-between">
+      <h3 class="text-xl font-bold text-gray-800 flex items-center">
+        <i class="ri-chat-3-fill text-blue-500 mr-2"></i>
+        Comments
+      </h3>
+      <span class="text-sm text-gray-500 bg-gray-100 rounded-full px-3 py-1">
+        {{ comments|length }} comment{{ comments|length|pluralize }}
+      </span>
+    </div>
+
+    <!-- Add Comment Form -->
+    {% if user.is_authenticated %}
+      <div class="bg-white rounded-2xl border-2 border-gray-100 p-6 shadow-sm">
+        <div class="flex space-x-4">
+          {% if user.profile.avatar %}
+            <img src="{{ user.profile.avatar.url }}" alt="{{ user.username }}"
+                 class="w-12 h-12 rounded-full object-cover ring-2 ring-purple-200">
+          {% else %}
+            <div class="w-12 h-12 rounded-full ring-2 ring-purple-200 bg-gradient-to-br from-purple-400 to-pink-500 flex items-center justify-center text-white font-bold">
+              {{ user.username|first|upper }}
+            </div>
+          {% endif %}
+          
+          <div class="flex-1">
+            <form method="post" action="{% url 'posts:add_comment' post.id %}" id="comment-form">
+              {% csrf_token %}
+              <textarea name="content" rows="3" required
+                        id="comment-input"
+                        class="w-full border-2 border-gray-200 rounded-xl px-4 py-3 text-gray-700 placeholder-gray-400 focus:outline-none focus:ring-4 focus:ring-purple-200 focus:border-purple-400 transition-all duration-300 resize-none"
+                        placeholder="Share your thoughts on this post..."></textarea>
+              <div class="flex justify-end mt-3">
+                <button type="submit"
+                        class="px-6 py-2 bg-gradient-to-r from-purple-600 to-pink-600 text-white rounded-full font-medium hover:from-purple-700 hover:to-pink-700 shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300">
+                  <i class="ri-send-plane-fill mr-2"></i>
+                  Post Comment
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+    {% else %}
+      <div class="text-center py-8 bg-gradient-to-r from-purple-50 to-pink-50 rounded-2xl">
+        <div class="text-4xl mb-4">🔒</div>
+        <p class="text-gray-600 text-lg mb-4">Join the conversation!</p>
+        <a href="{% url 'login' %}" 
+           class="inline-block px-6 py-3 bg-gradient-to-r from-purple-600 to-pink-600 text-white rounded-full font-medium hover:from-purple-700 hover:to-pink-700 shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300">
+          Sign In to Comment
+        </a>
+      </div>
+    {% endif %}
+
+    <!-- Comments List -->
+    <div class="space-y-4">
+      {% for comment in comments %}
+        <div class="bg-white rounded-2xl border border-gray-100 p-6 shadow-sm hover:shadow-md transition-shadow duration-300">
+          <div class="flex items-start space-x-4">
+            {% if comment.author.profile.avatar %}
+              <img src="{{ comment.author.profile.avatar.url }}" 
+                   class="w-10 h-10 rounded-full object-cover ring-2 ring-gray-200" />
+            {% else %}
+              <div class="w-10 h-10 rounded-full ring-2 ring-gray-200 bg-gradient-to-br from-blue-400 to-indigo-500 flex items-center justify-center text-white font-bold text-sm">
+                {{ comment.author.username|first|upper }}
+              </div>
+            {% endif %}
+            
+            <div class="flex-1">
+              <div class="flex items-center space-x-2 mb-2">
+                <a href="{% url 'posts:user_profile' comment.author.username %}" 
+                   class="font-bold text-gray-800 hover:text-purple-600 transition-colors">
+                  {{ comment.author.get_full_name|default:comment.author.username }}
+                </a>
+                <span class="text-sm text-gray-500">{{ comment.created_at|timesince }} ago</span>
+              </div>
+              <p class="text-gray-700 leading-relaxed">{{ comment.content }}</p>
+            </div>
+            
+            <!-- Comment Actions (if needed) -->
+            {% if comment.author == request.user %}
+              <div class="flex items-center space-x-1">
+                <button class="p-2 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-full transition-all duration-200">
+                  <i class="ri-delete-bin-6-line text-sm"></i>
+                </button>
+              </div>
+            {% endif %}
+          </div>
+        </div>
+      {% empty %}
+        <div class="text-center py-12">
+          <div class="text-6xl mb-4 opacity-50">💬</div>
+          <h4 class="text-xl font-semibold text-gray-600 mb-2">No comments yet</h4>
+          <p class="text-gray-500">Be the first to share your thoughts!</p>
+        </div>
+      {% endfor %}
+    </div>
+
+  </div>
+
+</div>
+
+<script>
+  function focusCommentInput() {
+    const input = document.getElementById('comment-input');
+    if (input) {
+      input.focus();
+      input.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }
+  }
+
+  function toggleLike(postId) {
+    fetch(`/posts/like/${postId}/`, {
+      method: 'POST',
+      headers: {
+        'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({})
+    })
+    .then(res => res.json())
+    .then(data => {
+      // Update like count in the modal
+      location.reload(); // Simple reload to update counts
+    })
+    .catch(error => {
+      console.error('Error:', error);
+    });
+  }
+
+  // Auto-resize textarea
+  document.getElementById('comment-input')?.addEventListener('input', function() {
+    this.style.height = 'auto';
+    this.style.height = this.scrollHeight + 'px';
+  });
+</script>gray-400">•</span>
+                <span class="text-

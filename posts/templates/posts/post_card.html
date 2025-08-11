@@ -1,0 +1,137 @@
+<div class="{% if post.is_repost %}border-l-4 border-purple-400 bg-purple-50{% else %}bg-white{% endif %} rounded-xl shadow-sm border border-gray-200 mb-6 p-5">
+
+  <!-- Reposted Badge -->
+  {% if post.is_repost %}
+    <div class="text-sm text-purple-600 font-semibold mb-2">
+      🔁 Reposted
+      {% if post.reposted_by %}
+        by <a href="{% url 'posts:user_profile' post.reposted_by.username %}" class="underline hover:text-purple-800">
+          {{ post.reposted_by.get_full_name|default:post.reposted_by.username }}
+        </a>
+      {% endif %}
+    </div>
+  {% endif %}
+
+  <!-- Author and Timestamp -->
+  <div class="flex items-center mb-4">
+    {% if post.author.profile.avatar %}
+      <img src="{{ post.author.profile.avatar.url }}" alt="{{ post.author.username }}"
+           class="w-10 h-10 rounded-full object-cover mr-3">
+    {% else %}
+      <img src="https://ui-avatars.com/api/?name={{ post.author.username }}" alt="{{ post.author.username }}"
+           class="w-10 h-10 rounded-full object-cover mr-3">
+    {% endif %}
+
+    <div>
+      <a href="{% url 'posts:user_profile' post.author.username %}" class="font-semibold text-gray-800 hover:underline">
+        {{ post.author.get_full_name|default:post.author.username }}
+      </a>
+      <p class="text-sm text-gray-500">{{ post.created_at|timesince }} ago</p>
+    </div>
+  </div>
+
+  <!-- Post Content -->
+  <div class="text-gray-800 text-base mb-3 whitespace-pre-line">
+    {{ post.content }}
+  </div>
+
+  {% if post.image %}
+    <div class="mb-4">
+      <img src="{{ post.image.url }}" alt="Post Image" class="w-full rounded-lg border border-gray-300">
+    </div>
+  {% endif %}
+
+  <!-- Action Buttons -->
+  <div class="flex items-center justify-between text-sm text-gray-600 mt-2">
+    <div class="flex items-center space-x-4">
+
+      <!-- Like -->
+      <form method="post" action="{% url 'posts:toggle_like' post.id %}">
+        {% csrf_token %}
+        <button type="button" onclick="toggleLike('{{ post.id }}')" class="flex items-center hover:text-blue-600">
+          <i class="ri-heart-3-line mr-1 text-lg"></i> Like
+        </button>
+        <span id="like-count-{{ post.id }}">❤️ {{ post.likes.count }}</span>
+      </form>
+
+      <!-- Comment Toggle -->
+      <button type="button" onclick="toggleComment('{{ post.id }}')" class="flex items-center hover:text-green-600">
+        <i class="ri-chat-3-line mr-1 text-lg"></i> Comment
+      </button>
+
+      <!-- Repost -->
+      <form method="post" action="{% url 'posts:repost' post.id %}">
+        {% csrf_token %}
+        <button type="submit" class="flex items-center hover:text-purple-600">
+          <i class="ri-repeat-line mr-1 text-lg"></i> Repost
+        </button>
+      </form>
+
+      <!-- Share (Placeholder) -->
+      <button class="flex items-center hover:text-gray-800">
+        <i class="ri-share-forward-line mr-1 text-lg"></i> Share
+      </button>
+
+      <!-- Edit/Delete (Only if original author) -->
+      {% if post.author == request.user %}
+        <div class="flex space-x-3 text-sm mt-2">
+          <a href="{% url 'posts:edit_post' post.id %}" class="text-blue-600 hover:underline">Edit</a>
+          <form method="post" action="{% url 'posts:delete_post' post.id %}" onsubmit="return confirm('Delete this post?');">
+            {% csrf_token %}
+            <button type="submit" class="text-red-600 hover:underline">Delete</button>
+          </form>
+        </div>
+      {% endif %}
+
+    </div>
+
+    <div>
+      ❤️ {{ post.likes.count }} · 💬 {{ post.comments.count }}
+    </div>
+  </div>
+
+  <!-- Comment Form (Hidden by default) -->
+  <div id="comment-box-{{ post.id }}" class="mt-4 hidden">
+    {% if user.is_authenticated %}
+      <form method="post" action="{% url 'posts:add_comment' post.id %}">
+        {% csrf_token %}
+        <textarea name="content" rows="2" required
+                  class="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring focus:border-blue-300"
+                  placeholder="Write a comment..."></textarea>
+        <button type="submit"
+                class="mt-2 px-4 py-1 bg-gray-800 text-white rounded hover:bg-gray-700 text-sm">
+          Comment
+        </button>
+      </form>
+    {% else %}
+      <p class="text-sm text-gray-500">Please <a href="{% url 'login' %}" class="underline">log in</a> to comment.</p>
+    {% endif %}
+  </div>
+</div>
+
+<script>
+  function toggleComment(postId) {
+    const box = document.getElementById('comment-box-' + postId);
+    if (box) {
+      box.classList.toggle('hidden');
+    }
+  }
+
+  function toggleLike(postId) {
+    fetch(`/posts/like/${postId}/`, {
+      method: 'POST',
+      headers: {
+        'X-CSRFToken': '{{ csrf_token }}',
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({})
+    })
+    .then(res => res.json())
+    .then(data => {
+      const countEl = document.getElementById(`like-count-${postId}`);
+      if (countEl) {
+        countEl.innerText = `❤️ ${data.like_count}`;
+      }
+    });
+  }
+</script>

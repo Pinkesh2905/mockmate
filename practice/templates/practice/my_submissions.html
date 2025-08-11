@@ -1,0 +1,124 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}My Submissions | {{ problem.title }} | MockMate{% endblock %}
+
+{% block content %}
+<div class="max-w-6xl mx-auto py-12 px-4 sm:px-6 lg:px-8">
+  <h1 class="text-4xl font-extrabold mb-4 text-gray-900">My Submissions</h1>
+  <p class="text-xl text-gray-700 mb-8">Problem: <strong class="text-blue-600">{{ problem.title }}</strong></p>
+
+  {% if submissions %}
+    <div class="space-y-6">
+      {% for submission in submissions %}
+        <div class="bg-white border border-gray-200 rounded-lg shadow-lg overflow-hidden">
+          <div class="p-6 cursor-pointer flex justify-between items-center" onclick="toggleSubmissionDetails('{{ submission.id }}')">
+            <div>
+              <p class="text-sm text-gray-500 mb-1">
+                Submitted on: <span class="font-medium text-gray-700">{{ submission.submission_time|date:"M d, Y H:i" }}</span>
+              </p>
+              <p class="text-md mb-2">
+                <span class="inline-block bg-gray-100 text-gray-800 text-xs px-2 py-1 rounded-full mr-2">
+                  Language: <span class="font-semibold">{{ submission.language }}</span>
+                </span>
+                <span class="inline-block px-3 py-1 rounded-full text-sm font-semibold
+                  {% if submission.status == 'ACCEPTED' %}bg-green-100 text-green-800
+                  {% elif submission.status == 'WRONG_ANSWER' %}bg-red-100 text-red-800
+                  {% elif submission.status == 'TIME_LIMIT_EXCEEDED' %}bg-orange-100 text-orange-800
+                  {% elif submission.status == 'RUNTIME_ERROR' %}bg-red-100 text-red-800
+                  {% elif submission.status == 'COMPILATION_ERROR' %}bg-red-100 text-red-800
+                  {% else %}bg-gray-100 text-gray-800{% endif %}">
+                  {{ submission.get_status_display }}
+                </span>
+              </p>
+            </div>
+            <div class="text-gray-500 text-2xl">
+              <i id="arrow-{{ submission.id }}" class="fas fa-chevron-down transition-transform duration-300"></i>
+            </div>
+          </div>
+
+          <div id="details-{{ submission.id }}" class="hidden border-t border-gray-200 px-6 py-4 bg-gray-50">
+            <h3 class="text-lg font-semibold text-gray-800 mb-3">Code:</h3>
+            <pre class="bg-gray-100 text-sm p-4 rounded-lg overflow-x-auto mb-4 border border-gray-200 shadow-inner">{{ submission.code }}</pre>
+
+            <h3 class="text-lg font-semibold text-gray-800 mb-3">Execution Details:</h3>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+              <div class="bg-white p-3 rounded-md border border-gray-200">
+                <p class="text-sm text-gray-600">CPU Time: <span class="font-medium text-gray-800">{{ submission.cpu_time|default:"N/A" }}</span></p>
+              </div>
+              <div class="bg-white p-3 rounded-md border border-gray-200">
+                <p class="text-sm text-gray-600">Memory: <span class="font-medium text-gray-800">{{ submission.memory|default:"N/A" }}</span></p>
+              </div>
+            </div>
+
+            <h3 class="text-lg font-semibold text-gray-800 mb-3">Test Results:</h3>
+            <div class="space-y-3">
+              {% if submission.test_results %}
+                {% for test_result in submission.test_results %}
+                  <div class="p-4 rounded-lg border
+                    {% if test_result.status == 'PASS' %}bg-green-50 border-green-200
+                    {% else %}bg-red-50 border-red-200{% endif %}">
+                    <p class="font-semibold text-gray-800 flex items-center mb-1">
+                      {% if test_result.status == 'PASS' %}
+                        <i class="fas fa-check-circle text-green-500 mr-2"></i>
+                      {% else %}
+                        <i class="fas fa-times-circle text-red-500 mr-2"></i>
+                      {% endif %}
+                      Test Case {{ forloop.counter }}: <span class="ml-1 {% if test_result.status == 'PASS' %}text-green-700{% else %}text-red-700{% endif %}">
+                        {{ test_result.status|replace:"_":" " }}
+                      </span>
+                    </p>
+                    {% if test_result.input and test_result.input != 'Hidden' %}
+                      <p class="text-sm text-gray-600 mt-1">Input:</p>
+                      <pre class="bg-white p-2 rounded text-xs font-mono border border-gray-300 overflow-x-auto">{{ test_result.input }}</pre>
+                    {% endif %}
+                    {% if test_result.expected_output and test_result.expected_output != 'Hidden' %}
+                      <p class="text-sm text-gray-600 mt-1">Expected Output:</p>
+                      <pre class="bg-white p-2 rounded text-xs font-mono border border-gray-300 overflow-x-auto">{{ test_result.expected_output }}</pre>
+                    {% endif %}
+                    <p class="text-sm text-gray-600 mt-1">Your Output:</p>
+                    <pre class="bg-white p-2 rounded text-xs font-mono border border-gray-300 overflow-x-auto">{{ test_result.actual_output }}</pre>
+                    {% if test_result.error %}
+                      <p class="text-sm text-red-700 font-medium mt-1">Error: {{ test_result.error }}</p>
+                    {% endif %}
+                    <p class="text-xs text-gray-500 mt-1">
+                      Time: {{ test_result.cpuTime|default:"N/A" }}s, Memory: {{ test_result.memory|default:"N/A" }}KB
+                    </p>
+                  </div>
+                {% endfor %}
+              {% else %}
+                <p class="text-gray-600">No detailed test results available for this submission.</p>
+              {% endif %}
+            </div>
+          </div>
+        </div>
+      {% endfor %}
+    </div>
+  {% else %}
+    <p class="text-gray-600 text-lg">You haven’t made any submissions yet for this problem. Time to get coding!</p>
+  {% endif %}
+
+  <a href="{% url 'practice:problem_detail' problem.slug %}"
+     class="inline-block mt-8 bg-blue-600 text-white px-6 py-3 rounded-lg shadow-md hover:bg-blue-700 transition duration-300 ease-in-out transform hover:scale-105">
+    <i class="fas fa-arrow-left mr-2"></i> Back to Problem
+  </a>
+</div>
+
+<!-- Font Awesome for icons -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+
+<script>
+  function toggleSubmissionDetails(submissionId) {
+    const detailsDiv = document.getElementById(`details-${submissionId}`);
+    const arrowIcon = document.getElementById(`arrow-${submissionId}`);
+
+    if (detailsDiv.classList.contains('hidden')) {
+      detailsDiv.classList.remove('hidden');
+      arrowIcon.classList.add('rotate-180');
+    } else {
+      detailsDiv.classList.add('hidden');
+      arrowIcon.classList.remove('rotate-180');
+    }
+  }
+</script>
+{% endblock %}

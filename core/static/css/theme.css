@@ -1,0 +1,87 @@
+/* ===============================
+   Base light theme
+   =============================== */
+
+body {
+  background: #ffffff;
+  color: #111827; /* gray-900 */
+  font-family: system-ui, sans-serif;
+  transition: background 0.3s, color 0.3s;
+}
+
+a {
+  text-decoration: none;
+  color: #2563eb; /* blue-600 */
+}
+
+a:hover {
+  color: #1d4ed8; /* blue-700 */
+}
+
+header, footer {
+  transition: background 0.3s, border-color 0.3s;
+}
+
+header {
+  background: #ffffff;
+  border-bottom: 1px solid #e5e7eb; /* gray-200 */
+}
+
+footer {
+  background: #f9fafb; /* gray-50 */
+  border-top: 1px solid #e5e7eb;
+}
+
+p {
+  line-height: 1.6;
+  margin: 1em 0;
+}
+
+pre {
+  background: #f3f4f6; /* gray-100 */
+  padding: 1em;
+  border-radius: 0.5em;
+  overflow-x: auto;
+}
+
+code {
+  background: #f3f4f6;
+  padding: 0.2em 0.4em;
+  border-radius: 0.3em;
+}
+
+/* ===============================
+   Dark theme
+   Uses html.dark or body.dark
+   =============================== */
+
+html.dark, body.dark {
+  background: #111827; /* gray-900 */
+  color: #f3f4f6; /* gray-100 */
+}
+
+html.dark a, body.dark a {
+  color: #60a5fa; /* blue-400 */
+}
+
+html.dark a:hover, body.dark a:hover {
+  color: #3b82f6; /* blue-500 */
+}
+
+html.dark header, body.dark header {
+  background: #1f2937; /* gray-800 */
+  border-bottom: 1px solid #374151; /* gray-700 */
+}
+
+html.dark footer, body.dark footer {
+  background: #1f2937;
+  border-top: 1px solid #374151;
+}
+
+html.dark pre, body.dark pre {
+  background: #1e293b; /* slate-800 */
+}
+
+html.dark code, body.dark code {
+  background: #1e293b;
+}

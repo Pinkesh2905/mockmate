@@ -1,0 +1,213 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}My Mock Interviews | MockMate{% endblock %}
+
+{% block content %}
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap');
+  body {
+    font-family: 'Poppins', sans-serif;
+  }
+  .status-tag {
+    animation: pulse-border 2s infinite;
+  }
+  @keyframes pulse-border {
+    0% { box-shadow: 0 0 0 0 rgba(var(--tag-color), 0.4); }
+    70% { box-shadow: 0 0 0 8px rgba(var(--tag-color), 0); }
+    100% { box-shadow: 0 0 0 0 rgba(var(--tag-color), 0); }
+  }
+  .card-hover:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 20px rgba(0,0,0,0.05);
+  }
+</style>
+
+<section class="bg-gray-100 min-h-screen py-16">
+  <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
+    
+    <div class="flex justify-between items-center mb-10">
+      <h1 class="text-4xl font-extrabold text-gray-900 leading-tight">
+        My Mock Sessions <span class="ml-2 text-blue-500">🤖</span>
+      </h1>
+      {% if sessions %}
+        <button id="clear-all-btn" class="px-6 py-2 bg-red-500 text-white font-semibold rounded-full hover:bg-red-600 transition transform hover:scale-105 shadow-md">
+          <i class="fas fa-trash-alt mr-2"></i> Clear All
+        </button>
+      {% endif %}
+    </div>
+
+    {% if sessions %}
+      <div class="space-y-6">
+        {% for session in sessions %}
+          <div class="bg-white rounded-3xl shadow-lg border border-gray-200 transition p-8 card-hover">
+            <div class="flex flex-col md:flex-row md:items-start md:justify-between gap-6 mb-4">
+              <div class="flex-1">
+                <h2 class="text-2xl font-bold text-gray-900 mb-1">
+                  {{ session.job_role }} Interview
+                </h2>
+                <p class="text-sm text-gray-500">
+                  <i class="far fa-calendar-alt mr-1"></i> Started: {{ session.start_time|date:"M d, Y H:i" }}
+                </p>
+              </div>
+              <div class="flex flex-col md:items-end gap-2">
+                {% if session.status == 'COMPLETED' %}
+                  <span class="px-4 py-1 rounded-full text-xs font-semibold self-start md:self-auto bg-green-100 text-green-800" style="--tag-color: 34,197,94;">
+                    <i class="fas fa-check-circle mr-1"></i> {{ session.get_status_display }}
+                  </span>
+                {% elif session.status == 'STARTED' %}
+                  <span class="px-4 py-1 rounded-full text-xs font-semibold self-start md:self-auto bg-blue-100 text-blue-800 status-tag" style="--tag-color: 59,130,246;">
+                    <i class="fas fa-spinner mr-1 animate-spin"></i> {{ session.get_status_display }}
+                  </span>
+                {% elif session.status == 'REVIEW_PENDING' %}
+                  <span class="px-4 py-1 rounded-full text-xs font-semibold self-start md:self-auto bg-yellow-100 text-yellow-800 status-tag" style="--tag-color: 252,211,77;">
+                    <i class="fas fa-hourglass-half mr-1"></i> {{ session.get_status_display }}
+                  </span>
+                {% elif session.status == 'REVIEWED' %}
+                  <span class="px-4 py-1 rounded-full text-xs font-semibold self-start md:self-auto bg-purple-100 text-purple-800" style="--tag-color: 139,92,246;">
+                    <i class="fas fa-star mr-1"></i> {{ session.get_status_display }}
+                  </span>
+                {% else %}
+                  <span class="px-4 py-1 rounded-full text-xs font-semibold self-start md:self-auto bg-gray-100 text-gray-800">
+                    {{ session.get_status_display }}
+                  </span>
+                {% endif %}
+
+                {% if session.score %}
+                  <div class="text-sm text-gray-700 font-semibold mt-2">
+                    Score: <span class="text-blue-600 font-extrabold">{{ session.score }}%</span>
+                  </div>
+                {% endif %}
+              </div>
+            </div>
+
+            <p class="text-gray-700 mb-6 border-b border-gray-200 pb-4">
+              <strong>Skills:</strong> {{ session.key_skills|default:"N/A" }}
+            </p>
+
+            {% if session.overall_feedback %}
+              <div class="bg-gray-50 border border-gray-200 p-4 rounded-xl mb-6">
+                <p class="font-semibold text-gray-800 mb-2 flex items-center">
+                  <i class="fas fa-comment-alt mr-2 text-blue-500"></i> Overall Feedback:
+                </p>
+                <p class="text-gray-700 text-sm whitespace-pre-line">{{ session.overall_feedback }}</p>
+              </div>
+            {% endif %}
+
+            <div class="flex flex-wrap justify-end gap-3 mt-4">
+              {% if session.status == 'STARTED' %}
+                <a href="{% url 'mock_interview:main_interview' session_id=session.id %}" 
+                   class="inline-flex items-center px-6 py-3 bg-blue-600 text-white rounded-full font-semibold hover:bg-blue-700 transition transform hover:scale-105 shadow-lg">
+                  <i class="fas fa-play-circle mr-2"></i> Continue
+                </a>
+              {% endif %}
+              <a href="{% url 'mock_interview:review_interview' session_id=session.id %}" 
+                 class="inline-flex items-center px-6 py-3 border border-gray-300 rounded-full text-gray-700 hover:bg-gray-100 transition transform hover:scale-105 shadow-md">
+                <i class="fas fa-eye mr-2"></i> View Transcript
+              </a>
+              <!-- Delete button added here -->
+              <form id="delete-form-{{ session.id }}" method="post" action="{% url 'mock_interview:delete_session' session_id=session.id %}" class="inline-block">
+                {% csrf_token %}
+                <button type="button" onclick="confirmDelete('{{ session.id }}')"
+                   class="inline-flex items-center px-4 py-3 bg-red-100 text-red-600 rounded-full font-semibold hover:bg-red-200 transition transform hover:scale-105 shadow-md">
+                  <i class="fas fa-trash-alt"></i>
+                </button>
+              </form>
+            </div>
+          </div>
+        {% endfor %}
+      </div>
+    {% else %}
+      <div class="text-center py-24 bg-white rounded-3xl shadow-xl">
+        <div class="text-gray-400 text-8xl mb-8">🤷‍♂️</div>
+        <h2 class="text-3xl font-bold text-gray-800 mb-4">No Mock Interviews Yet</h2>
+        <p class="text-gray-600 mb-8 max-w-md mx-auto leading-relaxed">
+          Start your first AI mock interview to practice your skills and get personalized feedback.
+        </p>
+        <a href="{% url 'mock_interview:interview_setup' %}" 
+           class="inline-block px-10 py-4 bg-gradient-to-r from-blue-500 to-blue-600 text-white rounded-full font-semibold text-lg hover:opacity-90 transition transform hover:scale-105 shadow-xl">
+          Start a New Interview
+        </a>
+      </div>
+    {% endif %}
+  </div>
+
+  <!-- Confirmation Modal -->
+  <div id="delete-modal" class="fixed inset-0 bg-gray-600 bg-opacity-75 flex items-center justify-center p-4 z-50 hidden">
+    <div class="bg-white rounded-2xl shadow-xl p-6 w-full max-w-md transform transition-all scale-95 duration-300 ease-out">
+      <div class="text-center">
+        <i class="fas fa-exclamation-triangle text-red-500 text-4xl mb-4"></i>
+        <h3 class="text-xl font-bold text-gray-900 mb-2">Are you sure?</h3>
+        <p class="text-sm text-gray-600 mb-6">
+          This action cannot be undone. All data for this interview will be permanently deleted.
+        </p>
+      </div>
+      <div class="flex justify-center gap-4">
+        <button id="modal-cancel-btn" type="button" class="px-6 py-2 border border-gray-300 rounded-full text-gray-700 hover:bg-gray-100 transition">
+          Cancel
+        </button>
+        <button id="modal-confirm-btn" type="button" class="px-6 py-2 bg-red-500 text-white rounded-full hover:bg-red-600 transition">
+          Delete
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Clear All Confirmation Modal -->
+  <div id="clear-all-modal" class="fixed inset-0 bg-gray-600 bg-opacity-75 flex items-center justify-center p-4 z-50 hidden">
+    <div class="bg-white rounded-2xl shadow-xl p-6 w-full max-w-md transform transition-all scale-95 duration-300 ease-out">
+      <div class="text-center">
+        <i class="fas fa-exclamation-triangle text-red-500 text-4xl mb-4"></i>
+        <h3 class="text-xl font-bold text-gray-900 mb-2">Clear all interviews?</h3>
+        <p class="text-sm text-gray-600 mb-6">
+          This will permanently delete all your mock interview history. This action cannot be undone.
+        </p>
+      </div>
+      <div class="flex justify-center gap-4">
+        <button id="clear-all-cancel-btn" type="button" class="px-6 py-2 border border-gray-300 rounded-full text-gray-700 hover:bg-gray-100 transition">
+          Cancel
+        </button>
+        <form id="clear-all-form" method="post" action="{% url 'mock_interview:clear_all_sessions' %}">
+          {% csrf_token %}
+          <button type="submit" class="px-6 py-2 bg-red-500 text-white rounded-full hover:bg-red-600 transition">
+            Yes, Clear All
+          </button>
+        </form>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Font Awesome for icons -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+<script>
+  // JavaScript for delete confirmation modal
+  function confirmDelete(sessionId) {
+    const modal = document.getElementById('delete-modal');
+    modal.classList.remove('hidden');
+
+    const confirmBtn = document.getElementById('modal-confirm-btn');
+    const cancelBtn = document.getElementById('modal-cancel-btn');
+
+    const newConfirmBtn = confirmBtn.cloneNode(true);
+    confirmBtn.parentNode.replaceChild(newConfirmBtn, confirmBtn);
+
+    newConfirmBtn.addEventListener('click', function() {
+      document.getElementById('delete-form-' + sessionId).submit();
+    });
+    
+    cancelBtn.addEventListener('click', function() {
+      modal.classList.add('hidden');
+    });
+  }
+
+  // JavaScript for clear all confirmation modal
+  document.getElementById('clear-all-btn')?.addEventListener('click', function() {
+    document.getElementById('clear-all-modal').classList.remove('hidden');
+  });
+
+  document.getElementById('clear-all-cancel-btn')?.addEventListener('click', function() {
+    document.getElementById('clear-all-modal').classList.add('hidden');
+  });
+</script>
+{% endblock %}

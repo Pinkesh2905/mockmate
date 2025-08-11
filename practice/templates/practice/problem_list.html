@@ -1,0 +1,55 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Practice Problems | MockMate{% endblock %}
+
+{% block content %}
+<div class="max-w-7xl mx-auto py-12 px-4 sm:px-6 lg:px-8">
+  <h1 class="text-4xl font-extrabold mb-8 text-gray-900 text-center">Practice Problems</h1>
+
+  {% if problems %}
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+      {% for problem in problems %}
+        <div class="bg-white p-8 border border-gray-200 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 ease-in-out transform hover:-translate-y-1">
+          <h2 class="text-2xl font-bold mb-3 text-gray-800">
+            <a href="{% url 'practice:problem_detail' problem.slug %}" class="hover:text-blue-600 transition-colors duration-200">
+              {{ problem.title }}
+            </a>
+          </h2>
+          <div class="mb-4">
+            {% if problem.difficulty %}
+              <span class="inline-block px-4 py-1 rounded-full text-sm font-semibold
+                {% if problem.difficulty == 'Easy' %}bg-green-100 text-green-800
+                {% elif problem.difficulty == 'Medium' %}bg-yellow-100 text-yellow-800
+                {% elif problem.difficulty == 'Hard' %}bg-red-100 text-red-800
+                {% else %}bg-blue-100 text-blue-800{% endif %}">
+                {{ problem.difficulty }}
+              </span>
+            {% endif %}
+            {% if problem.companies %}
+              <span class="inline-block bg-purple-100 text-purple-800 text-xs px-3 py-1 rounded-full ml-2">
+                {{ problem.companies }}
+              </span>
+            {% endif %}
+          </div>
+          <p class="text-gray-600 text-sm mt-2 mb-4">
+            Created on {{ problem.created_at|date:"M d, Y" }}
+          </p>
+          <a href="{% url 'practice:problem_detail' problem.slug %}"
+             class="inline-flex items-center justify-center px-5 py-2 border border-transparent text-base font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 transition duration-300 ease-in-out shadow-md">
+            Solve Now <i class="fas fa-arrow-right ml-2"></i>
+          </a>
+        </div>
+      {% endfor %}
+    </div>
+  {% else %}
+    <div class="text-center py-10">
+      <p class="text-gray-600 text-xl">No practice problems available yet. Check back soon!</p>
+      <i class="fas fa-code text-blue-400 text-6xl mt-6"></i>
+    </div>
+  {% endif %}
+</div>
+
+<!-- Font Awesome for icons -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+{% endblock %}

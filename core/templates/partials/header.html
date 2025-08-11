@@ -1,0 +1,95 @@
+<!-- templates/partials/header.html -->
+
+<header class="bg-white dark:bg-gray-800 shadow-sm sticky top-0 z-50">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="flex justify-between items-center h-16">
+      <!-- Logo -->
+      <a href="/" class="flex items-center space-x-2">
+        <div class="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center">
+          <i class="ri-code-s-slash-line text-white"></i>
+        </div>
+        <span class="text-xl font-bold text-gray-900 dark:text-white font-pacifico">
+          MockMate
+        </span>
+      </a>
+
+      <!-- Desktop Navigation -->
+      <nav class="hidden md:flex items-center space-x-8">
+        <a href="/" class="text-gray-700 dark:text-gray-300 hover:text-blue-600 transition-colors">Home</a>
+        <a href="/courses" class="text-gray-700 dark:text-gray-300 hover:text-blue-600 transition-colors">Courses</a>
+        <a href="/practice" class="text-gray-700 dark:text-gray-300 hover:text-blue-600 transition-colors">Practice</a>
+        <a href="/quizzes" class="text-gray-700 dark:text-gray-300 hover:text-blue-600 transition-colors">Quizzes</a>
+        <a href="/articles" class="text-gray-700 dark:text-gray-300 hover:text-blue-600 transition-colors">Articles</a>
+      </nav>
+
+      <!-- Right Section -->
+      <div class="flex items-center space-x-4">
+        <!-- Theme Toggle -->
+        <button onclick="toggleTheme()" class="w-10 h-10 rounded-lg bg-gray-100 dark:bg-gray-700 flex items-center justify-center text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors">
+          <i id="theme-icon" class="ri-moon-line"></i>
+        </button>
+
+        <!-- User Menu -->
+        <div class="hidden md:flex items-center space-x-3">
+          <a href="/login" class="px-4 py-2 text-gray-700 dark:text-gray-300 hover:text-blue-600 transition-colors">Sign In</a>
+          <a href="/register" class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">Sign Up</a>
+        </div>
+
+        <!-- Mobile Menu Button -->
+        <button onclick="toggleMobileMenu()" class="md:hidden w-10 h-10 rounded-lg bg-gray-100 dark:bg-gray-700 flex items-center justify-center text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors">
+          <i id="mobile-menu-icon" class="ri-menu-line"></i>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Mobile Menu -->
+  <div id="mobile-menu" class="hidden md:hidden bg-white dark:bg-gray-800 border-t border-gray-200 dark:border-gray-700">
+    <div class="px-4 py-3 space-y-3">
+      <a href="/" class="block text-gray-700 dark:text-gray-300 hover:text-blue-600 transition-colors py-2">Home</a>
+      <a href="/courses" class="block text-gray-700 dark:text-gray-300 hover:text-blue-600 transition-colors py-2">Courses</a>
+      <a href="/practice" class="block text-gray-700 dark:text-gray-300 hover:text-blue-600 transition-colors py-2">Practice</a>
+      <a href="/quizzes" class="block text-gray-700 dark:text-gray-300 hover:text-blue-600 transition-colors py-2">Quizzes</a>
+      <a href="/articles" class="block text-gray-700 dark:text-gray-300 hover:text-blue-600 transition-colors py-2">Articles</a>
+      <div class="pt-3 border-t border-gray-200 dark:border-gray-700">
+        <a href="/login" class="block w-full text-left py-2 text-gray-700 dark:text-gray-300 hover:text-blue-600">Sign In</a>
+        <a href="/register" class="block w-full text-left py-2 text-blue-600 dark:text-blue-400 font-medium">Sign Up</a>
+      </div>
+    </div>
+  </div>
+</header>
+
+<script>
+  function toggleMobileMenu() {
+    const menu = document.getElementById('mobile-menu');
+    const icon = document.getElementById('mobile-menu-icon');
+    if (menu.classList.contains('hidden')) {
+      menu.classList.remove('hidden');
+      icon.className = 'ri-close-line';
+    } else {
+      menu.classList.add('hidden');
+      icon.className = 'ri-menu-line';
+    }
+  }
+
+  function toggleTheme() {
+    const body = document.body;
+    body.classList.toggle('dark');
+    const icon = document.getElementById('theme-icon');
+    if (body.classList.contains('dark')) {
+      icon.className = 'ri-sun-line';
+      localStorage.setItem('theme', 'dark');
+    } else {
+      icon.className = 'ri-moon-line';
+      localStorage.setItem('theme', 'light');
+    }
+  }
+
+  // On page load
+  (function() {
+    if (localStorage.getItem('theme') === 'dark') {
+      document.body.classList.add('dark');
+      document.getElementById('theme-icon').className = 'ri-sun-line';
+    }
+  })();
+</script>

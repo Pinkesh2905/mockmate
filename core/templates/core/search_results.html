@@ -1,0 +1,49 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="max-w-5xl mx-auto p-6">
+  <h2 class="text-2xl font-semibold mb-6">Search results for "{{ query }}"</h2>
+
+  {% if users %}
+    <h3 class="text-xl font-bold mb-2">👤 Users</h3>
+    <ul class="mb-6 space-y-2">
+      {% for user in users %}
+        <li>
+          <a href="{% url 'users:public_profile' user.username %}" class="text-blue-600 hover:underline">
+            {{ user.get_full_name|default:user.username }}
+          </a>
+        </li>
+      {% endfor %}
+    </ul>
+  {% endif %}
+
+  {% if courses %}
+    <h3 class="text-xl font-bold mb-2">📘 Courses</h3>
+    <ul class="mb-6 space-y-2">
+      {% for course in courses %}
+        <li>
+          <a href="{% url 'courses:detail' course.slug %}" class="text-blue-600 hover:underline">
+            {{ course.title }}
+          </a>
+        </li>
+      {% endfor %}
+    </ul>
+  {% endif %}
+
+  {% if posts %}
+    <h3 class="text-xl font-bold mb-2">✏️ Posts</h3>
+    <ul class="space-y-4">
+      {% for post in posts %}
+        <li class="p-4 bg-white rounded-lg shadow border">
+          <p class="text-gray-800">{{ post.content|truncatewords:20 }}</p>
+          <p class="text-sm text-gray-500 mt-1">— {{ post.author.username }}</p>
+          <a href="{% url 'posts:detail' post.id %}" class="text-sm text-blue-600 hover:underline">Read More</a>
+        </li>
+      {% endfor %}
+    </ul>
+  {% endif %}
+
+  {% if not users and not courses and not posts %}
+    <p class="text-gray-500">No results found.</p>
+  {% endif %}
+</div>
+{% endblock %}

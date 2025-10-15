@@ -1,1376 +1,998 @@
-{% extends "base.html" %}
-{% load static %}
+{% extends 'base.html' %}
 
-{% block title %}MockMate - Learn, Practice, Excel{% endblock %}
+{% block title %}MockMate - Master Your Tech Career{% endblock %}
 
 {% block content %}
-
-<!-- Hero Section - Enhanced Dynamic Background & Text -->
-<section 
-  id="hero-section"
-  class="relative h-screen flex items-center justify-center bg-cover bg-center transition-all duration-1000 ease-in-out overflow-hidden"
-  style="background-image: linear-gradient(135deg, rgba(37, 99, 235, 0.9), rgba(147, 51, 234, 0.8)), url('https://images.unsplash.com/photo-1517077304055-6e89abbf09b0?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1920&q=80');"
->
-  <!-- Animated Background Elements -->
-  <div class="absolute inset-0 overflow-hidden">
-    <div class="floating-shapes">
-      <div class="shape shape-1"></div>
-      <div class="shape shape-2"></div>
-      <div class="shape shape-3"></div>
-      <div class="shape shape-4"></div>
-      <div class="shape shape-5"></div>
-      <div class="shape shape-6"></div>
-      <div class="shape shape-7"></div>
-    </div>
-    <!-- Code Rain Effect -->
-    <div class="code-rain">
-      <div class="rain-line" style="left: 10%; animation-delay: 0s;">01010110</div>
-      <div class="rain-line" style="left: 20%; animation-delay: 1s;">function()</div>
-      <div class="rain-line" style="left: 30%; animation-delay: 2s;">&lt;/&gt;</div>
-      <div class="rain-line" style="left: 40%; animation-delay: 3s;">console.log</div>
-      <div class="rain-line" style="left: 50%; animation-delay: 4s;">{ }</div>
-      <div class="rain-line" style="left: 60%; animation-delay: 5s;">async/await</div>
-      <div class="rain-line" style="left: 70%; animation-delay: 6s;">React</div>
-      <div class="rain-line" style="left: 80%; animation-delay: 7s;">Python</div>
-      <div class="rain-line" style="left: 90%; animation-delay: 8s;">while(true)</div>
+<!-- Hero Section with Coding Animation -->
+<section class="relative min-h-screen flex items-center justify-center overflow-hidden">
+  <!-- Dynamic coding background -->
+  <div class="absolute inset-0 bg-gradient-to-br from-slate-900/60 via-indigo-900/40 to-purple-900/50"></div>
+  
+  <!-- Animated code snippets -->
+  <div class="absolute inset-0 overflow-hidden pointer-events-none">
+    <div class="coding-rain">
+      <div class="code-snippet" style="left: 10%; animation-delay: 0s;">function solve() {</div>
+      <div class="code-snippet" style="left: 30%; animation-delay: 2s;">const result = [];</div>
+      <div class="code-snippet" style="left: 60%; animation-delay: 4s;">return answer;</div>
+      <div class="code-snippet" style="left: 80%; animation-delay: 6s;">}</div>
+      <div class="code-snippet" style="left: 45%; animation-delay: 8s;">if (condition) {</div>
+      <div class="code-snippet" style="left: 25%; animation-delay: 10s;">console.log('success');</div>
     </div>
   </div>
   
-  <!-- Gradient Overlay -->
-  <div class="absolute inset-0 bg-gradient-to-br from-blue-900/60 via-purple-900/50 to-indigo-900/60"></div>
-  
-  <!-- Content -->
   <div class="relative z-10 text-center max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-    <div class="hero-badge mb-6">
-      <span class="inline-flex items-center px-4 py-2 rounded-full text-sm font-medium bg-white/10 text-white border border-white/20 backdrop-blur-sm">
-        <span class="w-2 h-2 bg-green-400 rounded-full mr-2 animate-pulse"></span>
-        🚀 #1 Platform for Tech Interview Prep
-      </span>
+    <!-- Enhanced status badge with typing animation -->
+    <div class="inline-flex items-center px-8 py-4 rounded-2xl glass border border-emerald-400/30 mb-10 hover-lift">
+      <div class="w-3 h-3 bg-emerald-400 rounded-full mr-4 pulse-dot"></div>
+      <span class="text-slate-200 font-semibold text-lg typing-text">Leading Placement Preparation Platform</span>
     </div>
     
-    <h1 id="hero-title" class="text-6xl md:text-7xl lg:text-8xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-white via-blue-100 to-purple-200 mb-6 animate-fade-in-up leading-tight">
-      Learn, Practice, Excel
+    <!-- Main headline with gradient animation -->
+    <h1 class="text-6xl md:text-7xl lg:text-8xl font-bold text-white mb-10 leading-tight">
+      Master Your
+      <span class="text-transparent bg-clip-text animated-gradient brand-font block mt-2">
+        Tech Future
+      </span>
     </h1>
     
-    <p class="text-xl md:text-2xl text-gray-100 mb-8 max-w-3xl mx-auto animate-fade-in-up delay-200 leading-relaxed">
-      Master coding skills with our modern platform: courses, challenges, quizzes, community posts & real mock interviews. Join 15,000+ developers already leveling up! 🎯
-    </p>
-    
-    <div id="quote-container" class="mb-10 animate-fade-in-up delay-400">
-      <div id="quote-display" class="quote-box bg-white/10 backdrop-blur-sm border border-white/20 rounded-2xl p-6 max-w-2xl mx-auto">
-        <p class="text-lg italic text-blue-100 mb-2">
-          "The only way to do great work is to love what you do."
-        </p>
-        <p class="text-sm text-blue-200 font-medium">— Steve Jobs</p>
-      </div>
+    <!-- Enhanced subtitle with typewriter effect -->
+    <div class="text-2xl md:text-3xl text-slate-300 mb-16 max-w-4xl mx-auto leading-relaxed">
+      <span class="typewriter">Code. Learn. Succeed. Land your dream job.</span>
     </div>
     
-    <div class="flex flex-col sm:flex-row gap-4 justify-center animate-fade-in-up delay-600">
+    <!-- Enhanced CTA buttons with ripple effect -->
+    <div class="flex flex-col sm:flex-row gap-8 justify-center mb-20">
       {% if not user.is_authenticated %}
-        <a href="{% url 'users:signup' %}" class="group px-8 py-4 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-xl hover:from-blue-700 hover:to-purple-700 transition-all duration-300 font-semibold text-lg shadow-2xl transform hover:scale-105 hover:shadow-blue-500/25">
+        <a href="{% url 'users:signup' %}" class="group relative overflow-hidden px-12 py-5 bg-gradient-to-r from-indigo-600 via-purple-600 to-cyan-600 text-white rounded-2xl font-bold text-xl shadow-2xl btn-glow hover-lift ripple-btn">
+          <div class="absolute inset-0 bg-gradient-to-r from-cyan-600 via-purple-600 to-indigo-600 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+          <span class="relative flex items-center justify-center">
+            <i class="ri-rocket-line mr-3"></i>
+            Launch Career
+            <i class="ri-arrow-right-line ml-3 group-hover:translate-x-2 transition-transform duration-300"></i>
+          </span>
+        </a>
+        <a href="#features" class="group px-12 py-5 glass border-2 border-white/40 text-white rounded-2xl hover:bg-white/20 hover:border-indigo-400/60 transition-all duration-400 font-bold text-xl hover-lift">
           <span class="flex items-center justify-center">
-            🎉 Get Started Free
-            <i class="ri-arrow-right-line ml-2 group-hover:translate-x-1 transition-transform"></i>
+            <i class="ri-code-view mr-3"></i>
+            Explore Platform
+            <i class="ri-arrow-down-line ml-3 group-hover:translate-y-1 transition-transform duration-300"></i>
+          </span>
+        </a>
+      {% else %}
+        <a href="{% url 'practice:problem_list' %}" class="group relative overflow-hidden px-12 py-5 bg-gradient-to-r from-indigo-600 via-purple-600 to-cyan-600 text-white rounded-2xl font-bold text-xl shadow-2xl btn-glow hover-lift ripple-btn">
+          <span class="relative flex items-center justify-center">
+            <i class="ri-code-s-slash-line mr-3"></i>
+            Continue Coding
+            <i class="ri-arrow-right-line ml-3 group-hover:translate-x-2 transition-transform duration-300"></i>
+          </span>
+        </a>
+        <a href="{% url 'mock_interview:interview_setup' %}" class="group px-12 py-5 glass border-2 border-white/40 text-white rounded-2xl hover:bg-white/20 hover:border-cyan-400/60 transition-all duration-400 font-bold text-xl hover-lift">
+          <span class="flex items-center justify-center">
+            <i class="ri-robot-line mr-3"></i>
+            AI Interview
           </span>
         </a>
       {% endif %}
-      <a href="{% url 'practice:problem_list' %}" class="group px-8 py-4 bg-white/10 backdrop-blur-sm border border-white/30 text-white rounded-xl hover:bg-white/20 transition-all duration-300 font-semibold text-lg shadow-xl transform hover:scale-105">
-        <span class="flex items-center justify-center">
-          <i class="ri-code-s-slash-line mr-2"></i>
-          Start Coding Now
-        </span>
-      </a>
     </div>
     
-    <!-- Trust Indicators -->
-    <div class="mt-12 flex items-center justify-center space-x-8 text-white/70 animate-fade-in-up delay-800">
-      <div class="flex items-center">
-        <i class="ri-star-fill text-yellow-400 mr-1"></i>
-        <span class="text-sm">4.9/5 Rating</span>
+    <!-- Enhanced trust indicators with floating animation -->
+    <div class="flex flex-wrap items-center justify-center gap-10 text-slate-300">
+      <div class="flex items-center glass px-8 py-4 rounded-2xl border border-amber-400/30 floating-badge">
+        <i class="ri-star-fill text-amber-400 mr-3 text-lg"></i>
+        <span class="font-bold">4.9★ Rating</span>
       </div>
-      <div class="flex items-center">
-        <i class="ri-user-line mr-1"></i>
-        <span class="text-sm">15K+ Students</span>
+      <div class="flex items-center glass px-8 py-4 rounded-2xl border border-indigo-400/30 floating-badge" style="animation-delay: 0.5s;">
+        <i class="ri-group-line mr-3 text-indigo-400 text-lg"></i>
+        <span class="font-bold">25K+ Coders</span>
       </div>
-      <div class="flex items-center">
-        <i class="ri-shield-check-line text-green-400 mr-1"></i>
-        <span class="text-sm">Industry Approved</span>
+      <div class="flex items-center glass px-8 py-4 rounded-2xl border border-emerald-400/30 floating-badge" style="animation-delay: 1s;">
+        <i class="ri-trophy-line mr-3 text-emerald-400 text-lg"></i>
+        <span class="font-bold">95% Success</span>
       </div>
     </div>
   </div>
 </section>
 
-<!-- Fun Banner Section -->
-<section class="py-4 bg-gradient-to-r from-pink-500 via-purple-500 to-blue-500 relative overflow-hidden">
-  <div class="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent animate-shimmer"></div>
-  <div class="max-w-7xl mx-auto px-4 text-center">
-    <p class="text-white font-bold text-lg animate-bounce-slow">
-      🔥 New Feature Alert: Community Posts Now Live! Share your coding journey! 🔥
-    </p>
-  </div>
-</section>
-
-<!-- Stats Section - Enhanced with Icons -->
-<section class="py-20 bg-gradient-to-b from-gray-50 to-white relative overflow-hidden">
-  <!-- Background Pattern -->
-  <div class="absolute inset-0 opacity-5">
-    <div class="absolute inset-0" style="background-image: radial-gradient(circle at 20% 80%, #2563eb 0%, transparent 50%), radial-gradient(circle at 80% 20%, #7c3aed 0%, transparent 50%);"></div>
-  </div>
+<!-- Features Section with Code-themed Animations -->
+<section id="features" class="py-24 relative overflow-hidden">
+  <div class="absolute inset-0 bg-gradient-to-br from-slate-900/80 to-indigo-900/40"></div>
   
-  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative">
-    <div class="text-center mb-16">
-      <h2 class="text-4xl font-bold text-gray-900 mb-4">Trusted by Thousands 🌟</h2>
-      <p class="text-xl text-gray-600">Our platform delivers real results across the globe</p>
-    </div>
-    
-    <div class="grid grid-cols-2 md:grid-cols-4 gap-8">
-      <div class="stat-item text-center group">
-        <div class="bg-white rounded-2xl p-8 shadow-lg border border-gray-100 transform group-hover:-translate-y-2 transition-all duration-300 hover:shadow-xl">
-          <div class="w-16 h-16 bg-gradient-to-br from-blue-500 to-blue-600 rounded-2xl flex items-center justify-center mx-auto mb-4 transform group-hover:scale-110 transition-transform">
-            <i class="ri-play-circle-line text-white text-2xl"></i>
-          </div>
-          <div class="text-4xl font-bold text-gray-900 mb-2" data-target="75">0</div>
-          <div class="text-gray-600 font-medium text-lg">Expert Courses</div>
-        </div>
-      </div>
-      
-      <div class="stat-item text-center group">
-        <div class="bg-white rounded-2xl p-8 shadow-lg border border-gray-100 transform group-hover:-translate-y-2 transition-all duration-300 hover:shadow-xl">
-          <div class="w-16 h-16 bg-gradient-to-br from-green-500 to-green-600 rounded-2xl flex items-center justify-center mx-auto mb-4 transform group-hover:scale-110 transition-transform">
-            <i class="ri-code-s-slash-line text-white text-2xl"></i>
-          </div>
-          <div class="text-4xl font-bold text-gray-900 mb-2" data-target="500">0</div>
-          <div class="text-gray-600 font-medium text-lg">Practice Problems</div>
-        </div>
-      </div>
-      
-      <div class="stat-item text-center group">
-        <div class="bg-white rounded-2xl p-8 shadow-lg border border-gray-100 transform group-hover:-translate-y-2 transition-all duration-300 hover:shadow-xl">
-          <div class="w-16 h-16 bg-gradient-to-br from-purple-500 to-purple-600 rounded-2xl flex items-center justify-center mx-auto mb-4 transform group-hover:scale-110 transition-transform">
-            <i class="ri-question-answer-line text-white text-2xl"></i>
-          </div>
-          <div class="text-4xl font-bold text-gray-900 mb-2" data-target="300">0</div>
-          <div class="text-gray-600 font-medium text-lg">Quiz Topics</div>
-        </div>
-      </div>
-      
-      <div class="stat-item text-center group">
-        <div class="bg-white rounded-2xl p-8 shadow-lg border border-gray-100 transform group-hover:-translate-y-2 transition-all duration-300 hover:shadow-xl">
-          <div class="w-16 h-16 bg-gradient-to-br from-orange-500 to-orange-600 rounded-2xl flex items-center justify-center mx-auto mb-4 transform group-hover:scale-110 transition-transform">
-            <i class="ri-file-text-line text-white text-2xl"></i>
-          </div>
-          <div class="text-4xl font-bold text-gray-900 mb-2" data-target="800">0</div>
-          <div class="text-gray-600 font-medium text-lg">Learning Articles</div>
-        </div>
-      </div>
-    </div>
+  <!-- Binary background pattern -->
+  <div class="absolute inset-0 opacity-10">
+    <div class="binary-grid"></div>
   </div>
-</section>
-
-<!-- Features Section - Modern Card Design with Posts -->
-<section class="py-24 bg-white relative overflow-hidden">
-  <!-- Background Elements -->
-  <div class="absolute top-0 left-0 w-72 h-72 bg-blue-100 rounded-full mix-blend-multiply filter blur-xl opacity-70 animate-blob"></div>
-  <div class="absolute top-0 right-0 w-72 h-72 bg-purple-100 rounded-full mix-blend-multiply filter blur-xl opacity-70 animate-blob animation-delay-2000"></div>
-  <div class="absolute -bottom-8 left-20 w-72 h-72 bg-pink-100 rounded-full mix-blend-multiply filter blur-xl opacity-70 animate-blob animation-delay-4000"></div>
   
   <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative">
     <div class="text-center mb-20">
-      <div class="inline-flex items-center px-4 py-2 rounded-full text-sm font-medium bg-blue-50 text-blue-700 border border-blue-200 mb-6">
-        <i class="ri-star-line mr-2"></i>
-        ✨ Premium Features
+      <div class="inline-flex items-center px-6 py-3 rounded-xl glass border border-purple-400/30 mb-8">
+        <i class="ri-code-box-line mr-3 text-purple-400"></i>
+        <span class="text-slate-200 font-semibold">Platform Features</span>
       </div>
-      <h2 class="text-5xl font-bold text-gray-900 mb-6">
-        Everything You Need to <span class="text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-purple-600">Succeed</span>
+      <h2 class="text-5xl md:text-6xl font-bold text-white mb-8">
+        Everything for Your
+        <span class="text-transparent bg-clip-text animated-gradient brand-font">Success Journey</span>
       </h2>
-      <p class="text-xl text-gray-600 max-w-3xl mx-auto">
-        Build in-demand skills with structured courses, hands-on practice, community engagement, and realistic mock interviews designed by industry experts.
+      <p class="text-2xl text-slate-300 max-w-3xl mx-auto leading-relaxed">
+        Comprehensive tools designed for modern tech interview mastery
       </p>
     </div>
 
-    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-8">
-      <!-- Video Courses -->
-      <a href="{% url 'courses:list' %}" class="group block transform hover:-translate-y-3 transition-all duration-300">
-        <div class="bg-white rounded-3xl p-8 shadow-lg border border-gray-100 hover:shadow-2xl hover:border-blue-200 transition-all h-full flex flex-col items-center text-center relative overflow-hidden">
-          <div class="absolute top-0 right-0 w-24 h-24 bg-gradient-to-br from-blue-500/10 to-blue-600/10 rounded-full -mr-12 -mt-12"></div>
-          <div class="w-20 h-20 rounded-3xl bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center mb-6 transform group-hover:scale-110 group-hover:rotate-3 transition-all duration-300 shadow-lg">
-            <i class="ri-play-circle-line text-white text-3xl"></i>
-          </div>
-          <h3 class="text-xl font-bold text-gray-900 mb-3 group-hover:text-blue-600 transition">
-            📚 Video Courses
-          </h3>
-          <p class="text-gray-600 text-sm leading-relaxed flex-grow">
-            Learn from expert instructors with structured videos, interactive content, and real progress tracking.
-          </p>
-          <div class="mt-4 flex items-center text-blue-600 font-medium text-sm">
-            <span>Explore Courses</span>
-            <i class="ri-arrow-right-line ml-1 group-hover:translate-x-1 transition-transform"></i>
-          </div>
-        </div>
-      </a>
-
-      <!-- Practice Problems -->
-      <a href="{% url 'practice:problem_list' %}" class="group block transform hover:-translate-y-3 transition-all duration-300">
-        <div class="bg-white rounded-3xl p-8 shadow-lg border border-gray-100 hover:shadow-2xl hover:border-green-200 transition-all h-full flex flex-col items-center text-center relative overflow-hidden">
-          <div class="absolute top-0 right-0 w-24 h-24 bg-gradient-to-br from-green-500/10 to-green-600/10 rounded-full -mr-12 -mt-12"></div>
-          <div class="w-20 h-20 rounded-3xl bg-gradient-to-br from-green-500 to-green-600 flex items-center justify-center mb-6 transform group-hover:scale-110 group-hover:rotate-3 transition-all duration-300 shadow-lg">
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-10">
+      <!-- Coding Problems -->
+      <div class="feature-card group relative overflow-hidden">
+        <div class="absolute inset-0 bg-gradient-to-br from-indigo-500/10 to-purple-500/10 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+        <div class="relative p-8">
+          <div class="w-20 h-20 rounded-3xl bg-gradient-to-br from-indigo-500 to-indigo-600 flex items-center justify-center mb-8 group-hover:scale-110 transition-transform duration-300 icon-float">
             <i class="ri-code-s-slash-line text-white text-3xl"></i>
           </div>
-          <h3 class="text-xl font-bold text-gray-900 mb-3 group-hover:text-green-600 transition">
-            🔥 Practice Problems
+          <h3 class="text-2xl font-bold text-white mb-6 brand-font group-hover:text-indigo-400 transition-colors">
+            Coding Problems
           </h3>
-          <p class="text-gray-600 text-sm leading-relaxed flex-grow">
-            Solve real-world coding challenges with instant feedback, detailed solutions, and difficulty progression.
+          <p class="text-slate-300 mb-8 leading-relaxed text-lg">
+            Master algorithms and data structures with 1200+ curated problems from top tech companies.
           </p>
-          <div class="mt-4 flex items-center text-green-600 font-medium text-sm">
-            <span>Start Coding</span>
-            <i class="ri-arrow-right-line ml-1 group-hover:translate-x-1 transition-transform"></i>
+          
+          <div class="space-y-4 mb-8">
+            <div class="flex items-center text-emerald-400 font-medium">
+              <i class="ri-check-double-line mr-3"></i>
+              Company-specific questions
+            </div>
+            <div class="flex items-center text-emerald-400 font-medium">
+              <i class="ri-check-double-line mr-3"></i>
+              Multiple language support
+            </div>
+            <div class="flex items-center text-emerald-400 font-medium">
+              <i class="ri-check-double-line mr-3"></i>
+              Detailed explanations
+            </div>
           </div>
+          
+          <a href="{% url 'practice:problem_list' %}" class="inline-flex items-center px-6 py-3 bg-indigo-600 text-white rounded-xl font-bold hover:bg-indigo-700 transition-colors group-hover:translate-x-1 duration-300">
+            Start Coding
+            <i class="ri-arrow-right-line ml-2"></i>
+          </a>
         </div>
-      </a>
+      </div>
 
-      <!-- Quizzes -->
-      <a href="{% url 'quizzes:quiz_list' %}" class="group block transform hover:-translate-y-3 transition-all duration-300">
-        <div class="bg-white rounded-3xl p-8 shadow-lg border border-gray-100 hover:shadow-2xl hover:border-purple-200 transition-all h-full flex flex-col items-center text-center relative overflow-hidden">
-          <div class="absolute top-0 right-0 w-24 h-24 bg-gradient-to-br from-purple-500/10 to-purple-600/10 rounded-full -mr-12 -mt-12"></div>
-          <div class="w-20 h-20 rounded-3xl bg-gradient-to-br from-purple-500 to-purple-600 flex items-center justify-center mb-6 transform group-hover:scale-110 group-hover:rotate-3 transition-all duration-300 shadow-lg">
-            <i class="ri-question-answer-line text-white text-3xl"></i>
+      <!-- Aptitude Tests -->
+      <div class="feature-card group relative overflow-hidden">
+        <div class="absolute inset-0 bg-gradient-to-br from-purple-500/10 to-pink-500/10 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+        <div class="relative p-8">
+          <div class="w-20 h-20 rounded-3xl bg-gradient-to-br from-purple-500 to-purple-600 flex items-center justify-center mb-8 group-hover:scale-110 transition-transform duration-300 icon-float" style="animation-delay: 0.2s;">
+            <i class="ri-brain-line text-white text-3xl"></i>
           </div>
-          <h3 class="text-xl font-bold text-gray-900 mb-3 group-hover:text-purple-600 transition">
-            🧠 Interactive Quizzes
+          <h3 class="text-2xl font-bold text-white mb-6 brand-font group-hover:text-purple-400 transition-colors">
+            Aptitude Tests
           </h3>
-          <p class="text-gray-600 text-sm leading-relaxed flex-grow">
-            Reinforce your knowledge with dynamic quizzes, smart explanations, and adaptive learning paths.
+          <p class="text-slate-300 mb-8 leading-relaxed text-lg">
+            Sharpen logical reasoning, quantitative skills, and verbal ability with targeted assessments.
           </p>
-          <div class="mt-4 flex items-center text-purple-600 font-medium text-sm">
-            <span>Take Quiz</span>
-            <i class="ri-arrow-right-line ml-1 group-hover:translate-x-1 transition-transform"></i>
+          
+          <div class="space-y-4 mb-8">
+            <div class="flex items-center text-emerald-400 font-medium">
+              <i class="ri-check-double-line mr-3"></i>
+              Logical reasoning puzzles
+            </div>
+            <div class="flex items-center text-emerald-400 font-medium">
+              <i class="ri-check-double-line mr-3"></i>
+              Quantitative analysis
+            </div>
+            <div class="flex items-center text-emerald-400 font-medium">
+              <i class="ri-check-double-line mr-3"></i>
+              Verbal comprehension
+            </div>
           </div>
+          
+          <a href="{% url 'aptitude:dashboard' %}" class="inline-flex items-center px-6 py-3 bg-purple-600 text-white rounded-xl font-bold hover:bg-purple-700 transition-colors group-hover:translate-x-1 duration-300">
+            Take Tests
+            <i class="ri-arrow-right-line ml-2"></i>
+          </a>
         </div>
-      </a>
+      </div>
 
-      <!-- Articles -->
-      <a href="{% url 'articles:article_list' %}" class="group block transform hover:-translate-y-3 transition-all duration-300">
-        <div class="bg-white rounded-3xl p-8 shadow-lg border border-gray-100 hover:shadow-2xl hover:border-orange-200 transition-all h-full flex flex-col items-center text-center relative overflow-hidden">
-          <div class="absolute top-0 right-0 w-24 h-24 bg-gradient-to-br from-orange-500/10 to-orange-600/10 rounded-full -mr-12 -mt-12"></div>
-          <div class="w-20 h-20 rounded-3xl bg-gradient-to-br from-orange-500 to-orange-600 flex items-center justify-center mb-6 transform group-hover:scale-110 group-hover:rotate-3 transition-all duration-300 shadow-lg">
-            <i class="ri-file-text-line text-white text-3xl"></i>
+      <!-- Community Hub -->
+      <div class="feature-card group relative overflow-hidden">
+        <div class="absolute inset-0 bg-gradient-to-br from-emerald-500/10 to-teal-500/10 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+        <div class="relative p-8">
+          <div class="w-20 h-20 rounded-3xl bg-gradient-to-br from-emerald-500 to-emerald-600 flex items-center justify-center mb-8 group-hover:scale-110 transition-transform duration-300 icon-float" style="animation-delay: 0.4s;">
+            <i class="ri-team-line text-white text-3xl"></i>
           </div>
-          <h3 class="text-xl font-bold text-gray-900 mb-3 group-hover:text-orange-600 transition">
-            📖 Expert Articles
+          <h3 class="text-2xl font-bold text-white mb-6 brand-font group-hover:text-emerald-400 transition-colors">
+            Community Hub
           </h3>
-          <p class="text-gray-600 text-sm leading-relaxed flex-grow">
-            Expand your knowledge with high-quality articles, industry insights, and comprehensive guides.
+          <p class="text-slate-300 mb-8 leading-relaxed text-lg">
+            Connect with mentors, peers, and successful candidates in our thriving tech community.
           </p>
-          <div class="mt-4 flex items-center text-orange-600 font-medium text-sm">
-            <span>Read Articles</span>
-            <i class="ri-arrow-right-line ml-1 group-hover:translate-x-1 transition-transform"></i>
+          
+          <div class="space-y-4 mb-8">
+            <div class="flex items-center text-emerald-400 font-medium">
+              <i class="ri-check-double-line mr-3"></i>
+              Expert mentorship
+            </div>
+            <div class="flex items-center text-emerald-400 font-medium">
+              <i class="ri-check-double-line mr-3"></i>
+              Industry insights
+            </div>
+            <div class="flex items-center text-emerald-400 font-medium">
+              <i class="ri-check-double-line mr-3"></i>
+              Peer networking
+            </div>
           </div>
+          
+          <a href="{% url 'posts:feed' %}" class="inline-flex items-center px-6 py-3 bg-emerald-600 text-white rounded-xl font-bold hover:bg-emerald-700 transition-colors group-hover:translate-x-1 duration-300">
+            Join Community
+            <i class="ri-arrow-right-line ml-2"></i>
+          </a>
         </div>
-      </a>
+      </div>
 
-      <!-- Posts - NEW MODULE -->
-      <a href="{% url 'posts:feed' %}" class="group block transform hover:-translate-y-3 transition-all duration-300">
-        <div class="bg-white rounded-3xl p-8 shadow-lg border border-gray-100 hover:shadow-2xl hover:border-pink-200 transition-all h-full flex flex-col items-center text-center relative overflow-hidden">
-          <div class="absolute top-0 right-0 w-24 h-24 bg-gradient-to-br from-pink-500/10 to-pink-600/10 rounded-full -mr-12 -mt-12"></div>
-          <div class="w-20 h-20 rounded-3xl bg-gradient-to-br from-pink-500 to-pink-600 flex items-center justify-center mb-6 transform group-hover:scale-110 group-hover:rotate-3 transition-all duration-300 shadow-lg">
-            <i class="ri-chat-3-line text-white text-3xl"></i>
+      <!-- AI Mock Interviews -->
+      <div class="feature-card group relative overflow-hidden">
+        <div class="absolute inset-0 bg-gradient-to-br from-cyan-500/10 to-blue-500/10 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+        <div class="relative p-8">
+          <div class="w-20 h-20 rounded-3xl bg-gradient-to-br from-cyan-500 to-cyan-600 flex items-center justify-center mb-8 group-hover:scale-110 transition-transform duration-300 icon-float" style="animation-delay: 0.6s;">
+            <i class="ri-robot-2-line text-white text-3xl"></i>
           </div>
-          <h3 class="text-xl font-bold text-gray-900 mb-3 group-hover:text-pink-600 transition">
-            💬 Community Posts
+          <h3 class="text-2xl font-bold text-white mb-6 brand-font group-hover:text-cyan-400 transition-colors">
+            AI Interviews
           </h3>
-          <p class="text-gray-600 text-sm leading-relaxed flex-grow">
-            Connect with fellow developers, share your journey, ask questions, and celebrate wins together.
+          <p class="text-slate-300 mb-8 leading-relaxed text-lg">
+            Practice with realistic AI-powered interviews and receive detailed performance feedback.
           </p>
-          <div class="mt-4 flex items-center text-pink-600 font-medium text-sm">
-            <span>Join Community</span>
-            <i class="ri-arrow-right-line ml-1 group-hover:translate-x-1 transition-transform"></i>
+          
+          <div class="space-y-4 mb-8">
+            <div class="flex items-center text-emerald-400 font-medium">
+              <i class="ri-check-double-line mr-3"></i>
+              Real-time AI feedback
+            </div>
+            <div class="flex items-center text-emerald-400 font-medium">
+              <i class="ri-check-double-line mr-3"></i>
+              Company scenarios
+            </div>
+            <div class="flex items-center text-emerald-400 font-medium">
+              <i class="ri-check-double-line mr-3"></i>
+              Performance analytics
+            </div>
           </div>
+          
+          <a href="{% url 'mock_interview:interview_setup' %}" class="inline-flex items-center px-6 py-3 bg-cyan-600 text-white rounded-xl font-bold hover:bg-cyan-700 transition-colors group-hover:translate-x-1 duration-300">
+            Book Session
+            <i class="ri-arrow-right-line ml-2"></i>
+          </a>
         </div>
-      </a>
-
-      <!-- Mock Interviews -->
-      <a href="{% url 'mock_interview:interview_setup' %}" class="group block transform hover:-translate-y-3 transition-all duration-300">
-        <div class="bg-white rounded-3xl p-8 shadow-lg border border-gray-100 hover:shadow-2xl hover:border-teal-200 transition-all h-full flex flex-col items-center text-center relative overflow-hidden">
-          <div class="absolute top-0 right-0 w-24 h-24 bg-gradient-to-br from-teal-500/10 to-teal-600/10 rounded-full -mr-12 -mt-12"></div>
-          <div class="w-20 h-20 rounded-3xl bg-gradient-to-br from-teal-500 to-teal-600 flex items-center justify-center mb-6 transform group-hover:scale-110 group-hover:rotate-3 transition-all duration-300 shadow-lg">
-            <i class="ri-user-voice-line text-white text-3xl"></i>
-          </div>
-          <h3 class="text-xl font-bold text-gray-900 mb-3 group-hover:text-teal-600 transition">
-            🎯 Mock Interviews
-          </h3>
-          <p class="text-gray-600 text-sm leading-relaxed flex-grow">
-            Prepare with real-life interview scenarios, AI feedback, and personalized improvement plans.
-          </p>
-          <div class="mt-4 flex items-center text-teal-600 font-medium text-sm">
-            <span>Book Interview</span>
-            <i class="ri-arrow-right-line ml-1 group-hover:translate-x-1 transition-transform"></i>
-          </div>
-        </div>
-      </a>
+      </div>
     </div>
   </div>
 </section>
 
-<!-- Learning Path Section - NEW -->
-<section class="py-24 bg-gradient-to-br from-indigo-50 via-white to-purple-50 relative overflow-hidden">
+<!-- Stats Section with Counter Animation -->
+<section class="py-24 relative overflow-hidden">
+  <div class="absolute inset-0 bg-gradient-to-br from-indigo-900/50 to-purple-900/50"></div>
+  
   <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative">
-    <div class="text-center mb-16">
-      <h2 class="text-4xl font-bold text-gray-900 mb-6">🛤️ Your Learning Journey</h2>
-      <p class="text-xl text-gray-600 max-w-3xl mx-auto">
-        Follow our structured path from beginner to interview-ready professional
-      </p>
+    <div class="text-center mb-20">
+      <h2 class="text-5xl font-bold text-white mb-6">
+        Proven <span class="text-transparent bg-clip-text animated-gradient brand-font">Results</span>
+      </h2>
+      <p class="text-2xl text-slate-300">Numbers that speak for themselves</p>
     </div>
     
-    <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
-      <div class="learning-step text-center relative">
-        <div class="w-16 h-16 bg-gradient-to-br from-blue-500 to-blue-600 rounded-full flex items-center justify-center mx-auto mb-4 text-white font-bold text-2xl shadow-lg">
-          1
-        </div>
-        <h3 class="text-xl font-bold text-gray-900 mb-2">🎓 Learn Fundamentals</h3>
-        <p class="text-gray-600">Start with our comprehensive courses covering programming basics to advanced concepts.</p>
-        <div class="learning-arrow hidden md:block"></div>
+    <div class="grid grid-cols-2 md:grid-cols-4 gap-12">
+      <div class="text-center stats-card">
+        <div class="counter text-5xl md:text-6xl font-bold text-white mb-4" data-count="1200">0</div>
+        <div class="text-xl text-indigo-400 font-semibold">Coding Problems</div>
+        <div class="text-slate-400 mt-2">Curated challenges</div>
       </div>
-      
-      <div class="learning-step text-center relative">
-        <div class="w-16 h-16 bg-gradient-to-br from-green-500 to-green-600 rounded-full flex items-center justify-center mx-auto mb-4 text-white font-bold text-2xl shadow-lg">
-          2
-        </div>
-        <h3 class="text-xl font-bold text-gray-900 mb-2">💪 Practice Daily</h3>
-        <p class="text-gray-600">Solve coding problems and take quizzes to reinforce your knowledge and build muscle memory.</p>
-        <div class="learning-arrow hidden md:block"></div>
+      <div class="text-center stats-card" style="animation-delay: 0.2s;">
+        <div class="counter text-5xl md:text-6xl font-bold text-white mb-4" data-count="500">0</div>
+        <div class="text-xl text-purple-400 font-semibold">Aptitude Tests</div>
+        <div class="text-slate-400 mt-2">Practice assessments</div>
       </div>
-      
-      <div class="learning-step text-center relative">
-        <div class="w-16 h-16 bg-gradient-to-br from-purple-500 to-purple-600 rounded-full flex items-center justify-center mx-auto mb-4 text-white font-bold text-2xl shadow-lg">
-          3
-        </div>
-        <h3 class="text-xl font-bold text-gray-900 mb-2">🤝 Connect & Share</h3>
-        <p class="text-gray-600">Engage with the community, share your progress, and learn from others' experiences.</p>
-        <div class="learning-arrow hidden md:block"></div>
+      <div class="text-center stats-card" style="animation-delay: 0.4s;">
+        <div class="counter text-5xl md:text-6xl font-bold text-white mb-4" data-count="25000">0</div>
+        <div class="text-xl text-emerald-400 font-semibold">Active Students</div>
+        <div class="text-slate-400 mt-2">Learning community</div>
       </div>
-      
-      <div class="learning-step text-center relative">
-        <div class="w-16 h-16 bg-gradient-to-br from-teal-500 to-teal-600 rounded-full flex items-center justify-center mx-auto mb-4 text-white font-bold text-2xl shadow-lg">
-          4
-        </div>
-        <h3 class="text-xl font-bold text-gray-900 mb-2">🚀 Ace Interviews</h3>
-        <p class="text-gray-600">Practice with mock interviews and get ready to land your dream job with confidence.</p>
+      <div class="text-center stats-card" style="animation-delay: 0.6s;">
+        <div class="counter text-5xl md:text-6xl font-bold text-white mb-4" data-count="95">0</div>
+        <div class="text-xl text-amber-400 font-semibold">Success Rate %</div>
+        <div class="text-slate-400 mt-2">Job placements</div>
       </div>
     </div>
   </div>
 </section>
 
-<!-- Testimonials Section - NEW -->
-<section class="py-24 bg-white relative overflow-hidden">
+<!-- Success Stories with Card Flip Animation -->
+<section class="py-24 relative">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="text-center mb-20">
+      <h2 class="text-5xl font-bold text-white mb-8">
+        Success <span class="text-transparent bg-clip-text animated-gradient brand-font">Stories</span>
+      </h2>
+      <p class="text-2xl text-slate-300">Real achievements from our community</p>
+    </div>
+    
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-10">
+      <!-- Testimonial 1 -->
+      <div class="testimonial-card group">
+        <div class="glass-elevated rounded-3xl p-8 border border-white/10 hover-lift">
+          <div class="flex items-center mb-8">
+            <div class="w-16 h-16 bg-gradient-to-br from-indigo-500 to-indigo-600 rounded-2xl flex items-center justify-center text-white font-bold text-xl">
+              A
+            </div>
+            <div class="ml-6">
+              <h4 class="font-bold text-white text-xl">Arjun Patel</h4>
+              <p class="text-indigo-400 font-semibold">Software Engineer @ Google</p>
+            </div>
+          </div>
+          <div class="flex text-amber-400 mb-6 text-xl">
+            <i class="ri-star-fill"></i>
+            <i class="ri-star-fill"></i>
+            <i class="ri-star-fill"></i>
+            <i class="ri-star-fill"></i>
+            <i class="ri-star-fill"></i>
+          </div>
+          <p class="text-slate-300 leading-relaxed text-lg">"MockMate's structured coding approach and comprehensive problem set were instrumental in my Google interview success."</p>
+        </div>
+      </div>
+      
+      <!-- Testimonial 2 -->
+      <div class="testimonial-card group">
+        <div class="glass-elevated rounded-3xl p-8 border border-white/10 hover-lift">
+          <div class="flex items-center mb-8">
+            <div class="w-16 h-16 bg-gradient-to-br from-purple-500 to-purple-600 rounded-2xl flex items-center justify-center text-white font-bold text-xl">
+              P
+            </div>
+            <div class="ml-6">
+              <h4 class="font-bold text-white text-xl">Priya Sharma</h4>
+              <p class="text-purple-400 font-semibold">Product Manager @ Microsoft</p>
+            </div>
+          </div>
+          <div class="flex text-amber-400 mb-6 text-xl">
+            <i class="ri-star-fill"></i>
+            <i class="ri-star-fill"></i>
+            <i class="ri-star-fill"></i>
+            <i class="ri-star-fill"></i>
+            <i class="ri-star-fill"></i>
+          </div>
+          <p class="text-slate-300 leading-relaxed text-lg">"The community mentorship and AI interviews gave me the confidence and insights needed for my Microsoft PM role."</p>
+        </div>
+      </div>
+      
+      <!-- Testimonial 3 -->
+      <div class="testimonial-card group">
+        <div class="glass-elevated rounded-3xl p-8 border border-white/10 hover-lift">
+          <div class="flex items-center mb-8">
+            <div class="w-16 h-16 bg-gradient-to-br from-emerald-500 to-emerald-600 rounded-2xl flex items-center justify-center text-white font-bold text-xl">
+              R
+            </div>
+            <div class="ml-6">
+              <h4 class="font-bold text-white text-xl">Rahul Singh</h4>
+              <p class="text-emerald-400 font-semibold">SDE @ Amazon</p>
+            </div>
+          </div>
+          <div class="flex text-amber-400 mb-6 text-xl">
+            <i class="ri-star-fill"></i>
+            <i class="ri-star-fill"></i>
+            <i class="ri-star-fill"></i>
+            <i class="ri-star-fill"></i>
+            <i class="ri-star-fill"></i>
+          </div>
+          <p class="text-slate-300 leading-relaxed text-lg">"From campus coding contests to Amazon SDE - MockMate's mock interviews were absolute game-changers."</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Companies Section with Scroll Animation -->
+<section class="py-20 relative">
   <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
     <div class="text-center mb-16">
-      <h2 class="text-4xl font-bold text-gray-900 mb-6">💝 What Our Students Say</h2>
-      <p class="text-xl text-gray-600">Real stories from developers who transformed their careers</p>
+      <p class="text-slate-400 font-bold text-2xl mb-12">Our alumni work at</p>
     </div>
     
-    <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
-      <div class="testimonial-card bg-gradient-to-br from-blue-50 to-indigo-50 rounded-3xl p-8 border border-blue-100">
-        <div class="flex items-center mb-4">
-          <div class="w-12 h-12 bg-gradient-to-br from-blue-500 to-blue-600 rounded-full flex items-center justify-center text-white font-bold">
-            A
-          </div>
-          <div class="ml-4">
-            <h4 class="font-bold text-gray-900">Alex Chen</h4>
-            <p class="text-sm text-gray-600">Software Engineer @ Google</p>
-          </div>
-        </div>
-        <p class="text-gray-700 italic">"MockMate's practice problems prepared me perfectly for FAANG interviews. The step-by-step solutions were incredibly helpful! 🙌"</p>
-        <div class="flex text-yellow-400 mt-4">
-          <i class="ri-star-fill"></i><i class="ri-star-fill"></i><i class="ri-star-fill"></i><i class="ri-star-fill"></i><i class="ri-star-fill"></i>
-        </div>
-      </div>
-      
-              <div class="testimonial-card bg-gradient-to-br from-green-50 to-emerald-50 rounded-3xl p-8 border border-green-100">
-        <div class="flex items-center mb-4">
-          <div class="w-12 h-12 bg-gradient-to-br from-green-500 to-green-600 rounded-full flex items-center justify-center text-white font-bold">
-            S
-          </div>
-          <div class="ml-4">
-            <h4 class="font-bold text-gray-900">Sarah Wilson</h4>
-            <p class="text-sm text-gray-600">Full Stack Developer @ Meta</p>
-          </div>
-        </div>
-        <p class="text-gray-700 italic">"The community posts feature is amazing! I love sharing my coding journey and getting feedback from other developers. So motivating! 🚀"</p>
-        <div class="flex text-yellow-400 mt-4">
-          <i class="ri-star-fill"></i><i class="ri-star-fill"></i><i class="ri-star-fill"></i><i class="ri-star-fill"></i><i class="ri-star-fill"></i>
-        </div>
-      </div>
-      
-      <div class="testimonial-card bg-gradient-to-br from-purple-50 to-pink-50 rounded-3xl p-8 border border-purple-100">
-        <div class="flex items-center mb-4">
-          <div class="w-12 h-12 bg-gradient-to-br from-purple-500 to-pink-600 rounded-full flex items-center justify-center text-white font-bold">
-            M
-          </div>
-          <div class="ml-4">
-            <h4 class="font-bold text-gray-900">Mike Rodriguez</h4>
-            <p class="text-sm text-gray-600">Senior Developer @ Netflix</p>
-          </div>
-        </div>
-        <p class="text-gray-700 italic">"From zero to hero in 6 months! The structured learning path and mock interviews gave me the confidence I needed. Dream job achieved! 🎯"</p>
-        <div class="flex text-yellow-400 mt-4">
-          <i class="ri-star-fill"></i><i class="ri-star-fill"></i><i class="ri-star-fill"></i><i class="ri-star-fill"></i><i class="ri-star-fill"></i>
-        </div>
+    <div class="companies-scroll">
+      <div class="companies-track">
+        <div class="company-badge">Google</div>
+        <div class="company-badge">Microsoft</div>
+        <div class="company-badge">Meta</div>
+        <div class="company-badge">Amazon</div>
+        <div class="company-badge">Netflix</div>
+        <div class="company-badge">Apple</div>
+        <div class="company-badge">Tesla</div>
+        <div class="company-badge">Uber</div>
       </div>
     </div>
   </div>
 </section>
 
-<!-- Achievement Showcase Section - NEW -->
-<section class="py-24 bg-gradient-to-r from-purple-600 via-blue-600 to-teal-600 relative overflow-hidden">
-  <div class="absolute inset-0 bg-black/20"></div>
-  <div class="absolute inset-0 opacity-20">
-    <div class="achievement-pattern"></div>
-  </div>
-  
-  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative">
-    <div class="text-center mb-16">
-      <h2 class="text-4xl font-bold text-white mb-6">🏆 Unlock Achievements</h2>
-      <p class="text-xl text-blue-100">Level up your skills and earn badges as you progress</p>
-    </div>
-    
-    <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-8 gap-6">
-      <div class="achievement-badge group cursor-pointer transform hover:scale-110 transition-all">
-        <div class="bg-white/10 backdrop-blur-sm rounded-2xl p-4 border border-white/20 text-center">
-          <div class="text-4xl mb-2">🎯</div>
-          <p class="text-white text-xs font-medium">First Problem</p>
-        </div>
-      </div>
-      <div class="achievement-badge group cursor-pointer transform hover:scale-110 transition-all">
-        <div class="bg-white/10 backdrop-blur-sm rounded-2xl p-4 border border-white/20 text-center">
-          <div class="text-4xl mb-2">🔥</div>
-          <p class="text-white text-xs font-medium">Week Streak</p>
-        </div>
-      </div>
-      <div class="achievement-badge group cursor-pointer transform hover:scale-110 transition-all">
-        <div class="bg-white/10 backdrop-blur-sm rounded-2xl p-4 border border-white/20 text-center">
-          <div class="text-4xl mb-2">💎</div>
-          <p class="text-white text-xs font-medium">Course Complete</p>
-        </div>
-      </div>
-      <div class="achievement-badge group cursor-pointer transform hover:scale-110 transition-all">
-        <div class="bg-white/10 backdrop-blur-sm rounded-2xl p-4 border border-white/20 text-center">
-          <div class="text-4xl mb-2">🚀</div>
-          <p class="text-white text-xs font-medium">Interview Ace</p>
-        </div>
-      </div>
-      <div class="achievement-badge group cursor-pointer transform hover:scale-110 transition-all">
-        <div class="bg-white/10 backdrop-blur-sm rounded-2xl p-4 border border-white/20 text-center">
-          <div class="text-4xl mb-2">⭐</div>
-          <p class="text-white text-xs font-medium">Community Star</p>
-        </div>
-      </div>
-      <div class="achievement-badge group cursor-pointer transform hover:scale-110 transition-all">
-        <div class="bg-white/10 backdrop-blur-sm rounded-2xl p-4 border border-white/20 text-center">
-          <div class="text-4xl mb-2">🏅</div>
-          <p class="text-white text-xs font-medium">Quiz Master</p>
-        </div>
-      </div>
-      <div class="achievement-badge group cursor-pointer transform hover:scale-110 transition-all">
-        <div class="bg-white/10 backdrop-blur-sm rounded-2xl p-4 border border-white/20 text-center">
-          <div class="text-4xl mb-2">🌟</div>
-          <p class="text-white text-xs font-medium">Mentor</p>
-        </div>
-      </div>
-      <div class="achievement-badge group cursor-pointer transform hover:scale-110 transition-all">
-        <div class="bg-white/10 backdrop-blur-sm rounded-2xl p-4 border border-white/20 text-center">
-          <div class="text-4xl mb-2">👑</div>
-          <p class="text-white text-xs font-medium">Legend</p>
-        </div>
-      </div>
-    </div>
-  </div>
-</section>
-
-<!-- CTA Section - Enhanced Premium Design -->
+<!-- Final CTA with Particle Background -->
 <section class="py-24 relative overflow-hidden">
-  <!-- Animated Background -->
-  <div class="absolute inset-0 bg-gradient-to-br from-indigo-900 via-purple-900 to-pink-900"></div>
-  <div class="absolute inset-0 bg-gradient-to-r from-blue-600/80 to-purple-600/80 animate-gradient-shift"></div>
+  <div class="absolute inset-0 bg-gradient-to-br from-slate-900/80 via-indigo-900/60 to-purple-900/80"></div>
   
-  <!-- Background Pattern -->
-  <div class="absolute inset-0 opacity-10">
-    <div class="absolute inset-0" style="background-image: url('data:image/svg+xml,%3Csvg width=%2760%22 height=%2760%22 viewBox=%220 0 60 60%22 xmlns=%22http://www.w3.org/2000/svg%22%3E%3Cg fill=%22none%22 fill-rule=%22evenodd%22%3E%3Cg fill=%22%23ffffff%22 fill-opacity=%220.1%22%3E%3Ccircle cx=%223%22 cy=%223%22 r=%223%22/%3E%3C/g%3E%3C/g%3E%3C/svg%3E');"></div>
+  <!-- Particle system -->
+  <div class="particles">
+    <div class="particle"></div>
+    <div class="particle"></div>
+    <div class="particle"></div>
+    <div class="particle"></div>
+    <div class="particle"></div>
   </div>
   
-  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative">
-    <div class="text-center">
-      <!-- Badge -->
-      <div class="inline-flex items-center px-4 py-2 rounded-full text-sm font-medium bg-white/10 text-white border border-white/20 backdrop-blur-sm mb-8">
-        <i class="ri-rocket-line mr-2"></i>
-        🎉 Join the Success Story
-      </div>
-      
-      <h2 class="text-5xl md:text-6xl font-bold text-white mb-6 leading-tight">
-        Ready to <span class="text-transparent bg-clip-text bg-gradient-to-r from-yellow-400 to-pink-400">Level Up</span> Your Career?
-      </h2>
-      
-      <p class="text-xl text-blue-100 mb-10 max-w-3xl mx-auto leading-relaxed">
-        Join thousands of developers who've transformed their careers with MockMate. From junior to senior, we've got your back every step of the way! 🌟
-      </p>
-      
-      <!-- CTA Buttons -->
-      <div class="flex flex-col sm:flex-row gap-6 justify-center mb-12">
-        {% if not user.is_authenticated %}
-          <a href="{% url 'users:signup' %}" class="group px-10 py-5 bg-white text-gray-900 rounded-2xl hover:bg-gray-100 transition-all duration-300 font-bold text-lg shadow-2xl transform hover:scale-105 hover:shadow-white/25">
-            <span class="flex items-center justify-center">
-              <i class="ri-user-add-line mr-2"></i>
-              🎯 Start Free Trial
-              <i class="ri-arrow-right-line ml-2 group-hover:translate-x-1 transition-transform"></i>
-            </span>
-          </a>
-        {% endif %}
-        <a href="{% url 'mock_interview:interview_setup' %}" class="group px-10 py-5 bg-white/10 backdrop-blur-sm border-2 border-white/30 text-white rounded-2xl hover:bg-white/20 hover:border-white/50 transition-all duration-300 font-bold text-lg shadow-xl transform hover:scale-105">
-          <span class="flex items-center justify-center">
-            <i class="ri-calendar-check-line mr-2"></i>
-            📅 Book Mock Interview
+  <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 relative text-center">
+    <h2 class="text-5xl md:text-6xl font-bold text-white mb-8">
+      Ready to Code Your
+      <span class="text-transparent bg-clip-text animated-gradient brand-font block mt-2">
+        Success Story?
+      </span>
+    </h2>
+    
+    <p class="text-2xl text-slate-300 mb-16 max-w-4xl mx-auto leading-relaxed">
+      Join the community of successful developers and start your journey today
+    </p>
+    
+    <div class="flex flex-col sm:flex-row gap-8 justify-center">
+      {% if not user.is_authenticated %}
+        <a href="{% url 'users:signup' %}" class="group relative overflow-hidden px-16 py-6 bg-gradient-to-r from-indigo-600 via-purple-600 to-cyan-600 text-white rounded-2xl font-bold text-2xl shadow-2xl btn-glow hover-lift ripple-btn">
+          <div class="absolute inset-0 bg-gradient-to-r from-cyan-600 via-purple-600 to-indigo-600 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+          <span class="relative flex items-center justify-center">
+            <i class="ri-code-line mr-4"></i>
+            Start Coding Now
+            <i class="ri-arrow-right-line ml-4 group-hover:translate-x-2 transition-transform duration-300"></i>
           </span>
         </a>
-      </div>
-      
-      <!-- Social Proof -->
-      <div class="flex flex-col sm:flex-row items-center justify-center space-y-4 sm:space-y-0 sm:space-x-12 text-white/80">
-        <div class="flex items-center">
-          <div class="flex -space-x-2 mr-3">
-            <div class="w-8 h-8 rounded-full bg-gradient-to-br from-pink-400 to-purple-500 border-2 border-white"></div>
-            <div class="w-8 h-8 rounded-full bg-gradient-to-br from-blue-400 to-indigo-500 border-2 border-white"></div>
-            <div class="w-8 h-8 rounded-full bg-gradient-to-br from-green-400 to-teal-500 border-2 border-white"></div>
-          </div>
-          <span class="text-sm font-medium">15,000+ Happy Students</span>
-        </div>
-        
-        <div class="flex items-center">
-          <div class="flex text-yellow-400 mr-2">
-            <i class="ri-star-fill"></i>
-            <i class="ri-star-fill"></i>
-            <i class="ri-star-fill"></i>
-            <i class="ri-star-fill"></i>
-            <i class="ri-star-fill"></i>
-          </div>
-          <span class="text-sm font-medium">4.9/5 Average Rating</span>
-        </div>
-        
-        <div class="flex items-center">
-          <i class="ri-shield-check-fill text-green-400 mr-2"></i>
-          <span class="text-sm font-medium">Industry Certified</span>
-        </div>
-      </div>
+        <a href="{% url 'login' %}" class="group px-16 py-6 glass border-2 border-white/40 text-white rounded-2xl hover:bg-white/20 hover:border-indigo-400/60 font-bold text-2xl hover-lift">
+          <span class="flex items-center justify-center">
+            <i class="ri-login-box-line mr-4"></i>
+            Sign In
+          </span>
+        </a>
+      {% else %}
+        <a href="{% url 'practice:problem_list' %}" class="group relative overflow-hidden px-16 py-6 bg-gradient-to-r from-indigo-600 via-purple-600 to-cyan-600 text-white rounded-2xl font-bold text-2xl shadow-2xl btn-glow hover-lift">
+          <span class="relative flex items-center justify-center">
+            <i class="ri-code-s-slash-line mr-4"></i>
+            Continue Coding
+            <i class="ri-arrow-right-line ml-4 group-hover:translate-x-2 transition-transform duration-300"></i>
+          </span>
+        </a>
+      {% endif %}
     </div>
   </div>
 </section>
 
 <style>
-  /* Enhanced Keyframes */
-  @keyframes fadeInUp {
-    from { 
-      opacity: 0; 
-      transform: translateY(30px); 
-    }
-    to { 
-      opacity: 1; 
-      transform: translateY(0); 
-    }
-  }
-  
-  @keyframes gradientShift {
-    0%, 100% { background-position: 0% 50%; }
-    50% { background-position: 100% 50%; }
-  }
-  
-  @keyframes blob {
-    0%, 100% { transform: translate(0px, 0px) scale(1); }
-    33% { transform: translate(30px, -50px) scale(1.1); }
-    66% { transform: translate(-20px, 20px) scale(0.9); }
-  }
-  
-  @keyframes float {
-    0%, 100% { transform: translateY(0px); }
-    50% { transform: translateY(-20px); }
-  }
-  
-  @keyframes shimmer {
-    0% { transform: translateX(-100%); }
-    100% { transform: translateX(100%); }
-  }
-  
-  @keyframes bounce-slow {
-    0%, 100% { transform: translateY(0); }
-    50% { transform: translateY(-10px); }
-  }
-  
-  @keyframes rain {
-    0% { transform: translateY(-100vh) rotate(0deg); opacity: 0; }
-    10% { opacity: 0.5; }
-    90% { opacity: 0.5; }
-    100% { transform: translateY(100vh) rotate(360deg); opacity: 0; }
-  }
-
-  /* Apply animations */
-  .animate-fade-in-up {
-    animation: fadeInUp 0.8s ease-out forwards;
+/* Enhanced Coding-themed Animations */
+@keyframes codeRain {
+  0% {
+    transform: translateY(-100vh);
     opacity: 0;
   }
-  .animate-fade-in-up.delay-200 { animation-delay: 0.2s; }
-  .animate-fade-in-up.delay-400 { animation-delay: 0.4s; }
-  .animate-fade-in-up.delay-600 { animation-delay: 0.6s; }
-  .animate-fade-in-up.delay-800 { animation-delay: 0.8s; }
+  10% {
+    opacity: 1;
+  }
+  90% {
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(100vh);
+    opacity: 0;
+  }
+}
 
-  .animate-gradient-shift {
-    background-size: 200% 200%;
-    animation: gradientShift 8s ease infinite;
-  }
-  
-  .animate-blob {
-    animation: blob 7s infinite;
-  }
-  
-  .animate-shimmer {
-    animation: shimmer 2s infinite;
-  }
-  
-  .animate-bounce-slow {
-    animation: bounce-slow 2s ease-in-out infinite;
-  }
-  
-  .animation-delay-2000 {
-    animation-delay: 2s;
-  }
-  
-  .animation-delay-4000 {
-    animation-delay: 4s;
-  }
+.code-snippet {
+  position: absolute;
+  font-family: 'JetBrains Mono', monospace;
+  color: #22d3ee;
+  font-size: 16px;
+  font-weight: 500;
+  animation: codeRain 15s linear infinite;
+  text-shadow: 0 0 10px rgba(34, 211, 238, 0.5);
+}
 
-  /* Floating Shapes Styles */
-  .floating-shapes {
-    position: absolute;
-    width: 100%;
-    height: 100%;
-    overflow: hidden;
-  }
+.code-snippet:nth-child(2n) {
+  color: #a78bfa;
+  text-shadow: 0 0 10px rgba(167, 139, 250, 0.5);
+}
 
-  .shape {
-    position: absolute;
-    background: rgba(255, 255, 255, 0.1);
-    backdrop-filter: blur(10px);
-    border-radius: 50%;
-    animation: float 6s ease-in-out infinite;
-  }
+.code-snippet:nth-child(3n) {
+  color: #22c55e;
+  text-shadow: 0 0 10px rgba(34, 197, 94, 0.5);
+}
 
-  .shape-1 {
-    width: 80px;
-    height: 80px;
-    top: 20%;
-    left: 10%;
-    animation-delay: 0s;
-  }
+.code-snippet:nth-child(4n) {
+  color: #fbbf24;
+  text-shadow: 0 0 10px rgba(251, 191, 36, 0.5);
+}
 
-  .shape-2 {
-    width: 120px;
-    height: 120px;
-    top: 60%;
-    right: 10%;
-    animation-delay: 2s;
+/* Animated Gradient Text */
+@keyframes gradientShift {
+  0%, 100% {
+    background-position: 0% 50%;
   }
+  50% {
+    background-position: 100% 50%;
+  }
+}
 
-  .shape-3 {
-    width: 60px;
-    height: 60px;
-    top: 10%;
-    right: 30%;
-    animation-delay: 4s;
-  }
+.animated-gradient {
+  background: linear-gradient(-45deg, #6366f1, #8b5cf6, #06b6d4, #10b981);
+  background-size: 400% 400%;
+  animation: gradientShift 8s ease infinite;
+  -webkit-background-clip: text;
+  background-clip: text;
+}
 
-  .shape-4 {
-    width: 100px;
-    height: 100px;
-    bottom: 20%;
-    left: 20%;
-    animation-delay: 1s;
+/* Pulse Dot Animation */
+@keyframes pulseDot {
+  0%, 100% {
+    transform: scale(1);
+    opacity: 1;
   }
+  50% {
+    transform: scale(1.2);
+    opacity: 0.8;
+  }
+}
 
-  .shape-5 {
-    width: 90px;
-    height: 90px;
-    bottom: 10%;
-    right: 20%;
-    animation-delay: 3s;
-  }
-  
-  .shape-6 {
-    width: 70px;
-    height: 70px;
-    top: 40%;
-    left: 50%;
-    animation-delay: 3.5s;
-  }
-  
-  .shape-7 {
-    width: 110px;
-    height: 110px;
-    top: 70%;
-    left: 70%;
-    animation-delay: 5s;
-  }
+.pulse-dot {
+  animation: pulseDot 2s ease-in-out infinite;
+}
 
-  /* Code Rain Effect */
-  .code-rain {
-    position: absolute;
-    width: 100%;
-    height: 100%;
-    overflow: hidden;
-  }
+/* Typewriter Effect */
+@keyframes typewriter {
+  from { width: 0; }
+  to { width: 100%; }
+}
 
-  .rain-line {
-    position: absolute;
-    top: -100px;
-    color: rgba(255, 255, 255, 0.3);
-    font-family: 'Courier New', monospace;
-    font-size: 14px;
-    animation: rain 10s linear infinite;
-    white-space: nowrap;
-  }
+.typewriter {
+  overflow: hidden;
+  border-right: 2px solid #6366f1;
+  white-space: nowrap;
+  animation: typewriter 4s steps(40, end), blink 0.75s step-end infinite;
+  display: inline-block;
+}
 
-  /* Quote Box Styling */
-  .quote-box {
-    transition: all 0.5s ease;
-  }
+@keyframes blink {
+  from, to { border-color: transparent; }
+  50% { border-color: #6366f1; }
+}
 
-  /* Hero Badge */
-  .hero-badge {
-    animation: fadeInUp 0.8s ease-out 0.1s both;
+/* Floating Badge Animation */
+@keyframes floatBadge {
+  0%, 100% {
+    transform: translateY(0px);
   }
+  50% {
+    transform: translateY(-10px);
+  }
+}
 
-  /* Learning Path Arrows */
-  .learning-arrow::after {
-    content: '→';
-    position: absolute;
-    top: 50%;
-    right: -20px;
-    transform: translateY(-50%);
-    color: #6366f1;
-    font-size: 24px;
-    font-weight: bold;
-  }
+.floating-badge {
+  animation: floatBadge 3s ease-in-out infinite;
+}
 
-  /* Achievement Pattern */
-  .achievement-pattern {
-    background-image: 
-      radial-gradient(circle at 25% 25%, rgba(255,255,255,0.1) 2px, transparent 2px),
-      radial-gradient(circle at 75% 75%, rgba(255,255,255,0.1) 2px, transparent 2px);
-    background-size: 50px 50px;
-  }
+/* Binary Grid Background */
+.binary-grid {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-image: 
+    linear-gradient(90deg, rgba(34, 211, 238, 0.05) 1px, transparent 1px),
+    linear-gradient(rgba(167, 139, 250, 0.05) 1px, transparent 1px);
+  background-size: 40px 40px;
+  animation: gridMove 20s linear infinite;
+}
 
-  /* Testimonial Cards */
-  .testimonial-card {
-    transition: all 0.3s ease;
-  }
+@keyframes gridMove {
+  0% { transform: translate(0, 0); }
+  100% { transform: translate(40px, 40px); }
+}
 
-  .testimonial-card:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 20px 40px rgba(0,0,0,0.1);
-  }
+/* Feature Cards Enhanced */
+.feature-card {
+  background: rgba(255, 255, 255, 0.03);
+  backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 24px;
+  transition: all 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
+}
 
-  /* Achievement Badges */
-  .achievement-badge:hover {
-    filter: drop-shadow(0 10px 20px rgba(0,0,0,0.2));
-  }
+.feature-card:hover {
+  transform: translateY(-8px);
+  box-shadow: 0 25px 50px rgba(0, 0, 0, 0.3);
+  border-color: rgba(99, 102, 241, 0.3);
+}
 
-  /* Custom Scroll Behavior */
-  html {
-    scroll-behavior: smooth;
+/* Icon Float Animation */
+@keyframes iconFloat {
+  0%, 100% {
+    transform: translateY(0px) rotate(0deg);
   }
+  50% {
+    transform: translateY(-5px) rotate(5deg);
+  }
+}
 
-  /* Improved Button Hover Effects */
-  .group:hover .ri-arrow-right-line {
-    animation: bounce-right 0.6s ease-in-out infinite;
-  }
+.icon-float {
+  animation: iconFloat 4s ease-in-out infinite;
+}
 
-  @keyframes bounce-right {
-    0%, 100% { transform: translateX(0); }
-    50% { transform: translateX(4px); }
+/* Button Glow Effect */
+.btn-glow {
+  box-shadow: 0 0 30px rgba(99, 102, 241, 0.3);
+  transition: all 0.3s ease;
+}
+
+.btn-glow:hover {
+  box-shadow: 0 0 50px rgba(99, 102, 241, 0.6);
+}
+
+/* Ripple Button Effect */
+.ripple-btn {
+  position: relative;
+  overflow: hidden;
+}
+
+.ripple-btn::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 0;
+  height: 0;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.3);
+  transition: width 0.6s, height 0.6s, top 0.6s, left 0.6s;
+  transform: translate(-50%, -50%);
+}
+
+.ripple-btn:hover::before {
+  width: 300px;
+  height: 300px;
+}
+
+/* Counter Animation */
+.counter {
+  display: inline-block;
+  transition: all 0.3s ease;
+}
+
+/* Stats Card Animation */
+@keyframes statsSlideIn {
+  from {
+    opacity: 0;
+    transform: translateY(50px);
   }
-  
-  /* Loading state */
-  .loaded .animate-fade-in-up {
+  to {
     opacity: 1;
     transform: translateY(0);
   }
+}
+
+.stats-card {
+  animation: statsSlideIn 0.8s ease-out forwards;
+  opacity: 0;
+}
+
+/* Testimonial Card Hover */
+.testimonial-card:hover .glass-elevated {
+  transform: translateY(-5px) rotateY(5deg);
+  box-shadow: 0 20px 40px rgba(99, 102, 241, 0.2);
+}
+
+/* Companies Scroll Animation */
+.companies-scroll {
+  overflow: hidden;
+  white-space: nowrap;
+  position: relative;
+}
+
+.companies-track {
+  display: inline-block;
+  animation: scroll 30s linear infinite;
+}
+
+@keyframes scroll {
+  0% {
+    transform: translateX(100%);
+  }
+  100% {
+    transform: translateX(-100%);
+  }
+}
+
+.company-badge {
+  display: inline-block;
+  background: rgba(255, 255, 255, 0.05);
+  backdrop-filter: blur(16px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  padding: 16px 32px;
+  margin: 0 20px;
+  border-radius: 16px;
+  color: white;
+  font-weight: bold;
+  font-size: 18px;
+  transition: all 0.3s ease;
+}
+
+.company-badge:hover {
+  background: rgba(255, 255, 255, 0.1);
+  transform: scale(1.05);
+}
+
+/* Particle System */
+.particles {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+}
+
+.particle {
+  position: absolute;
+  width: 4px;
+  height: 4px;
+  background: #6366f1;
+  border-radius: 50%;
+  animation: particleFloat 15s ease-in-out infinite;
+}
+
+.particle:nth-child(1) {
+  left: 20%;
+  animation-delay: 0s;
+  background: #8b5cf6;
+}
+
+.particle:nth-child(2) {
+  left: 40%;
+  animation-delay: 3s;
+  background: #06b6d4;
+}
+
+.particle:nth-child(3) {
+  left: 60%;
+  animation-delay: 6s;
+  background: #10b981;
+}
+
+.particle:nth-child(4) {
+  left: 80%;
+  animation-delay: 9s;
+  background: #f59e0b;
+}
+
+.particle:nth-child(5) {
+  left: 10%;
+  animation-delay: 12s;
+  background: #ef4444;
+}
+
+@keyframes particleFloat {
+  0%, 100% {
+    transform: translateY(100vh) translateX(0px);
+    opacity: 0;
+  }
+  10%, 90% {
+    opacity: 1;
+  }
+  50% {
+    transform: translateY(0vh) translateX(50px);
+  }
+}
+
+/* Hover Lift Effect */
+.hover-lift {
+  transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+}
+
+.hover-lift:hover {
+  transform: translateY(-6px);
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .text-6xl { font-size: 3rem !important; }
+  .text-7xl { font-size: 3.5rem !important; }
+  .text-8xl { font-size: 4rem !important; }
+  
+  .code-snippet {
+    font-size: 14px;
+  }
+  
+  .companies-track {
+    animation-duration: 20s;
+  }
+  
+  .feature-card {
+    margin-bottom: 2rem;
+  }
+  
+  .particle {
+    display: none;
+  }
+  
+  .typewriter {
+    animation-duration: 2s;
+  }
+}
+
+@media (max-width: 640px) {
+  .px-12 { padding-left: 2rem; padding-right: 2rem; }
+  .px-16 { padding-left: 2.5rem; padding-right: 2.5rem; }
+  .py-5 { padding-top: 1rem; padding-bottom: 1rem; }
+  .py-6 { padding-top: 1.25rem; padding-bottom: 1.25rem; }
+  
+  .text-2xl { font-size: 1.25rem !important; }
+  .text-3xl { font-size: 1.5rem !important; }
+}
+
+/* Performance Optimizations */
+.will-change-transform {
+  will-change: transform;
+}
+
+/* Glass Effect Enhancement */
+.glass-elevated {
+  background: rgba(255, 255, 255, 0.06);
+  backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  transition: all 0.3s ease;
+}
+
+.glass-elevated:hover {
+  background: rgba(255, 255, 255, 0.1);
+  border-color: rgba(255, 255, 255, 0.2);
+}
+
+/* Accessibility */
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
 </style>
 
 <script>
-  document.addEventListener('DOMContentLoaded', function() {
-    // --- Enhanced Dynamic Hero Section ---
-    const heroSection = document.getElementById('hero-section');
-    const heroTitle = document.getElementById('hero-title');
-    const quoteDisplay = document.getElementById('quote-display');
+document.addEventListener('DOMContentLoaded', function() {
+  // Counter Animation
+  function animateCounter(element) {
+    const target = parseInt(element.getAttribute('data-count'));
+    const duration = 2000;
+    const start = performance.now();
+    const startValue = 0;
 
-    const backgrounds = [
-      {
-        image: "https://images.unsplash.com/photo-1517077304055-6e89abbf09b0?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80",
-        gradient: "linear-gradient(135deg, rgba(37, 99, 235, 0.9), rgba(147, 51, 234, 0.8))"
-      },
-      {
-        image: "https://images.unsplash.com/photo-1555066931-4365d14bab8c?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80",
-        gradient: "linear-gradient(135deg, rgba(59, 130, 246, 0.9), rgba(99, 102, 241, 0.8))"
-      },
-      {
-        image: "https://images.unsplash.com/photo-1504639725590-34d0984388bd?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80",
-        gradient: "linear-gradient(135deg, rgba(79, 70, 229, 0.9), rgba(168, 85, 247, 0.8))"
-      },
-      {
-        image: "https://images.unsplash.com/photo-1461749280684-dccba630e2f6?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80",
-        gradient: "linear-gradient(135deg, rgba(16, 185, 129, 0.9), rgba(59, 130, 246, 0.8))"
-      },
-      {
-        image: "https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80",
-        gradient: "linear-gradient(135deg, rgba(236, 72, 153, 0.9), rgba(139, 92, 246, 0.8))"
+    function updateCounter(currentTime) {
+      const elapsed = currentTime - start;
+      const progress = Math.min(elapsed / duration, 1);
+      const currentValue = Math.floor(progress * (target - startValue) + startValue);
+      
+      if (target > 1000) {
+        element.textContent = (currentValue / 1000).toFixed(0) + 'K+';
+      } else {
+        element.textContent = currentValue + (target === 95 ? '%' : '');
       }
-    ];
 
-    const titles = [
-      "Learn, Practice, Excel",
-      "Unlock Your Coding Potential", 
-      "Ace Your Tech Interviews",
-      "Build Your Future in Tech",
-      "Master Programming Skills",
-      "Code Your Way to Success",
-      "Transform Ideas into Reality"
-    ];
-
-    const quotes = [
-      { 
-        text: "The only way to do great work is to love what you do.", 
-        author: "Steve Jobs" 
-      },
-      { 
-        text: "Success is not final, failure is not fatal: it is the courage to continue that counts.", 
-        author: "Winston Churchill" 
-      },
-      { 
-        text: "The future belongs to those who believe in the beauty of their dreams.", 
-        author: "Eleanor Roosevelt" 
-      },
-      { 
-        text: "Innovation distinguishes between a leader and a follower.", 
-        author: "Steve Jobs" 
-      },
-      { 
-        text: "Code is like humor. When you have to explain it, it's bad.", 
-        author: "Cory House" 
-      },
-      {
-        text: "First, solve the problem. Then, write the code.",
-        author: "John Johnson"
-      },
-      {
-        text: "The best error message is the one that never shows up.",
-        author: "Thomas Fuchs"
-      },
-      {
-        text: "Programming isn't about what you know; it's about what you can figure out.",
-        author: "Chris Pine"
-      },
-      {
-        text: "Every great developer you know got there by solving problems they were unqualified to solve.",
-        author: "Patrick McKenzie"
-      },
-      {
-        text: "Experience is the name everyone gives to their mistakes.",
-        author: "Oscar Wilde"
-      },
-      {
-        text: "The most important skill to learn is how to learn.",
-        author: "Naval Ravikant"
-      },
-      {
-        text: "In programming, the hard part isn't solving problems, but deciding what problems to solve.",
-        author: "Paul Graham"
-      },
-      {
-        text: "Clean code always looks like it was written by someone who cares.",
-        author: "Robert Martin"
-      },
-      {
-        text: "Debugging is twice as hard as writing the code in the first place.",
-        author: "Brian Kernighan"
-      },
-      {
-        text: "The best way to get a project done faster is to start sooner.",
-        author: "Jim Highsmith"
-      },
-      {
-        text: "Programs must be written for people to read, and only incidentally for machines to execute.",
-        author: "Harold Abelson"
-      },
-      {
-        text: "Walking on water and developing software from a specification are easy if both are frozen.",
-        author: "Edward V. Berard"
-      },
-      {
-        text: "A language that doesn't affect the way you think about programming is not worth knowing.",
-        author: "Alan Perlis"
+      if (progress < 1) {
+        requestAnimationFrame(updateCounter);
       }
-    ];
-
-    let currentBackgroundIndex = 0;
-    let currentTitleIndex = 0;
-    let currentQuoteIndex = 0;
-
-    function changeHeroContent() {
-      const currentBg = backgrounds[currentBackgroundIndex];
-      
-      // Change background with smooth transition
-      heroSection.style.backgroundImage = `${currentBg.gradient}, url('${currentBg.image}')`;
-      currentBackgroundIndex = (currentBackgroundIndex + 1) % backgrounds.length;
-
-      // Change title with enhanced animation
-      heroTitle.style.opacity = '0';
-      heroTitle.style.transform = 'translateY(20px)';
-      
-      setTimeout(() => {
-        heroTitle.textContent = titles[currentTitleIndex];
-        heroTitle.style.opacity = '1';
-        heroTitle.style.transform = 'translateY(0)';
-        currentTitleIndex = (currentTitleIndex + 1) % titles.length;
-      }, 300);
-
-      // Change quote with slide animation
-      const quoteContainer = document.getElementById('quote-container');
-      quoteContainer.style.opacity = '0';
-      quoteContainer.style.transform = 'translateX(-30px)';
-      
-      setTimeout(() => {
-        const newQuote = quotes[currentQuoteIndex];
-        const quoteText = quoteDisplay.querySelector('p:first-child');
-        const quoteAuthor = quoteDisplay.querySelector('p:last-child');
-        
-        quoteText.textContent = `"${newQuote.text}"`;
-        quoteAuthor.textContent = `— ${newQuote.author}`;
-        
-        quoteContainer.style.opacity = '1';
-        quoteContainer.style.transform = 'translateX(0)';
-        currentQuoteIndex = (currentQuoteIndex + 1) % quotes.length;
-      }, 400);
     }
 
-    // Initial setup
-    changeHeroContent();
-    // Change content every 10 seconds for better readability
-    setInterval(changeHeroContent, 10000);
+    requestAnimationFrame(updateCounter);
+  }
 
-    // --- Enhanced Animated Stats Section ---
-    const statItems = document.querySelectorAll('.stat-item .text-4xl');
+  // Intersection Observer for animations
+  const observerOptions = {
+    threshold: 0.1,
+    rootMargin: '0px 0px -50px 0px'
+  };
 
-    const animateNumbers = () => {
-      statItems.forEach(item => {
-        const target = parseInt(item.dataset.target);
-        let current = 0;
-        const duration = 2000; // milliseconds
-        const increment = target / (duration / 16); // 60fps
-        
-        const updateCount = () => {
-          if (current < target) {
-            current += increment;
-            const displayValue = Math.min(Math.ceil(current), target);
-            item.textContent = displayValue + (target >= 100 ? '+' : '');
-            requestAnimationFrame(updateCount);
-          } else {
-            item.textContent = target + (target >= 100 ? '+' : '');
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        // Counter animation
+        if (entry.target.classList.contains('stats-card')) {
+          const counter = entry.target.querySelector('.counter');
+          if (counter && !counter.dataset.animated) {
+            counter.dataset.animated = 'true';
+            setTimeout(() => animateCounter(counter), 
+              parseFloat(entry.target.style.animationDelay || 0) * 1000);
           }
-        };
-        updateCount();
-      });
-    };
-
-    // Enhanced Intersection Observer for stats
-    const statsObserver = new IntersectionObserver((entries) => {
-      entries.forEach(entry => {
-        if (entry.isIntersecting) {
-          // Add staggered animation delay
-          const items = entry.target.querySelectorAll('.stat-item');
-          items.forEach((item, index) => {
-            setTimeout(() => {
-              item.style.opacity = '1';
-              item.style.transform = 'translateY(0)';
-            }, index * 150);
-          });
-          
-          // Start number animation after a brief delay
-          setTimeout(animateNumbers, 300);
-          statsObserver.unobserve(entry.target);
         }
-      });
-    }, { 
-      threshold: 0.3,
-      rootMargin: '0px 0px -50px 0px'
-    });
-
-    // Observe stats section
-    const statsSection = document.querySelector('.stat-item').closest('section');
-    if (statsSection) {
-      // Initially hide stats for animation
-      const statItems = statsSection.querySelectorAll('.stat-item');
-      statItems.forEach(item => {
-        item.style.opacity = '0';
-        item.style.transform = 'translateY(30px)';
-        item.style.transition = 'all 0.6s ease-out';
-      });
-      
-      statsObserver.observe(statsSection);
-    }
-
-    // --- Enhanced Features Cards Animation ---
-    const featureCards = document.querySelectorAll('section a[class*="group block transform"]');
-    
-    const featuresObserver = new IntersectionObserver((entries) => {
-      entries.forEach(entry => {
-        if (entry.isIntersecting) {
-          entry.target.style.opacity = '1';
-          entry.target.style.transform = 'translateY(0)';
-        }
-      });
-    }, {
-      threshold: 0.1,
-      rootMargin: '0px 0px -20px 0px'
-    });
-
-    // Initially hide and observe feature cards
-    featureCards.forEach((card, index) => {
-      card.style.opacity = '0';
-      card.style.transform = 'translateY(40px)';
-      card.style.transition = `all 0.6s ease-out ${index * 0.1}s`;
-      featuresObserver.observe(card);
-    });
-
-    // --- Learning Path Animation ---
-    const learningSteps = document.querySelectorAll('.learning-step');
-    
-    const learningObserver = new IntersectionObserver((entries) => {
-      entries.forEach(entry => {
-        if (entry.isIntersecting) {
-          const steps = entry.target.closest('section').querySelectorAll('.learning-step');
-          steps.forEach((step, index) => {
-            setTimeout(() => {
-              step.style.opacity = '1';
-              step.style.transform = 'translateY(0) scale(1)';
-            }, index * 200);
-          });
-          learningObserver.unobserve(entry.target);
-        }
-      });
-    }, { threshold: 0.3 });
-
-    // Initialize learning steps
-    learningSteps.forEach(step => {
-      step.style.opacity = '0';
-      step.style.transform = 'translateY(30px) scale(0.9)';
-      step.style.transition = 'all 0.6s ease-out';
-    });
-
-    if (learningSteps.length > 0) {
-      learningObserver.observe(learningSteps[0].closest('section'));
-    }
-
-    // --- Testimonial Cards Animation ---
-    const testimonialCards = document.querySelectorAll('.testimonial-card');
-    
-    const testimonialObserver = new IntersectionObserver((entries) => {
-      entries.forEach(entry => {
-        if (entry.isIntersecting) {
-          entry.target.style.opacity = '1';
-          entry.target.style.transform = 'translateY(0) rotate(0deg)';
-        }
-      });
-    }, { threshold: 0.2 });
-
-    testimonialCards.forEach((card, index) => {
-      card.style.opacity = '0';
-      card.style.transform = `translateY(40px) rotate(${(index - 1) * 2}deg)`;
-      card.style.transition = `all 0.8s ease-out ${index * 0.2}s`;
-      testimonialObserver.observe(card);
-    });
-
-    // --- Achievement Badges Animation ---
-    const achievementBadges = document.querySelectorAll('.achievement-badge');
-    
-    const achievementObserver = new IntersectionObserver((entries) => {
-      entries.forEach(entry => {
-        if (entry.isIntersecting) {
-          const badges = entry.target.closest('section').querySelectorAll('.achievement-badge');
-          badges.forEach((badge, index) => {
-            setTimeout(() => {
-              badge.style.opacity = '1';
-              badge.style.transform = 'translateY(0) scale(1)';
-            }, index * 100);
-          });
-          achievementObserver.unobserve(entry.target);
-        }
-      });
-    }, { threshold: 0.3 });
-
-    // Initialize achievement badges
-    achievementBadges.forEach(badge => {
-      badge.style.opacity = '0';
-      badge.style.transform = 'translateY(20px) scale(0.8)';
-      badge.style.transition = 'all 0.5s ease-out';
-      
-      // Add click effect
-      badge.addEventListener('click', function() {
-        this.style.transform = 'scale(1.2)';
-        setTimeout(() => {
-          this.style.transform = 'scale(1)';
-        }, 200);
-      });
-    });
-
-    if (achievementBadges.length > 0) {
-      achievementObserver.observe(achievementBadges[0].closest('section'));
-    }
-
-    // --- Smooth Scroll Enhancement ---
-    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-      anchor.addEventListener('click', function (e) {
-        e.preventDefault();
-        const target = document.querySelector(this.getAttribute('href'));
-        if (target) {
-          target.scrollIntoView({
-            behavior: 'smooth',
-            block: 'start'
-          });
-        }
-      });
-    });
-
-    // --- Enhanced Parallax Effect ---
-    let ticking = false;
-    
-    function updateParallax() {
-      const scrolled = window.pageYOffset;
-      const parallaxElements = document.querySelectorAll('.floating-shapes .shape');
-      
-      parallaxElements.forEach((element, index) => {
-        const speed = 0.3 + (index * 0.05);
-        const yPos = -(scrolled * speed);
-        const rotation = scrolled * (0.1 + index * 0.02);
-        element.style.transform = `translateY(${yPos}px) rotate(${rotation}deg)`;
-      });
-      
-      // Parallax for code rain
-      const rainElements = document.querySelectorAll('.rain-line');
-      rainElements.forEach((element, index) => {
-        const speed = 0.2 + (index * 0.03);
-        const yPos = (scrolled * speed) % window.innerHeight;
-        element.style.transform = `translateY(${yPos}px)`;
-      });
-      
-      ticking = false;
-    }
-    
-    function requestTick() {
-      if (!ticking) {
-        requestAnimationFrame(updateParallax);
-        ticking = true;
-      }
-    }
-    
-    window.addEventListener('scroll', requestTick);
-
-    // --- Add Loading Animation ---
-    window.addEventListener('load', function() {
-      document.body.classList.add('loaded');
-      
-      // Animate hero elements on load
-      const heroElements = document.querySelectorAll('#hero-section .animate-fade-in-up');
-      heroElements.forEach((element, index) => {
-        setTimeout(() => {
-          element.style.opacity = '1';
-          element.style.transform = 'translateY(0)';
-        }, index * 200);
-      });
-    });
-
-    // --- Add Dynamic Button Effects ---
-    const ctaButtons = document.querySelectorAll('a[class*="group"]');
-    
-    ctaButtons.forEach(button => {
-      button.addEventListener('mouseenter', function() {
-        this.style.transform = 'translateY(-2px) scale(1.02)';
-        this.style.boxShadow = '0 20px 40px rgba(0,0,0,0.15)';
-      });
-      
-      button.addEventListener('mouseleave', function() {
-        this.style.transform = 'translateY(0) scale(1)';
-        this.style.boxShadow = '';
-      });
-      
-      // Add ripple effect on click
-      button.addEventListener('click', function(e) {
-        const ripple = document.createElement('div');
-        const rect = this.getBoundingClientRect();
-        const size = Math.max(rect.width, rect.height);
-        const x = e.clientX - rect.left - size / 2;
-        const y = e.clientY - rect.top - size / 2;
         
-        ripple.style.cssText = `
-          position: absolute;
-          width: ${size}px;
-          height: ${size}px;
-          left: ${x}px;
-          top: ${y}px;
-          background: rgba(255,255,255,0.3);
-          border-radius: 50%;
-          transform: scale(0);
-          animation: ripple 0.6s ease-out;
-          pointer-events: none;
-        `;
-        
-        this.style.position = 'relative';
-        this.style.overflow = 'hidden';
-        this.appendChild(ripple);
-        
-        setTimeout(() => ripple.remove(), 600);
-      });
-    });
-
-    // --- Add Ripple Animation ---
-    const style = document.createElement('style');
-    style.textContent = `
-      @keyframes ripple {
-        to {
-          transform: scale(4);
-          opacity: 0;
-        }
-      }
-    `;
-    document.head.appendChild(style);
-
-    // --- Performance optimization: Debounced resize handler ---
-    let resizeTimeout;
-    window.addEventListener('resize', function() {
-      clearTimeout(resizeTimeout);
-      resizeTimeout = setTimeout(function() {
-        // Recalculate any size-dependent animations
-        const heroHeight = window.innerHeight;
-        heroSection.style.minHeight = heroHeight + 'px';
-      }, 250);
-    });
-
-    // --- Add Mouse Follow Effect for Hero ---
-    let mouseX = 0, mouseY = 0;
-    let ballX = 0, ballY = 0;
-    
-    document.addEventListener('mousemove', function(e) {
-      mouseX = e.clientX;
-      mouseY = e.clientY;
-    });
-
-    function animateMouseFollower() {
-      const diffX = mouseX - ballX;
-      const diffY = mouseY - ballY;
-      
-      ballX += diffX * 0.1;
-      ballY += diffY * 0.1;
-      
-      const shapes = document.querySelectorAll('.floating-shapes .shape');
-      shapes.forEach((shape, index) => {
-        const speed = 0.02 + (index * 0.005);
-        const x = (ballX - window.innerWidth / 2) * speed;
-        const y = (ballY - window.innerHeight / 2) * speed;
-        shape.style.transform += ` translate(${x}px, ${y}px)`;
-      });
-      
-      requestAnimationFrame(animateMouseFollower);
-    }
-    
-    animateMouseFollower();
-
-    // --- Add Scroll Progress Indicator ---
-    const scrollProgress = document.createElement('div');
-    scrollProgress.style.cssText = `
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 0%;
-      height: 4px;
-      background: linear-gradient(90deg, #3b82f6, #8b5cf6, #ec4899);
-      z-index: 9999;
-      transition: width 0.1s ease;
-    `;
-    document.body.appendChild(scrollProgress);
-
-    window.addEventListener('scroll', function() {
-      const winScroll = document.body.scrollTop || document.documentElement.scrollTop;
-      const height = document.documentElement.scrollHeight - document.documentElement.clientHeight;
-      const scrolled = (winScroll / height) * 100;
-      scrollProgress.style.width = scrolled + '%';
-    });
-
-    // --- Add Fun Easter Eggs ---
-    let konamiCode = [];
-    const konamiSequence = [38, 38, 40, 40, 37, 39, 37, 39, 66, 65];
-    
-    document.addEventListener('keydown', function(e) {
-      konamiCode.push(e.keyCode);
-      if (konamiCode.length > konamiSequence.length) {
-        konamiCode.shift();
-      }
-      
-      if (konamiCode.join(',') === konamiSequence.join(',')) {
-        // Easter egg: Make all shapes rainbow colored
-        const shapes = document.querySelectorAll('.floating-shapes .shape');
-        shapes.forEach((shape, index) => {
-          const colors = ['#ff0000', '#ff8800', '#ffff00', '#00ff00', '#0088ff', '#8800ff'];
-          shape.style.background = colors[index % colors.length];
-          shape.style.opacity = '0.8';
-        });
-        
-        // Show celebration message
-        const celebration = document.createElement('div');
-        celebration.innerHTML = '🎉 Konami Code Activated! You found the Easter Egg! 🎉';
-        celebration.style.cssText = `
-          position: fixed;
-          top: 50%;
-          left: 50%;
-          transform: translate(-50%, -50%);
-          background: rgba(0,0,0,0.9);
-          color: white;
-          padding: 20px;
-          border-radius: 10px;
-          z-index: 10000;
-          font-size: 18px;
-          text-align: center;
-        `;
-        document.body.appendChild(celebration);
-        
-        setTimeout(() => celebration.remove(), 3000);
-        konamiCode = [];
+        // General animation trigger
+        entry.target.style.animationPlayState = 'running';
       }
     });
+  }, observerOptions);
 
-    // --- Add Typing Effect for Hero Title ---
-    function typeWriter(element, text, speed = 100) {
-      let i = 0;
-      element.textContent = '';
-      
-      function type() {
-        if (i < text.length) {
-          element.textContent += text.charAt(i);
-          i++;
-          setTimeout(type, speed);
-        }
-      }
-      type();
-    }
-
-    // Initialize typing effect on first load
-    setTimeout(() => {
-      typeWriter(heroTitle, titles[0], 80);
-    }, 1000);
+  // Observe elements
+  document.querySelectorAll('.stats-card, .feature-card, .testimonial-card').forEach(el => {
+    observer.observe(el);
   });
+
+  // Smooth scrolling
+  document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+    anchor.addEventListener('click', function(e) {
+      e.preventDefault();
+      const target = document.querySelector(this.getAttribute('href'));
+      if (target) {
+        target.scrollIntoView({
+          behavior: 'smooth',
+          block: 'start'
+        });
+      }
+    });
+  });
+
+  // Typing animation restart
+  const typewriterElement = document.querySelector('.typewriter');
+  if (typewriterElement) {
+    setInterval(() => {
+      typewriterElement.style.animation = 'none';
+      setTimeout(() => {
+        typewriterElement.style.animation = 'typewriter 4s steps(40, end), blink 0.75s step-end infinite';
+      }, 100);
+    }, 8000);
+  }
+
+  // Ripple effect for buttons
+  document.querySelectorAll('.ripple-btn').forEach(button => {
+    button.addEventListener('click', function(e) {
+      const ripple = document.createElement('span');
+      const rect = this.getBoundingClientRect();
+      const size = Math.max(rect.width, rect.height);
+      const x = e.clientX - rect.left - size / 2;
+      const y = e.clientY - rect.top - size / 2;
+      
+      ripple.style.cssText = `
+        position: absolute;
+        width: ${size}px;
+        height: ${size}px;
+        left: ${x}px;
+        top: ${y}px;
+        background: rgba(255, 255, 255, 0.3);
+        border-radius: 50%;
+        transform: scale(0);
+        animation: rippleEffect 0.6s linear;
+        pointer-events: none;
+        z-index: 1;
+      `;
+      
+      this.appendChild(ripple);
+      
+      setTimeout(() => {
+        ripple.remove();
+      }, 600);
+    });
+  });
+
+  // Add ripple keyframes
+  const style = document.createElement('style');
+  style.textContent = `
+    @keyframes rippleEffect {
+      to {
+        transform: scale(2);
+        opacity: 0;
+      }
+    }
+  `;
+  document.head.appendChild(style);
+
+  // Pause animations on reduced motion preference
+  if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+    document.querySelectorAll('*').forEach(el => {
+      el.style.animationDuration = '0.01ms';
+      el.style.transitionDuration = '0.01ms';
+    });
+  }
+});
 </script>
+
 {% endblock %}

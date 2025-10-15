@@ -1,335 +1,856 @@
 {% extends "base.html" %}
 {% load static %}
+{% load custom_filters %}
+{% block title %}{{ problem.title }} - MockMate{% endblock %}
 
-{% block title %}{{ problem.title }} | Practice{% endblock %}
+{% block extra_css %}
+<style>
+.glass-card {
+    background: rgba(17, 24, 39, 0.7);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border: 1px solid rgba(75, 85, 99, 0.3);
+}
+
+.glass-card-light {
+    background: rgba(31, 41, 55, 0.5);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid rgba(75, 85, 99, 0.2);
+}
+
+.difficulty-easy { @apply bg-green-500/20 text-green-300 border-green-500/30; }
+.difficulty-medium { @apply bg-yellow-500/20 text-yellow-300 border-yellow-500/30; }
+.difficulty-hard { @apply bg-red-500/20 text-red-300 border-red-500/30; }
+
+#code-editor {
+    height: 400px;
+    width: 100%;
+    background: #1e1e1e;
+    color: #d4d4d4;
+    font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
+    font-size: 14px;
+    line-height: 1.4;
+    border: none;
+    outline: none;
+    resize: none;
+    padding: 16px;
+    border-radius: 12px;
+    overflow: auto;
+    white-space: pre-wrap;
+    tab-size: 4;
+}
+
+#code-editor:focus {
+    box-shadow: 0 0 0 2px #007acc;
+}
+
+.tab-active {
+    @apply bg-blue-600 text-white;
+}
+
+.tab-inactive {
+    @apply bg-gray-700/50 text-gray-300 hover:bg-gray-700 hover:text-white;
+}
+
+pre code {
+    background: rgba(17, 24, 39, 0.8) !important;
+    color: #e5e7eb !important;
+}
+
+.spinner {
+    border: 2px solid #f3f3f3;
+    border-top: 2px solid #3498db;
+    border-radius: 50%;
+    width: 40px;
+    height: 40px;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+.console-output {
+    background: #1e1e1e;
+    color: #d4d4d4;
+    font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
+    font-size: 13px;
+    line-height: 1.4;
+    padding: 12px;
+    border-radius: 8px;
+    height: 150px;
+    overflow-y: auto;
+}
+
+#custom-input {
+    background: #1e1e1e;
+    color: #d4d4d4;
+    font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
+    font-size: 13px;
+    line-height: 1.4;
+}
+
+.btn-disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    pointer-events: none;
+}
+</style>
+{% endblock %}
 
 {% block content %}
-<div class="max-w-7xl mx-auto py-12 px-4 sm:px-6 lg:px-8">
-  <div class="bg-white shadow-xl rounded-lg overflow-hidden">
-    <div class="px-6 py-8 md:flex md:items-start md:justify-between">
-      <div class="md:w-1/2 pr-8">
-        <h1 class="text-4xl font-extrabold text-gray-900 mb-4">{{ problem.title }}</h1>
-        <div class="mb-6">
-          <span class="inline-block bg-blue-100 text-blue-800 text-sm font-medium px-3 py-1 rounded-full mr-2">
-            {{ problem.difficulty }}
-          </span>
-          {% if problem.companies %}
-            <span class="inline-block bg-purple-100 text-purple-800 text-sm font-medium px-3 py-1 rounded-full">
-              {{ problem.companies }}
-            </span>
-          {% endif %}
-        </div>
-
-        <h2 class="text-2xl font-semibold text-gray-800 mb-3">Problem Statement</h2>
-        <div class="prose max-w-none text-gray-700 leading-relaxed mb-6">
-          {{ problem.statement|linebreaks }}
-        </div>
-
-        <h2 class="text-2xl font-semibold text-gray-800 mb-3">Sample Test Cases</h2>
-        <div id="sample-test-cases" class="space-y-4 mb-6">
-          {% for test_case in sample_test_cases %}
-            <div class="bg-gray-50 p-4 rounded-lg border border-gray-200">
-              <p class="font-medium text-gray-800 mb-2">
-                Test Case {{ forloop.counter }}: {% if test_case.description %}{{ test_case.description }}{% else %}Example{% endif %}
-              </p>
-              <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div>
-                  <h3 class="text-sm font-semibold text-gray-600 mb-1">Input:</h3>
-                  <pre class="bg-white p-3 rounded text-sm font-mono border border-gray-300 overflow-x-auto">{{ test_case.input }}</pre>
+<div class="min-h-screen bg-transparent">
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 h-screen">
+        <!-- Problem Description Panel -->
+        <div class="overflow-auto">
+            <!-- Problem Header -->
+            <div class="glass-card rounded-2xl p-6 mb-6">
+                <div class="flex items-start justify-between mb-4">
+                    <div class="flex-1">
+                        <h1 class="text-2xl font-bold text-white mb-3">{{ problem.title }}</h1>
+                        <div class="flex items-center space-x-4">
+                            <span class="px-3 py-1 text-sm font-medium rounded-full border
+                                {% if problem.difficulty == 'EASY' %}difficulty-easy
+                                {% elif problem.difficulty == 'MEDIUM' %}difficulty-medium
+                                {% else %}difficulty-hard{% endif %}">
+                                {{ problem.get_difficulty_display }}
+                            </span>
+                            {% if problem.category %}
+                            <span class="flex items-center text-sm text-gray-300">
+                                <div class="w-2 h-2 rounded-full mr-2" style="background-color: {{ problem.category.color_code }}"></div>
+                                {{ problem.category.name }}
+                            </span>
+                            {% endif %}
+                            {% if problem.is_premium %}
+                            <span class="px-2 py-1 text-xs font-medium bg-yellow-500/20 text-yellow-300 border border-yellow-500/30 rounded-full">
+                                Premium
+                            </span>
+                            {% endif %}
+                        </div>
+                    </div>
+                    <div class="flex items-center space-x-2">
+                        {% if user_problem_stats.is_solved %}
+                        <div class="flex items-center text-green-400">
+                            <svg class="w-5 h-5 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
+                            </svg>
+                            Solved
+                        </div>
+                        {% elif user_problem_stats.is_attempted %}
+                        <div class="flex items-center text-yellow-400">
+                            <svg class="w-5 h-5 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
+                            </svg>
+                            Attempted
+                        </div>
+                        {% endif %}
+                    </div>
                 </div>
-                <div>
-                  <h3 class="text-sm font-semibold text-gray-600 mb-1">Expected Output:</h3>
-                  <pre class="bg-white p-3 rounded text-sm font-mono border border-gray-300 overflow-x-auto">{{ test_case.expected_output }}</pre>
+
+                <div class="flex items-center space-x-6 text-sm text-gray-400">
+                    <span>{{ problem.acceptance_rate }}% acceptance</span>
+                    <span>{{ problem.total_submissions }} submissions</span>
+                    {% if problem.time_complexity %}
+                    <span>Time: {{ problem.time_complexity }}</span>
+                    {% endif %}
+                    {% if problem.space_complexity %}
+                    <span>Space: {{ problem.space_complexity }}</span>
+                    {% endif %}
                 </div>
-              </div>
-              <div class="mt-3 text-sm font-medium" id="sample-output-{{ test_case.id }}">
-                <!-- Actual output for sample test case will be displayed here -->
-              </div>
             </div>
-          {% empty %}
-            <p class="text-gray-600">No sample test cases available.</p>
-          {% endfor %}
-        </div>
-      </div>
 
-      <div class="md:w-1/2 md:pl-8 mt-8 md:mt-0">
-        <div class="flex items-center justify-between mb-4">
-          <label for="language" class="font-medium text-gray-700">Language:</label>
-          <select id="language" name="language" class="border rounded-md px-3 py-2 text-gray-700 shadow-sm focus:ring-blue-500 focus:border-blue-500"
-                  onchange="changeLanguage(this.value)">
-            <option value="python3" {% if language == 'python3' %}selected{% endif %}>Python</option>
-            <option value="cpp" {% if language == 'cpp' %}selected{% endif %}>C++</option>
-            <option value="java" {% if language == 'java' %}selected{% endif %}>Java</option>
-          </select>
+            <!-- Problem Tabs -->
+            <div class="glass-card rounded-2xl mb-6">
+                <div class="flex border-b border-gray-700/50">
+                    <a href="?tab=description" class="px-6 py-3 font-medium rounded-tl-2xl {% if not request.GET.tab or request.GET.tab == 'description' %}tab-active{% else %}tab-inactive{% endif %}">
+                        Description
+                    </a>
+                    <a href="?tab=editorial" class="px-6 py-3 font-medium {% if request.GET.tab == 'editorial' %}tab-active{% else %}tab-inactive{% endif %}">
+                        Editorial
+                    </a>
+                    <a href="{% url 'practice:problem_discussions' problem.slug %}" class="px-6 py-3 font-medium tab-inactive">
+                        Discussions ({{ discussions_count }})
+                    </a>
+                    <a href="{% url 'practice:my_submissions' problem.slug %}" class="px-6 py-3 font-medium tab-inactive">
+                        Submissions
+                    </a>
+                </div>
+
+                <!-- Tab Content -->
+                {% if not request.GET.tab or request.GET.tab == 'description' %}
+                <!-- Description Tab -->
+                <div class="p-6">
+                    <div class="prose prose-invert max-w-none">
+                        {{ problem.statement|linebreaks }}
+                    </div>
+
+                    {% if problem.constraints %}
+                    <div class="mt-6">
+                        <h3 class="text-lg font-semibold text-white mb-3">Constraints</h3>
+                        <div class="bg-gray-800/50 rounded-lg p-4 text-gray-300">
+                            {{ problem.constraints|linebreaks }}
+                        </div>
+                    </div>
+                    {% endif %}
+
+                    {% if sample_test_cases %}
+                    <div class="mt-6">
+                        <h3 class="text-lg font-semibold text-white mb-3">Examples</h3>
+                        {% for test_case in sample_test_cases %}
+                        <div class="glass-card-light rounded-xl p-4 mb-4">
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <div>
+                                    <h4 class="text-sm font-medium text-gray-300 mb-2">Input:</h4>
+                                    <pre class="bg-gray-900/50 rounded-lg p-3 text-sm text-green-300"><code>{{ test_case.input_data }}</code></pre>
+                                </div>
+                                <div>
+                                    <h4 class="text-sm font-medium text-gray-300 mb-2">Output:</h4>
+                                    <pre class="bg-gray-900/50 rounded-lg p-3 text-sm text-blue-300"><code>{{ test_case.expected_output }}</code></pre>
+                                </div>
+                            </div>
+                            {% if test_case.explanation %}
+                            <div class="mt-4">
+                                <h4 class="text-sm font-medium text-gray-300 mb-2">Explanation:</h4>
+                                <p class="text-gray-400 text-sm">{{ test_case.explanation }}</p>
+                            </div>
+                            {% endif %}
+                        </div>
+                        {% endfor %}
+                    </div>
+                    {% endif %}
+
+                    {% if problem.tags.all %}
+                    <div class="mt-6">
+                        <h3 class="text-sm font-medium text-gray-300 mb-3">Related Topics</h3>
+                        <div class="flex flex-wrap gap-2">
+                            {% for tag in problem.tags.all %}
+                            <span class="px-3 py-1 text-sm bg-blue-500/20 text-blue-300 border border-blue-500/30 rounded-lg">
+                                {{ tag.name }}
+                            </span>
+                            {% endfor %}
+                        </div>
+                    </div>
+                    {% endif %}
+
+                    {% if problem.companies %}
+                    <div class="mt-6">
+                        <h3 class="text-sm font-medium text-gray-300 mb-3">Companies</h3>
+                        <div class="flex flex-wrap gap-2">
+                            {% for company in problem.companies|split:"," %}
+                            <span class="px-3 py-1 text-sm bg-gray-700/50 text-gray-300 rounded-lg">
+                                {{ company|trim }}
+                            </span>
+                            {% endfor %}
+                        </div>
+                    </div>
+                    {% endif %}
+
+                    <!-- Hints Section -->
+                    {% if problem.hints %}
+                    <div class="mt-6">
+                        <button id="show-hints-btn" class="text-blue-400 hover:text-blue-300 text-sm font-medium">
+                            💡 Show Hints ({{ problem.hints|length }})
+                        </button>
+                        <div id="hints-section" class="hidden mt-3 space-y-2">
+                            {% for hint in problem.hints %}
+                            <div class="glass-card-light rounded-lg p-3">
+                                <p class="text-gray-300 text-sm">{{ hint }}</p>
+                            </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                    {% endif %}
+                </div>
+                {% elif request.GET.tab == 'editorial' %}
+                <!-- Editorial Tab -->
+                <div class="p-6">
+                    {% if problem.approach %}
+                    <div class="prose prose-invert max-w-none">
+                        <h3 class="text-lg font-semibold text-white mb-4">Approach</h3>
+                        {{ problem.approach|linebreaks }}
+                    </div>
+                    {% else %}
+                    <p class="text-gray-400">Editorial not available yet.</p>
+                    {% endif %}
+
+                    {% if video_solutions %}
+                    <div class="mt-6">
+                        <h3 class="text-lg font-semibold text-white mb-4">Video Solutions</h3>
+                        <div class="space-y-3">
+                            {% for video in video_solutions %}
+                            <div class="glass-card-light rounded-lg p-4">
+                                <div class="flex justify-between items-center">
+                                    <h4 class="font-medium text-white">{{ video.title }}</h4>
+                                    {% if video.is_premium %}
+                                    <span class="px-2 py-1 text-xs bg-yellow-500/20 text-yellow-300 border border-yellow-500/30 rounded">Premium</span>
+                                    {% endif %}
+                                </div>
+                                <a href="{{ video.url }}" target="_blank" class="text-blue-400 hover:text-blue-300 text-sm">
+                                    Watch Solution →
+                                </a>
+                            </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                    {% endif %}
+                </div>
+                {% endif %}
+            </div>
         </div>
 
-        <div id="editor" class="w-full h-96 border border-gray-300 rounded-lg shadow-inner mb-4"></div>
+        <!-- Code Editor Panel -->
+        <div class="flex flex-col">
+            <!-- Editor Header -->
+            <div class="glass-card rounded-2xl p-4 mb-6">
+                <div class="flex justify-between items-center">
+                    <div class="flex items-center space-x-4">
+                        <label class="text-sm font-medium text-gray-300">Language:</label>
+                        <select id="language-select" class="bg-gray-700 text-white rounded-lg px-3 py-2 text-sm border border-gray-600 focus:border-blue-500 focus:outline-none">
+                            {% for lang_code, lang_name in available_languages %}
+                            <option value="{{ lang_code }}" {% if lang_code == language %}selected{% endif %}>
+                                {{ lang_name }}
+                            </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="flex space-x-2">
+                        <button id="run-code-btn" class="bg-green-600 hover:bg-green-700 text-white font-medium py-2 px-4 rounded-lg transition-colors">
+                            <svg class="w-4 h-4 inline mr-2" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM9.555 7.168A1 1 0 008 8v4a1 1 0 001.555.832l3-2a1 1 0 000-1.664l-3-2z" clip-rule="evenodd"/>
+                            </svg>
+                            Run
+                        </button>
+                        <button id="submit-code-btn" class="bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded-lg transition-colors">
+                            <svg class="w-4 h-4 inline mr-2" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M3 17a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm3.293-7.707a1 1 0 011.414 0L9 10.586V3a1 1 0 112 0v7.586l1.293-1.293a1 1 0 111.414 1.414l-3 3a1 1 0 01-1.414 0l-3-3a1 1 0 010-1.414z" clip-rule="evenodd"/>
+                            </svg>
+                            Submit
+                        </button>
+                    </div>
+                </div>
+            </div>
 
-        <div class="flex space-x-4 mt-4">
-          <button onclick="runCode()" class="flex-1 bg-green-600 text-white px-6 py-3 rounded-lg shadow-md hover:bg-green-700 transition duration-300 ease-in-out transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-opacity-50">
-            <i class="fas fa-play mr-2"></i> Run Code
-          </button>
-          <button onclick="submitSolution()" class="flex-1 bg-blue-600 text-white px-6 py-3 rounded-lg shadow-md hover:bg-blue-700 transition duration-300 ease-in-out transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50">
-            <i class="fas fa-paper-plane mr-2"></i> Submit
-          </button>
-        </div>
+            <!-- Code Editor -->
+            <div class="glass-card rounded-2xl p-4 mb-6 flex-1">
+                <textarea id="code-editor" placeholder="Write your code here...">{{ starter_code }}</textarea>
+            </div>
 
-        <div id="loading-indicator" class="mt-4 text-center text-blue-600 font-medium hidden">
-          <i class="fas fa-spinner fa-spin mr-2"></i> Running tests...
-        </div>
+            <!-- Console/Results -->
+            <div class="glass-card rounded-2xl">
+                <div class="flex border-b border-gray-700/50">
+                    <button id="console-tab-btn" class="console-tab px-6 py-3 font-medium rounded-tl-2xl bg-blue-600 text-white">
+                        Console
+                    </button>
+                    <button id="custom-input-tab-btn" class="console-tab px-6 py-3 font-medium bg-gray-700/50 text-gray-300">
+                        Custom Input
+                    </button>
+                </div>
 
-        <h2 class="text-2xl font-semibold text-gray-800 mt-8 mb-3">Output/Results:</h2>
-        <div id="output-container" class="bg-gray-100 p-6 rounded-lg border border-gray-300 shadow-inner min-h-[100px]">
-          <pre id="output" class="text-sm font-mono text-gray-800 overflow-auto whitespace-pre-wrap"></pre>
-          <div id="submission-summary" class="mt-4 hidden">
-            <h3 class="text-lg font-semibold mb-2">Submission Summary:</h3>
-            <p id="overall-status" class="text-lg font-bold"></p>
-            <p class="text-sm text-gray-600">CPU Time: <span id="cpu-time"></span></p>
-            <p class="text-sm text-gray-600">Memory: <span id="memory-usage"></span></p>
-            <div id="detailed-test-results" class="mt-4 space-y-2"></div>
-            <a href="{% url 'practice:my_submissions' problem.slug %}" class="inline-block mt-4 text-blue-600 font-medium hover:underline">
-              View All Submissions →
-            </a>
-          </div>
+                <!-- Console Tab -->
+                <div id="console-tab" class="p-4">
+                    <div id="console-output" class="console-output">
+                        <div class="text-gray-500">Console output will appear here...</div>
+                    </div>
+                </div>
+
+                <!-- Custom Input Tab -->
+                <div id="custom-input-tab" class="p-4 hidden">
+                    <textarea id="custom-input" placeholder="Enter your custom input here..." 
+                              class="w-full h-24 text-gray-300 rounded-lg p-3 text-sm border border-gray-600 focus:border-blue-500 focus:outline-none resize-none"></textarea>
+                    <button id="run-custom-btn" class="mt-3 bg-green-600 hover:bg-green-700 text-white font-medium py-2 px-4 rounded-lg transition-colors">
+                        Run with Custom Input
+                    </button>
+                </div>
+            </div>
         </div>
-      </div>
     </div>
-  </div>
+
+    <!-- Loading Modal -->
+    <div id="loading-modal" class="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 hidden flex items-center justify-center">
+        <div class="glass-card rounded-2xl p-8 text-center">
+            <div class="spinner mx-auto mb-4"></div>
+            <p class="text-white font-medium">Executing your code...</p>
+        </div>
+    </div>
+
+    <!-- Results Modal -->
+    <div id="results-modal" class="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+        <div class="glass-card rounded-2xl p-6 max-w-4xl w-full max-h-[80vh] overflow-auto">
+            <div class="flex justify-between items-center mb-6">
+                <h3 class="text-xl font-bold text-white">Submission Results</h3>
+                <button id="close-results" class="text-gray-400 hover:text-white">
+                    <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 20 20">
+                        <path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd"/>
+                    </svg>
+                </button>
+            </div>
+            <div id="results-content"></div>
+        </div>
+    </div>
 </div>
 
-<!-- Font Awesome for icons -->
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
-<!-- Monaco Editor CDN -->
-<script src="https://cdn.jsdelivr.net/npm/monaco-editor@0.49.0/min/vs/loader.js"></script>
-
 <script>
-  let editor; // Global variable for Monaco Editor instance
+// Default code templates
+const codeTemplates = {
+    'python3': `def solution():
+    # Write your solution here
+    pass
 
-  require.config({ paths: { 'vs': 'https://cdn.jsdelivr.net/npm/monaco-editor@0.49.0/min/vs' }});
-  require(['vs/editor/editor.main'], function() {
-    editor = monaco.editor.create(document.getElementById('editor'), {
-      value: `{{ starter_code|escapejs }}`, // Use escapejs to properly escape Django template variables
-      language: '{{ language }}',
-      theme: 'vs-light', // You can change to 'vs-dark' or 'hc-black'
-      automaticLayout: true, // Resizes editor automatically
-      minimap: { enabled: false },
-      fontSize: 14,
-      scrollBeyondLastLine: false,
-      wordWrap: 'on',
-      fontFamily: 'Fira Code, monospace', // Consider a coding font if available
-      lineNumbersMinChars: 3,
-      padding: { top: 10, bottom: 10 },
-      tabSize: 4,
-      insertSpaces: true,
-    });
+# Example usage
+if __name__ == "__main__":
+    result = solution()
+    print(result)`,
+    
+    'cpp17': `#include <iostream>
+#include <vector>
+#include <string>
+using namespace std;
 
-    // Update editor language when select box changes
-    document.getElementById('language').addEventListener('change', function() {
-      const lang = this.value;
-      let monacoLang = 'python'; // Default
-      if (lang === 'cpp') {
-        monacoLang = 'cpp';
-      } else if (lang === 'java') {
-        monacoLang = 'java';
-      }
-      monaco.editor.setModelLanguage(editor.getModel(), monacoLang);
-      changeLanguage(lang); // Call Django view to get new starter code
-    });
+class Solution {
+public:
+    // Write your solution here
+    
+};
 
-    // Handle initial language setting for Monaco
-    const initialLang = document.getElementById('language').value;
-    let initialMonacoLang = 'python';
-    if (initialLang === 'cpp') {
-      initialMonacoLang = 'cpp';
-    } else if (initialLang === 'java') {
-      initialMonacoLang = 'java';
+int main() {
+    Solution sol;
+    // Test your solution here
+    return 0;
+}`,
+    
+    'java': `public class Solution {
+    // Write your solution here
+    
+    public static void main(String[] args) {
+        Solution sol = new Solution();
+        // Test your solution here
     }
-    monaco.editor.setModelLanguage(editor.getModel(), initialMonacoLang);
-  });
+}`,
+    
+    'javascript': `function solution() {
+    // Write your solution here
+}
 
-  function changeLanguage(lang) {
-    const params = new URLSearchParams(window.location.search);
-    params.set('language', lang);
-    window.location.search = params.toString(); // Reloads page with new language starter code
-  }
+// Test your solution
+console.log(solution());`,
+    
+    'csharp': `using System;
+using System.Collections.Generic;
 
-  function showLoading(message) {
-    document.getElementById('loading-indicator').textContent = message;
-    document.getElementById('loading-indicator').classList.remove('hidden');
-    document.getElementById('output').textContent = ''; // Clear previous output
-    document.getElementById('submission-summary').classList.add('hidden'); // Hide submission summary
-  }
+public class Solution {
+    // Write your solution here
+    
+    public static void Main() {
+        Solution sol = new Solution();
+        // Test your solution here
+    }
+}`
+};
 
-  function hideLoading() {
-    document.getElementById('loading-indicator').classList.add('hidden');
-  }
+// Global variables
+let currentLanguage = '{{ language }}';
 
-  function displayOutput(output, isError = false) {
-    const outputElement = document.getElementById('output');
-    outputElement.textContent = output;
-    if (isError) {
-      outputElement.classList.remove('bg-gray-100');
-      outputElement.classList.add('bg-red-100', 'text-red-800');
+// Get elements
+const codeEditor = document.getElementById('code-editor');
+const languageSelect = document.getElementById('language-select');
+const runBtn = document.getElementById('run-code-btn');
+const submitBtn = document.getElementById('submit-code-btn');
+const runCustomBtn = document.getElementById('run-custom-btn');
+const consoleOutput = document.getElementById('console-output');
+const customInput = document.getElementById('custom-input');
+
+// Console tab switching
+function showConsoleTab(tabName) {
+    const consoleTab = document.getElementById('console-tab');
+    const customTab = document.getElementById('custom-input-tab');
+    const consoleTabBtn = document.getElementById('console-tab-btn');
+    const customTabBtn = document.getElementById('custom-input-tab-btn');
+    
+    if (tabName === 'console') {
+        consoleTab.classList.remove('hidden');
+        customTab.classList.add('hidden');
+        consoleTabBtn.classList.remove('bg-gray-700/50', 'text-gray-300');
+        consoleTabBtn.classList.add('bg-blue-600', 'text-white');
+        customTabBtn.classList.remove('bg-blue-600', 'text-white');
+        customTabBtn.classList.add('bg-gray-700/50', 'text-gray-300');
     } else {
-      outputElement.classList.remove('bg-red-100', 'text-red-800');
-      outputElement.classList.add('bg-gray-100');
+        consoleTab.classList.add('hidden');
+        customTab.classList.remove('hidden');
+        customTabBtn.classList.remove('bg-gray-700/50', 'text-gray-300');
+        customTabBtn.classList.add('bg-blue-600', 'text-white');
+        consoleTabBtn.classList.remove('bg-blue-600', 'text-white');
+        consoleTabBtn.classList.add('bg-gray-700/50', 'text-gray-300');
     }
-  }
+}
 
-  function runCode() {
-    const code = editor.getValue();
-    const language = document.getElementById('language').value;
-    const sampleTestCases = {% json_script "sample_test_cases_json" sample_test_cases %};
-    const sampleOutputsDiv = document.getElementById('sample-test-cases');
-
-    showLoading('Running code against sample input...');
-
-    // Clear previous sample test case outputs
-    document.querySelectorAll('[id^="sample-output-"]').forEach(el => {
-      el.innerHTML = '';
-      el.classList.remove('text-green-700', 'text-red-700');
-    });
-
-    // For 'Run Code', we run against the *first* sample input for quick check
-    // If there are multiple, user can manually copy-paste or we can run all
-    // For now, let's run against all sample test cases and display their individual outputs
-    let promises = [];
-    sampleTestCases.forEach(testCase => {
-      promises.push(
-        fetch("{% url 'practice:run_submission' problem.slug %}", {
-          method: 'POST',
-          headers: {
-            'X-CSRFToken': '{{ csrf_token }}',
-            'Content-Type': 'application/x-www-form-urlencoded'
-          },
-          body: new URLSearchParams({
-            'code': code,
-            'language': language,
-            'input': testCase.input // Send the specific test case input
-          })
-        })
-        .then(res => res.json())
+// Language change handler
+languageSelect.addEventListener('change', function() {
+    currentLanguage = this.value;
+    
+    // Try to fetch template from backend first
+    fetch(`{% url 'practice:get_template' problem.slug 'PLACEHOLDER' %}`.replace('PLACEHOLDER', currentLanguage))
+        .then(response => response.json())
         .then(data => {
-          const sampleOutputElement = document.getElementById(`sample-output-${testCase.id}`);
-          if (data.error) {
-            sampleOutputElement.innerHTML = `<strong class="text-red-700">Error:</strong> ${data.error}`;
-            sampleOutputElement.classList.add('text-red-700');
-          } else {
-            const actualOutput = data.output || 'No output';
-            const expectedOutput = testCase.expected_output.trim().replace(/\r\n/g, '\n');
-            const passed = actualOutput.trim().replace(/\r\n/g, '\n') === expectedOutput;
-
-            sampleOutputElement.innerHTML = `
-              <strong class="${passed ? 'text-green-700' : 'text-red-700'}">
-                ${passed ? '<i class="fas fa-check-circle"></i> Passed' : '<i class="fas fa-times-circle"></i> Failed'}
-              </strong><br>
-              Your Output: <pre class="inline-block bg-white p-2 rounded text-sm font-mono border border-gray-300">${actualOutput}</pre>
-            `;
-            if (!passed) {
-              sampleOutputElement.innerHTML += `<br>Expected: <pre class="inline-block bg-white p-2 rounded text-sm font-mono border border-gray-300">${expectedOutput}</pre>`;
+            if (data.template) {
+                codeEditor.value = data.template;
+            } else {
+                codeEditor.value = codeTemplates[currentLanguage] || '// Write your code here';
             }
-            sampleOutputElement.classList.add(passed ? 'text-green-700' : 'text-red-700');
-          }
-          return data; // Pass data along for Promise.all
         })
-        .catch(err => {
-          const sampleOutputElement = document.getElementById(`sample-output-${testCase.id}`);
-          sampleOutputElement.innerHTML = `<strong class="text-red-700">Error:</strong> ${err}`;
-          sampleOutputElement.classList.add('text-red-700');
-          return { error: err };
-        })
-      );
-    });
-
-    Promise.all(promises)
-      .then(results => {
-        hideLoading();
-        // You can aggregate results here if needed, or just rely on individual updates
-        displayOutput("Finished running sample tests. Check individual test case outputs above.");
-      })
-      .catch(err => {
-        hideLoading();
-        displayOutput(`Error running all sample tests: ${err}`, true);
-      });
-  }
-
-  function submitSolution() {
-    const code = editor.getValue();
-    const language = document.getElementById('language').value;
-
-    showLoading('Submitting solution and running all tests...');
-
-    fetch("{% url 'practice:submit_solution' problem.slug %}", {
-      method: 'POST',
-      headers: {
-        'X-CSRFToken': '{{ csrf_token }}',
-        'Content-Type': 'application/x-www-form-urlencoded'
-      },
-      body: new URLSearchParams({
-        'code': code,
-        'language': language
-      })
-    })
-    .then(res => res.json())
-    .then(data => {
-      hideLoading();
-      document.getElementById('output').textContent = ''; // Clear raw output area
-      document.getElementById('submission-summary').classList.remove('hidden');
-
-      const overallStatusElement = document.getElementById('overall-status');
-      const cpuTimeElement = document.getElementById('cpu-time');
-      const memoryUsageElement = document.getElementById('memory-usage');
-      const detailedResultsDiv = document.getElementById('detailed-test-results');
-
-      overallStatusElement.textContent = `Status: ${data.status.replace(/_/g, ' ')}`;
-      if (data.status === 'ACCEPTED') {
-        overallStatusElement.classList.add('text-green-600');
-        overallStatusElement.classList.remove('text-red-600', 'text-orange-600');
-      } else if (data.status === 'PENDING') {
-        overallStatusElement.classList.add('text-orange-600');
-        overallStatusElement.classList.remove('text-green-600', 'text-red-600');
-      }
-      else {
-        overallStatusElement.classList.add('text-red-600');
-        overallStatusElement.classList.remove('text-green-600', 'text-orange-600');
-      }
-
-      cpuTimeElement.textContent = data.cpuTime || 'N/A';
-      memoryUsageElement.textContent = data.memory || 'N/A';
-
-      detailedResultsDiv.innerHTML = ''; // Clear previous results
-
-      if (data.test_results && data.test_results.length > 0) {
-        data.test_results.forEach((result, index) => {
-          const statusIcon = result.status === 'PASS' ? '<i class="fas fa-check-circle text-green-500"></i>' : '<i class="fas fa-times-circle text-red-500"></i>';
-          const statusTextClass = result.status === 'PASS' ? 'text-green-700' : 'text-red-700';
-          const testCaseHtml = `
-            <div class="p-3 rounded-md ${result.status === 'PASS' ? 'bg-green-50' : 'bg-red-50'} border ${result.status === 'PASS' ? 'border-green-200' : 'border-red-200'}">
-              <p class="font-semibold text-gray-800">Test Case ${index + 1}: ${statusIcon} <span class="${statusTextClass}">${result.status.replace(/_/g, ' ')}</span></p>
-              ${result.input !== 'Hidden' ? `<p class="text-sm text-gray-600 mt-1">Input: <pre class="inline-block bg-white p-1 rounded text-xs font-mono border border-gray-300">${result.input}</pre></p>` : ''}
-              ${result.expected_output !== 'Hidden' ? `<p class="text-sm text-gray-600">Expected: <pre class="inline-block bg-white p-1 rounded text-xs font-mono border border-gray-300">${result.expected_output}</pre></p>` : ''}
-              <p class="text-sm text-gray-600">Your Output: <pre class="inline-block bg-white p-1 rounded text-xs font-mono border border-gray-300">${result.actual_output}</pre></p>
-              ${result.error ? `<p class="text-sm text-red-700 font-medium">Error: ${result.error}</p>` : ''}
-              <p class="text-xs text-gray-500">Time: ${result.cpuTime}s, Memory: ${result.memory}KB</p>
-            </div>
-          `;
-          detailedResultsDiv.innerHTML += testCaseHtml;
+        .catch(error => {
+            console.log('Using default template for', currentLanguage);
+            codeEditor.value = codeTemplates[currentLanguage] || '// Write your code here';
         });
-      } else {
-        detailedResultsDiv.innerHTML = '<p class="text-gray-600">No detailed test results available.</p>';
-      }
+});
 
-      // Redirect if provided by the backend (e.g., to submissions page)
-      if (data.redirect_url) {
-        // Optional: Add a small delay or confirmation before redirecting
-        // setTimeout(() => { window.location.href = data.redirect_url; }, 2000);
-      }
+// Run code against samples
+runBtn.addEventListener('click', function() {
+    const code = codeEditor.value.trim();
+    if (!code) {
+        displayError('Please write some code before running.');
+        return;
+    }
+    
+    setButtonLoading(this, true, 'Running...');
+    showLoading();
+    
+    fetch(`{% url 'practice:run_samples' problem.slug %}`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/x-www-form-urlencoded',
+            'X-CSRFToken': getCookie('csrftoken')
+        },
+        body: new URLSearchParams({
+            'code': code,
+            'language': currentLanguage
+        })
     })
-    .catch(err => {
-      hideLoading();
-      displayOutput(`Error submitting solution: ${err}`, true);
-      document.getElementById('submission-summary').classList.add('hidden');
+    .then(response => {
+        if (!response.ok) {
+            throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+        }
+        return response.json();
+    })
+    .then(data => {
+        hideLoading();
+        displayRunResults(data);
+        showConsoleTab('console');
+        setButtonLoading(this, false, 'Run');
+    })
+    .catch(error => {
+        hideLoading();
+        displayError('Error running code: ' + error.message);
+        setButtonLoading(this, false, 'Run');
     });
-  }
+});
+
+// Submit solution
+submitBtn.addEventListener('click', function() {
+    const code = codeEditor.value.trim();
+    if (!code) {
+        displayError('Please write some code before submitting.');
+        return;
+    }
+    
+    setButtonLoading(this, true, 'Submitting...');
+    showLoading();
+    
+    fetch(`{% url 'practice:submit_solution' problem.slug %}`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/x-www-form-urlencoded',
+            'X-CSRFToken': getCookie('csrftoken')
+        },
+        body: new URLSearchParams({
+            'code': code,
+            'language': currentLanguage
+        })
+    })
+    .then(response => {
+        if (!response.ok) {
+            throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+        }
+        return response.json();
+    })
+    .then(data => {
+        hideLoading();
+        displaySubmissionResults(data);
+        setButtonLoading(this, false, 'Submit');
+    })
+    .catch(error => {
+        hideLoading();
+        displayError('Error submitting code: ' + error.message);
+        setButtonLoading(this, false, 'Submit');
+    });
+});
+
+// Run with custom input
+runCustomBtn.addEventListener('click', function() {
+    const code = codeEditor.value.trim();
+    if (!code) {
+        displayError('Please write some code before running.');
+        return;
+    }
+    
+    setButtonLoading(this, true, 'Running...');
+    
+    fetch(`{% url 'practice:run_code' problem.slug %}`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/x-www-form-urlencoded',
+            'X-CSRFToken': getCookie('csrftoken')
+        },
+        body: new URLSearchParams({
+            'code': code,
+            'language': currentLanguage,
+            'input': customInput.value
+        })
+    })
+    .then(response => {
+        if (!response.ok) {
+            throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+        }
+        return response.json();
+    })
+    .then(data => {
+        displayCustomRunResults(data);
+        showConsoleTab('console');
+        setButtonLoading(this, false, 'Run with Custom Input');
+    })
+    .catch(error => {
+        displayError('Error running code: ' + error.message);
+        setButtonLoading(this, false, 'Run with Custom Input');
+    });
+});
+
+// Console tab event listeners
+document.getElementById('console-tab-btn').addEventListener('click', () => showConsoleTab('console'));
+document.getElementById('custom-input-tab-btn').addEventListener('click', () => showConsoleTab('custom-input'));
+
+// Hints toggle
+document.getElementById('show-hints-btn')?.addEventListener('click', function() {
+    const hintsSection = document.getElementById('hints-section');
+    if (hintsSection) {
+        hintsSection.classList.toggle('hidden');
+        const hintsCount = {{ problem.hints|length|default:0 }};
+        this.textContent = hintsSection.classList.contains('hidden') ? 
+            `💡 Show Hints (${hintsCount})` : '🔒 Hide Hints';
+    }
+});
+
+// Close results modal
+document.getElementById('close-results').addEventListener('click', function() {
+    document.getElementById('results-modal').classList.add('hidden');
+});
+
+// Utility functions
+function setButtonLoading(button, isLoading, text) {
+    if (isLoading) {
+        button.disabled = true;
+        button.classList.add('btn-disabled');
+        button.textContent = text;
+    } else {
+        button.disabled = false;
+        button.classList.remove('btn-disabled');
+        button.innerHTML = text === 'Run' ? 
+            `<svg class="w-4 h-4 inline mr-2" fill="currentColor" viewBox="0 0 20 20">
+                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM9.555 7.168A1 1 0 008 8v4a1 1 0 001.555.832l3-2a1 1 0 000-1.664l-3-2z" clip-rule="evenodd"/>
+            </svg>Run` :
+            text === 'Submit' ? 
+            `<svg class="w-4 h-4 inline mr-2" fill="currentColor" viewBox="0 0 20 20">
+                <path fill-rule="evenodd" d="M3 17a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm3.293-7.707a1 1 0 011.414 0L9 10.586V3a1 1 0 112 0v7.586l1.293-1.293a1 1 0 111.414 1.414l-3 3a1 1 0 01-1.414 0l-3-3a1 1 0 010-1.414z" clip-rule="evenodd"/>
+            </svg>Submit` :
+            text;
+    }
+}
+
+function showLoading() {
+    document.getElementById('loading-modal').classList.remove('hidden');
+}
+
+function hideLoading() {
+    document.getElementById('loading-modal').classList.add('hidden');
+}
+
+function displayRunResults(data) {
+    if (data.error) {
+        consoleOutput.innerHTML = `<div class="text-red-400">Error: ${escapeHtml(data.error)}</div>`;
+        return;
+    }
+    
+    let html = '<div class="space-y-3">';
+    
+    if (data.summary) {
+        const { passed, total, all_passed } = data.summary;
+        html += `<div class="flex items-center space-x-4 mb-4">
+            <span class="${all_passed ? 'text-green-400' : 'text-red-400'} font-medium">
+                ${passed}/${total} test cases passed
+            </span>
+        </div>`;
+    }
+    
+    if (data.results && Array.isArray(data.results)) {
+        data.results.forEach((result, index) => {
+            const statusColor = result.passed ? 'text-green-400' : 'text-red-400';
+            const borderColor = result.passed ? 'border-green-500' : 'border-red-500';
+            html += `<div class="border-l-4 ${borderColor} pl-4 py-2">
+                <div class="font-medium ${statusColor}">
+                    ${escapeHtml(result.description || `Test Case ${index + 1}`)}
+                </div>
+                <div class="text-sm text-gray-400 mt-1">
+                    <div>Expected: <span class="text-blue-300">${escapeHtml(result.expected_output || 'N/A')}</span></div>
+                    <div>Got: <span class="${result.passed ? 'text-green-300' : 'text-red-300'}">${escapeHtml(result.actual_output || 'N/A')}</span></div>
+                </div>
+            </div>`;
+        });
+    }
+    
+    html += '</div>';
+    consoleOutput.innerHTML = html;
+}
+
+function displayCustomRunResults(data) {
+    if (data.error) {
+        consoleOutput.innerHTML = `<div class="text-red-400">Error: ${escapeHtml(data.error)}</div>`;
+    } else {
+        consoleOutput.innerHTML = `<div class="space-y-2">
+            <div class="text-green-400 font-medium">Output:</div>
+            <pre class="text-gray-300 whitespace-pre-wrap bg-gray-800/50 p-3 rounded">${escapeHtml(data.output || 'No output')}</pre>
+            <div class="text-xs text-gray-400 mt-2">
+                Runtime: ${escapeHtml(data.execution_time || 'N/A')} | Memory: ${escapeHtml(data.memory || 'N/A')}
+            </div>
+        </div>`;
+    }
+}
+
+function displaySubmissionResults(data) {
+    const resultsContent = document.getElementById('results-content');
+    let html = '<div class="space-y-6">';
+    
+    // Status header
+    const statusColor = data.status === 'ACCEPTED' ? 'text-green-400' : 'text-red-400';
+    html += `<div class="text-center">
+        <div class="text-2xl font-bold ${statusColor} mb-2">
+            ${escapeHtml((data.status || 'UNKNOWN').replace(/_/g, ' '))}
+        </div>
+        <div class="text-gray-300">Score: ${data.score || 0}/100</div>
+    </div>`;
+    
+    // Summary
+    if (data.summary) {
+        html += `<div class="glass-card-light rounded-xl p-4">
+            <div class="grid grid-cols-2 gap-4 text-sm">
+                <div>Passed: <span class="font-medium">${data.summary.passed || 0}/${data.summary.total || 0}</span></div>
+                <div>Runtime: <span class="font-medium">${escapeHtml(data.summary.runtime || 'N/A')}</span></div>
+            </div>
+        </div>`;
+    }
+    
+    // Test results
+    if (data.test_results && Array.isArray(data.test_results)) {
+        html += '<div class="space-y-3">';
+        html += '<h4 class="text-lg font-medium text-white mb-3">Test Cases</h4>';
+        
+        data.test_results.forEach((result, index) => {
+            const borderColor = result.status === 'PASS' ? 'border-green-500' : 'border-red-500';
+            const textColor = result.status === 'PASS' ? 'text-green-400' : 'text-red-400';
+            
+            html += `<div class="glass-card-light rounded-lg p-4 border-l-4 ${borderColor}">
+                <div class="flex justify-between items-center mb-2">
+                    <span class="font-medium text-white">
+                        ${escapeHtml(result.description || `Test Case ${index + 1}`)}
+                    </span>
+                    <span class="${textColor} text-sm font-medium">
+                        ${escapeHtml(result.status || 'UNKNOWN')}
+                    </span>
+                </div>
+                ${result.is_sample && result.input !== 'Hidden' ? `
+                <div class="text-sm text-gray-400 space-y-1">
+                    <div>Input: <span class="text-blue-300">${escapeHtml(result.input || 'N/A')}</span></div>
+                    <div>Expected: <span class="text-blue-300">${escapeHtml(result.expected_output || 'N/A')}</span></div>
+                    <div>Got: <span class="${result.status === 'PASS' ? 'text-green-300' : 'text-red-300'}">${escapeHtml(result.actual_output || 'N/A')}</span></div>
+                </div>` : ''}
+            </div>`;
+        });
+        html += '</div>';
+    }
+    
+    html += '</div>';
+    resultsContent.innerHTML = html;
+    document.getElementById('results-modal').classList.remove('hidden');
+}
+
+function displayError(message) {
+    consoleOutput.innerHTML = `<div class="text-red-400">⚠️ Error: ${escapeHtml(message)}</div>`;
+    showConsoleTab('console');
+}
+
+function getCookie(name) {
+    let cookieValue = null;
+    if (document.cookie && document.cookie !== '') {
+        const cookies = document.cookie.split(';');
+        for (let i = 0; i < cookies.length; i++) {
+            const cookie = cookies[i].trim();
+            if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                break;
+            }
+        }
+    }
+    return cookieValue;
+}
+
+function escapeHtml(text) {
+    const map = {
+        '&': '&amp;',
+        '<': '&lt;',
+        '>': '&gt;',
+        '"': '&quot;',
+        "'": '&#039;'
+    };
+    return String(text || '').replace(/[&<>"']/g, function(m) { return map[m]; });
+}
+
+// Initialize when page loads
+document.addEventListener('DOMContentLoaded', function() {
+    console.log('Page loaded, initializing code editor...');
+    
+    // Set initial code if provided
+    if (codeEditor && !codeEditor.value.trim()) {
+        codeEditor.value = codeTemplates[currentLanguage] || '// Write your code here';
+    }
+    
+    // Add keyboard shortcuts
+    codeEditor.addEventListener('keydown', function(e) {
+        // Tab key for indentation
+        if (e.key === 'Tab') {
+            e.preventDefault();
+            const start = this.selectionStart;
+            const end = this.selectionEnd;
+            
+            // Insert tab character
+            this.value = this.value.substring(0, start) + '    ' + this.value.substring(end);
+            
+            // Put cursor at right position again
+            this.selectionStart = this.selectionEnd = start + 4;
+        }
+        
+        // Ctrl+Enter to run
+        if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') {
+            e.preventDefault();
+            runBtn.click();
+        }
+        
+        // Ctrl+Shift+Enter to submit
+        if ((e.ctrlKey || e.metaKey) && e.shiftKey && e.key === 'Enter') {
+            e.preventDefault();
+            submitBtn.click();
+        }
+    });
+    
+    console.log('Code editor initialized successfully');
+});
 </script>
 {% endblock %}

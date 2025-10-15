@@ -4,27 +4,40 @@ from . import views
 app_name = "practice"
 
 urlpatterns = [
+    # Main student views
     path('', views.problem_list, name='problem_list'),
-    path('<slug:slug>/', views.problem_detail, name='problem_detail'),
-    path('<slug:slug>/run/', views.run_submission, name='run_submission'),
-    path('<slug:slug>/submit/', views.submit_solution, name='submit_solution'), # Added submit_solution
-    path('<slug:slug>/submissions/', views.my_submissions, name='my_submissions'),
+    path('dashboard/', views.user_dashboard, name='user_dashboard'),
+    path('profile/<str:username>/', views.user_profile, name='user_profile'),
+    path('leaderboard/', views.leaderboard, name='leaderboard'),
+    path('my-badges/', views.my_badges, name='my_badges'),
+    
+    # Problem views
+    path('problem/<slug:slug>/', views.problem_detail, name='problem_detail'),
+    path('problem/<slug:slug>/run/', views.run_code, name='run_code'),
+    path('problem/<slug:slug>/submit/', views.submit_solution, name='submit_solution'),
+    path('problem/<slug:slug>/submissions/', views.my_submissions, name='my_submissions'),
+    path('problem/<slug:slug>/run-samples/', views.run_code_against_samples, name='run_samples'),
+    path('problem/<slug:slug>/template/<str:language>/', views.get_language_template, name='get_template'),
+    path('problem/<slug:slug>/hints/', views.get_problem_hints, name='get_hints'),
+    
+    # Discussion views
+    path('problem/<slug:slug>/discussions/', views.problem_discussions, name='problem_discussions'),
+    path('problem/<slug:slug>/discussions/create/', views.create_discussion, name='create_discussion'),
+    path('discussion/<int:discussion_id>/vote/', views.vote_discussion, name='vote_discussion'),
+    
+    # Video solutions
+    path('problem/<slug:slug>/add-video-solution/', views.add_video_solution, name='add_video_solution'),
     
     # Tutor/Staff Paths
-    path('tutor-dashboard/', views.tutor_dashboard, name='tutor_dashboard'),
-    path('tutor-dashboard/problems/add/', views.problem_create_edit, name='problem_add'),
-    path('tutor-dashboard/problems/edit/<slug:slug>/', views.problem_create_edit, name='problem_edit'),
-
-    # Admin Paths (for approval)
-    path('admin-dashboard/', views.admin_dashboard, name='admin_dashboard'),
-    path('admin-dashboard/tutors/<int:user_id>/approve/', views.admin_approve_tutor, name='admin_approve_tutor'),
-    path('admin-dashboard/problems/<slug:problem_slug>/<str:action>/', views.admin_problem_approval, name='admin_problem_approval'),
+    path('tutor/dashboard/', views.tutor_dashboard, name='tutor_dashboard'),
+    path('tutor/problems/add/', views.problem_create_edit, name='problem_add'),
+    path('tutor/problems/edit/<slug:slug>/', views.problem_create_edit, name='problem_edit'),
+    path('tutor/bulk-upload/', views.bulk_problem_upload, name='bulk_problem_upload'),
     
-    # REMOVED: Registration paths (e.g., 'register/student/', 'register/tutor/', 'tutor_approval/')
-    # These functionalities are now handled by the 'users' app or the admin interface.
-    # path('register/student/', views.student_register, name='student_register'), # REMOVE THIS
-    # path('register/tutor/', views.tutor_register, name='tutor_register'),     # REMOVE THIS
-    # path('tutor-approval/', views.tutor_approval_list, name='tutor_approval_list'), # REMOVE THIS
-    # path('tutor-approval/<int:pk>/', views.tutor_approve_deny, name='tutor_approve_deny'), # REMOVE THIS
+    # Admin Paths
+    path('admin/dashboard/', views.admin_dashboard, name='admin_dashboard'),
+    path('admin/tutors/<int:user_id>/approve/', views.admin_approve_tutor, name='admin_approve_tutor'),
+    path('admin/problems/<slug:problem_slug>/<str:action>/', views.admin_problem_approval, name='admin_problem_approval'),
+    
+    path('submission/<uuid:submission_id>/', views.get_submission_details, name='get_submission_details'),
 ]
-

@@ -1,309 +1,162 @@
 {% extends "base.html" %}
-{% load crispy_forms_tags %}
 {% load static %}
 
 {% block title %}Edit Post - MockMate{% endblock %}
 
 {% block content %}
-<div class="min-h-screen bg-gradient-to-br from-indigo-50 via-purple-50 to-pink-50 py-12 px-4">
+<div class="min-h-screen py-8 px-4 sm:px-6 lg:px-8">
   <div class="max-w-3xl mx-auto">
 
-    <!-- Page Header -->
-    <div class="text-center mb-8">
-      <div class="flex items-center justify-center mb-4">
-        <div class="text-5xl mr-3 animate-bounce">✏️</div>
-        <h1 class="text-4xl font-bold bg-gradient-to-r from-purple-600 via-pink-500 to-indigo-600 bg-clip-text text-transparent">
-          Edit Your Post
-        </h1>
-      </div>
-      <p class="text-lg text-gray-600">Refine your thoughts and make them shine</p>
-    </div>
-
-    <!-- Back Button -->
-    <div class="mb-6">
+    <!-- Back Navigation -->
+    <div class="mb-8">
       <a href="javascript:history.back()" 
-         class="inline-flex items-center text-purple-600 hover:text-purple-700 font-medium transition-colors">
-        <i class="ri-arrow-left-line mr-2 text-xl"></i>
-        Back to Post
+         class="flex items-center text-cyan-400 hover:text-cyan-300 font-medium transition-colors group">
+        <i class="ri-arrow-left-line text-xl mr-2 group-hover:-translate-x-1 transition-transform"></i>
+        <span>Back</span>
       </a>
     </div>
 
-    <!-- Edit Form -->
-    <div class="bg-white/80 backdrop-blur-lg rounded-3xl shadow-2xl border border-white/30 overflow-hidden">
+    <!-- Main Form Container -->
+    <div class="bg-white/5 backdrop-blur-xl border border-white/10 rounded-3xl shadow-2xl overflow-hidden">
       
       <!-- Form Header -->
-      <div class="bg-gradient-to-r from-purple-600 to-pink-600 text-white p-8">
+      <div class="bg-gradient-to-r from-cyan-600/20 to-blue-600/20 p-6 sm:p-8 border-b border-white/10">
         <div class="flex items-center">
           {% if user.profile.avatar %}
             <img src="{{ user.profile.avatar.url }}" alt="{{ user.username }}"
-                 class="w-16 h-16 rounded-full object-cover mr-5 ring-4 ring-white/30">
+                 class="w-14 h-14 rounded-full object-cover mr-5 ring-2 ring-cyan-400/50">
           {% else %}
-            <div class="w-16 h-16 rounded-full mr-5 ring-4 ring-white/30 bg-white/20 flex items-center justify-center text-white font-bold text-xl">
+            <div class="w-14 h-14 rounded-full mr-5 ring-2 ring-cyan-400/50 bg-gradient-to-br from-cyan-500 to-blue-600 flex items-center justify-center text-white font-bold text-xl">
               {{ user.username|first|upper }}
             </div>
           {% endif %}
           <div>
-            <h2 class="text-2xl font-bold">{{ user.get_full_name|default:user.username }}</h2>
-            <p class="opacity-90">Editing your post</p>
+            <h1 class="text-2xl font-bold text-gray-100">Edit Post</h1>
+            <p class="text-gray-400">Make changes to your shared post.</p>
           </div>
         </div>
       </div>
 
       <!-- Form Content -->
-      <div class="p-8">
-        <form method="post" enctype="multipart/form-data" id="edit-form" class="space-y-8">
+      <div class="p-6 sm:p-8">
+        <form method="post" enctype="multipart/form-data" id="edit-form" class="space-y-6">
           {% csrf_token %}
-          
-          <!-- Error Messages -->
-          {% if form.non_field_errors %}
-            <div class="bg-red-50 border-l-4 border-red-400 p-6 rounded-xl">
-              <div class="flex">
-                <i class="ri-error-warning-line text-red-400 text-2xl mr-3"></i>
-                <div>
-                  <h3 class="text-red-800 font-medium mb-2">Please fix the following errors:</h3>
-                  {{ form.non_field_errors }}
-                </div>
-              </div>
-            </div>
-          {% endif %}
 
           <!-- Content Field -->
-          <div class="space-y-3">
+          <div>
             <label for="{{ form.content.id_for_label }}" 
-                   class="block text-lg font-semibold text-gray-700 flex items-center">
-              <i class="ri-quill-pen-line mr-2 text-purple-600"></i>
+                   class="block text-sm font-medium text-gray-300 mb-2">
               Your Message
             </label>
-            
-            <div class="relative">
-              <textarea name="content" 
-                        id="{{ form.content.id_for_label }}"
-                        rows="6" 
-                        required
-                        class="w-full border-2 border-gray-200 rounded-2xl px-6 py-4 text-lg text-gray-700 placeholder-gray-400 focus:outline-none focus:ring-4 focus:ring-purple-200 focus:border-purple-400 transition-all duration-300 resize-none shadow-sm"
-                        placeholder="Share your thoughts, experiences, or ask questions...">{{ form.content.value|default_if_none:"" }}</textarea>
-              
-              <!-- Character Counter -->
-              <div class="absolute bottom-4 right-4 bg-white/80 rounded-full px-3 py-1 text-sm text-gray-500">
-                <span id="char-count">{{ form.content.value|length|default:0 }}</span>/500
-              </div>
-            </div>
-            
+            <textarea name="content" 
+                      id="{{ form.content.id_for_label }}"
+                      rows="6" 
+                      required
+                      class="w-full bg-black/20 backdrop-blur-sm border border-white/10 rounded-xl px-4 py-3 text-gray-200 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-cyan-500 transition-all duration-300 resize-none"
+                      placeholder="What's on your mind?">{{ form.content.value|default_if_none:"" }}</textarea>
             {% if form.content.errors %}
-              <div class="text-red-600 text-sm flex items-center mt-2">
-                <i class="ri-error-warning-line mr-1"></i>
-                {{ form.content.errors.0 }}
-              </div>
+              <p class="text-red-400 text-sm mt-2">{{ form.content.errors.0 }}</p>
             {% endif %}
           </div>
 
           <!-- Image Field -->
-          <div class="space-y-3">
-            <label class="block text-lg font-semibold text-gray-700 flex items-center">
-              <i class="ri-image-2-line mr-2 text-purple-600"></i>
-              Image (Optional)
+          <div>
+            <label class="block text-sm font-medium text-gray-300 mb-2">
+              Image
             </label>
             
-            <!-- Current Image Display -->
-            {% if form.instance.image %}
-              <div class="mb-4">
-                <p class="text-sm text-gray-600 mb-3 flex items-center">
-                  <i class="ri-image-line mr-2"></i>
-                  Current image:
-                </p>
-                <div class="relative inline-block rounded-xl overflow-hidden shadow-lg">
+            <div class="flex flex-col gap-4">
+              <!-- Current Image Display -->
+              {% if form.instance.image %}
+                <div class="relative w-fit">
+                  <p class="text-xs text-gray-400 mb-2">Current image:</p>
                   <img src="{{ form.instance.image.url }}" 
                        alt="Current image" 
-                       class="max-w-full h-64 object-cover">
-                  <div class="absolute inset-0 bg-black/0 hover:bg-black/20 transition-all duration-300 flex items-center justify-center opacity-0 hover:opacity-100">
-                    <span class="text-white font-medium">Click below to change</span>
-                  </div>
+                       class="max-h-60 rounded-lg shadow-lg border border-white/10">
                 </div>
-              </div>
-            {% endif %}
+              {% endif %}
 
-            <!-- Image Upload -->
-            <div class="relative">
-              <label for="{{ form.image.id_for_label }}" 
-                     class="flex items-center justify-center w-full border-2 border-dashed border-purple-300 rounded-2xl p-8 cursor-pointer hover:border-purple-500 hover:bg-purple-50 transition-all duration-300 group">
-                <div class="text-center">
-                  <i class="ri-upload-cloud-2-line text-5xl text-purple-500 mb-3 group-hover:scale-110 transition-transform"></i>
-                  <p class="text-purple-700 font-medium text-lg">
-                    {% if form.instance.image %}
-                      Replace image
-                    {% else %}
-                      Add an image to your post
-                    {% endif %}
+              <!-- Image Upload -->
+              <div class="relative">
+                <label for="{{ form.image.id_for_label }}" 
+                       class="flex flex-col items-center justify-center w-full border-2 border-dashed border-white/20 rounded-xl p-6 cursor-pointer hover:border-cyan-400 hover:bg-cyan-500/10 transition-all duration-300 group">
+                  <i class="ri-upload-cloud-2-line text-4xl text-gray-400 group-hover:text-cyan-400 transition-colors"></i>
+                  <p class="text-gray-400 group-hover:text-gray-200 mt-2 text-sm font-semibold">
+                    {% if form.instance.image %}Change image{% else %}Upload an image{% endif %}
                   </p>
-                  <p class="text-sm text-gray-500 mt-2">PNG, JPG up to 10MB</p>
-                </div>
-              </label>
-              <input type="file" 
-                     name="image" 
-                     id="{{ form.image.id_for_label }}"
-                     accept="image/*" 
-                     class="absolute inset-0 w-full h-full opacity-0 cursor-pointer">
-            </div>
+                </label>
+                <input type="file" 
+                       name="image" 
+                       id="{{ form.image.id_for_label }}"
+                       accept="image/*" 
+                       class="absolute inset-0 w-full h-full opacity-0 cursor-pointer">
+              </div>
 
-            <!-- Image Preview -->
-            <div id="image-preview" class="hidden">
-              <p class="text-sm text-gray-600 mb-2 flex items-center">
-                <i class="ri-eye-line mr-2"></i>
-                New image preview:
-              </p>
-              <div class="rounded-xl overflow-hidden shadow-lg">
-                <img id="preview-img" class="max-w-full h-64 object-cover">
+              <!-- Image Preview -->
+              <div id="image-preview" class="hidden relative w-fit">
+                 <p class="text-xs text-gray-400 mb-2">New image preview:</p>
+                 <img id="preview-img" class="max-h-60 rounded-lg shadow-lg border border-white/10">
               </div>
             </div>
             
             {% if form.image.errors %}
-              <div class="text-red-600 text-sm flex items-center mt-2">
-                <i class="ri-error-warning-line mr-1"></i>
-                {{ form.image.errors.0 }}
-              </div>
+              <p class="text-red-400 text-sm mt-2">{{ form.image.errors.0 }}</p>
             {% endif %}
           </div>
 
           <!-- Action Buttons -->
-          <div class="flex items-center justify-between pt-6 border-t border-gray-200">
+          <div class="flex items-center justify-end gap-4 pt-6 border-t border-white/10">
             <a href="javascript:history.back()" 
-               class="px-8 py-3 text-gray-600 hover:text-gray-800 font-medium transition-colors flex items-center">
-              <i class="ri-close-line mr-2"></i>
+               class="px-5 py-2 text-gray-300 hover:bg-white/10 font-medium rounded-full transition-colors text-sm">
               Cancel
             </a>
-            
-            <div class="flex space-x-4">
-              <!-- Save as Draft (if applicable) -->
-              <button type="button" 
-                      class="px-6 py-3 bg-gray-200 hover:bg-gray-300 text-gray-700 font-medium rounded-full transition-all duration-300 flex items-center">
-                <i class="ri-draft-line mr-2"></i>
-                Save Draft
-              </button>
-              
-              <!-- Update Button -->
-              <button type="submit"
-                      class="px-8 py-3 bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white font-bold rounded-full shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300 flex items-center">
-                <i class="ri-save-line mr-2"></i>
-                Update Post
-              </button>
-            </div>
+            <button type="submit"
+                    class="px-6 py-2.5 bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-600 hover:to-blue-700 text-white font-bold rounded-full shadow-lg hover:shadow-cyan-500/50 transform hover:scale-105 transition-all duration-300 text-sm flex items-center gap-2">
+              <i class="ri-check-line text-lg"></i>
+              Update Post
+            </button>
           </div>
 
         </form>
       </div>
-
     </div>
-
-    <!-- Tips Section -->
-    <div class="mt-8 bg-gradient-to-r from-blue-50 to-indigo-50 rounded-2xl p-6 border border-blue-200">
-      <h3 class="text-lg font-semibold text-blue-800 mb-3 flex items-center">
-        <i class="ri-lightbulb-line mr-2"></i>
-        Pro Tips for Great Posts
-      </h3>
-      <ul class="space-y-2 text-blue-700">
-        <li class="flex items-start">
-          <i class="ri-check-line mr-2 mt-1 text-blue-500"></i>
-          <span>Keep your message clear and engaging</span>
-        </li>
-        <li class="flex items-start">
-          <i class="ri-check-line mr-2 mt-1 text-blue-500"></i>
-          <span>Add relevant images to increase engagement</span>
-        </li>
-        <li class="flex items-start">
-          <i class="ri-check-line mr-2 mt-1 text-blue-500"></i>
-          <span>Ask questions to encourage discussions</span>
-        </li>
-      </ul>
-    </div>
-
   </div>
 </div>
 
 <!-- Loading Overlay -->
-<div id="loading-overlay" class="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 hidden items-center justify-center">
-  <div class="bg-white rounded-2xl p-8 shadow-2xl text-center">
-    <div class="animate-spin rounded-full h-12 w-12 border-4 border-purple-600 border-t-transparent mx-auto mb-4"></div>
-    <p class="text-gray-700 font-medium">Updating your post...</p>
+<div id="loading-overlay" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 hidden items-center justify-center">
+  <div class="flex flex-col items-center gap-4">
+    <div class="animate-spin rounded-full h-10 w-10 border-4 border-white/20 border-t-cyan-400"></div>
+    <p class="text-gray-200 font-medium">Updating...</p>
   </div>
 </div>
 
-<style>
-  /* Custom file input styling */
-  input[type="file"] {
-    opacity: 0;
-  }
-
-  /* Textarea auto-resize */
-  textarea {
-    min-height: 150px;
-  }
-
-  /* Loading animation */
-  @keyframes pulse-slow {
-    0%, 100% { opacity: 1; }
-    50% { opacity: 0.5; }
-  }
-  
-  .animate-pulse-slow {
-    animation: pulse-slow 2s ease-in-out infinite;
-  }
-</style>
 
 <script>
   document.addEventListener('DOMContentLoaded', function() {
     
-    // Character counter
-    const textarea = document.querySelector('textarea[name="content"]');
-    const charCount = document.getElementById('char-count');
-    
-    if (textarea && charCount) {
-      textarea.addEventListener('input', function() {
-        const length = this.value.length;
-        charCount.textContent = length;
-        
-        // Visual feedback for character limit
-        const container = charCount.parentElement;
-        if (length > 500) {
-          container.classList.add('bg-red-100', 'text-red-600');
-          container.classList.remove('bg-white/80', 'text-gray-500');
-        } else if (length > 400) {
-          container.classList.add('bg-yellow-100', 'text-yellow-600');
-          container.classList.remove('bg-white/80', 'text-gray-500', 'bg-red-100', 'text-red-600');
-        } else {
-          container.classList.add('bg-white/80', 'text-gray-500');
-          container.classList.remove('bg-red-100', 'text-red-600', 'bg-yellow-100', 'text-yellow-600');
-        }
-      });
-
-      // Auto-resize textarea
-      textarea.addEventListener('input', function() {
-        this.style.height = 'auto';
-        this.style.height = this.scrollHeight + 'px';
-      });
-    }
-
-    // Image preview
-    const imageInput = document.querySelector('input[type="file"]');
-    const imagePreview = document.getElementById('image-preview');
+    // Image preview functionality
+    const imageInput = document.getElementById('{{ form.image.id_for_label }}');
+    const imagePreviewContainer = document.getElementById('image-preview');
     const previewImg = document.getElementById('preview-img');
     
-    if (imageInput && imagePreview && previewImg) {
+    if (imageInput && imagePreviewContainer && previewImg) {
       imageInput.addEventListener('change', function(e) {
         const file = e.target.files[0];
         if (file) {
           const reader = new FileReader();
-          reader.onload = function(e) {
-            previewImg.src = e.target.result;
-            imagePreview.classList.remove('hidden');
+          reader.onload = function(event) {
+            previewImg.src = event.target.result;
+            imagePreviewContainer.classList.remove('hidden');
           };
           reader.readAsDataURL(file);
         } else {
-          imagePreview.classList.add('hidden');
+          imagePreviewContainer.classList.add('hidden');
         }
       });
     }
 
-    // Form submission with loading
+    // Show loading overlay on form submission
     const form = document.getElementById('edit-form');
     const loadingOverlay = document.getElementById('loading-overlay');
     
@@ -313,29 +166,6 @@
         loadingOverlay.classList.add('flex');
       });
     }
-
-    // Prevent accidental navigation away
-    let formChanged = false;
-    const inputs = form.querySelectorAll('input, textarea');
-    
-    inputs.forEach(input => {
-      input.addEventListener('input', () => {
-        formChanged = true;
-      });
-    });
-
-    window.addEventListener('beforeunload', function(e) {
-      if (formChanged) {
-        e.preventDefault();
-        e.returnValue = 'You have unsaved changes. Are you sure you want to leave?';
-        return e.returnValue;
-      }
-    });
-
-    form.addEventListener('submit', () => {
-      formChanged = false;
-    });
-
   });
 </script>
 {% endblock %}

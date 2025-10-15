@@ -4,6 +4,7 @@ from django.utils.text import slugify
 from django.utils import timezone
 import uuid
 
+
 class Post(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     author = models.ForeignKey(User, on_delete=models.CASCADE, related_name='posts')
@@ -15,10 +16,11 @@ class Post(models.Model):
 
     def save(self, *args, **kwargs):
         if not self.slug:
-            base_slug = slugify(self.content[:50] or str(self.id))
+            base_slug = slugify(self.content[:50] if self.content else str(self.id))
             slug = base_slug
             num = 1
-            while Post.objects.filter(slug=slug).exists():
+            # Fix: Exclude current instance from slug uniqueness check
+            while Post.objects.filter(slug=slug).exclude(pk=self.pk).exists():
                 slug = f"{base_slug}-{num}"
                 num += 1
             self.slug = slug
@@ -26,9 +28,27 @@ class Post(models.Model):
 
     def __str__(self):
         return f"{self.author.username} - {self.content[:30]}"
+    
+    def like_count(self):
+        """Cached property for like count"""
+        return self.likes.count()
+    
+    def comment_count(self):
+        """Cached property for comment count"""
+        return self.comments.count()
+    
+    def is_liked_by(self, user):
+        """Check if user has liked this post"""
+        if user.is_authenticated:
+            return self.likes.filter(user=user).exists()
+        return False
 
     class Meta:
         ordering = ['-created_at']
+        indexes = [
+            models.Index(fields=['-created_at']),
+            models.Index(fields=['author', '-created_at']),
+        ]
 
 
 class Comment(models.Model):
@@ -41,6 +61,12 @@ class Comment(models.Model):
     def __str__(self):
         return f"Comment by {self.author.username} on {self.post.slug}"
 
+    class Meta:
+        ordering = ['created_at']
+        indexes = [
+            models.Index(fields=['post', 'created_at']),
+        ]
+
 
 class Like(models.Model):
     post = models.ForeignKey(Post, on_delete=models.CASCADE, related_name='likes')
@@ -49,6 +75,9 @@ class Like(models.Model):
 
     class Meta:
         unique_together = ('post', 'user')
+        indexes = [
+            models.Index(fields=['post', 'user']),
+        ]
 
     def __str__(self):
         return f"{self.user.username} likes {self.post.slug}"
@@ -59,6 +88,10 @@ class Repost(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='reposts')
     comment = models.TextField(blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        unique_together = ('original_post', 'user')
+        ordering = ['-created_at']
 
     def __str__(self):
         return f"{self.user.username} reposted {self.original_post.slug}"
@@ -71,15 +104,22 @@ class PostView(models.Model):
 
     class Meta:
         unique_together = ('post', 'user')
+        indexes = [
+            models.Index(fields=['post', 'user']),
+        ]
 
     def __str__(self):
         return f"{self.user.username} viewed {self.post.slug}"
 
 
-# Optional: Tagging or Hashtag functionality
 class Hashtag(models.Model):
     name = models.CharField(max_length=50, unique=True)
-    posts = models.ManyToManyField(Post, related_name='hashtags')
+    posts = models.ManyToManyField(Post, related_name='hashtags', blank=True)
 
     def __str__(self):
         return f"#{self.name}"
+    
+    class Meta:
+        indexes = [
+            models.Index(fields=['name']),
+        ]

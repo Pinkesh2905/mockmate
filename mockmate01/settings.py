@@ -66,6 +66,7 @@ INSTALLED_APPS = [
     'posts',
     'crispy_forms',
     'crispy_bootstrap5',
+    'aptitude',
 ]
 
 # --------------------------------
@@ -163,3 +164,29 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 # --------------------------------
 JDOODLE_CLIENT_ID = env("JDOODLE_CLIENT_ID", default="")
 JDOODLE_CLIENT_SECRET = env("JDOODLE_CLIENT_SECRET", default="")
+
+# Email Configuration
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = os.getenv('EMAIL_HOST')
+EMAIL_PORT = int(os.getenv('EMAIL_PORT', 587))
+EMAIL_USE_TLS = True
+EMAIL_HOST_USER = os.getenv('EMAIL_HOST_USER')
+EMAIL_HOST_PASSWORD = os.getenv('EMAIL_HOST_PASSWORD')
+DEFAULT_FROM_EMAIL = os.getenv('DEFAULT_FROM_EMAIL')
+
+
+# Domain for email links
+DOMAIN_NAME = "localhost:8000"
+
+
+# Session Configuration
+SESSION_COOKIE_AGE = 1800  # 30 minutes default
+SESSION_EXPIRE_AT_BROWSER_CLOSE = False
+
+# Password Reset Configuration
+PASSWORD_RESET_TIMEOUT = 10800  # 3 hours
+
+# Security Settings
+SECURE_BROWSER_XSS_FILTER = True
+SECURE_CONTENT_TYPE_NOSNIFF = True
+X_FRAME_OPTIONS = 'DENY'

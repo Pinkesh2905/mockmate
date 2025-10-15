@@ -1,0 +1,368 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}{% if is_new %}Create Problem{% else %}Edit Problem{% endif %} | MockMate{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+<script src="https://cdn.jsdelivr.net/npm/monaco-editor@0.49.0/min/vs/loader.js"></script>
+{% endblock %}
+
+{% block content %}
+<div class="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50">
+  <div class="max-w-6xl mx-auto py-8 px-4 sm:px-6 lg:px-8">
+    
+    <!-- Header -->
+    <div class="bg-white rounded-xl shadow-lg p-6 mb-6">
+      <div class="flex items-center space-x-4 mb-4">
+        <a href="{% url 'practice:tutor_dashboard' %}" 
+           class="text-gray-500 hover:text-gray-700 transition duration-200">
+          <i class="fas fa-arrow-left text-lg"></i>
+        </a>
+        <div>
+          <h1 class="text-3xl font-bold text-gray-900">
+            {% if is_new %}Create New Problem{% else %}Edit Problem{% endif %}
+          </h1>
+          <p class="text-gray-600 mt-1">
+            {% if is_new %}
+              Design a new coding challenge for students
+            {% else %}
+              Modify problem: {{ problem.title }}
+            {% endif %}
+          </p>
+        </div>
+      </div>
+
+      {% if not is_new %}
+        <!-- Problem Status -->
+        <div class="flex items-center space-x-4">
+          <span class="px-3 py-1 rounded-full text-sm font-medium
+            {% if problem.status == 'PUBLISHED' %}bg-emerald-100 text-emerald-800
+            {% elif problem.status == 'PENDING_APPROVAL' %}bg-amber-100 text-amber-800
+            {% elif problem.status == 'DRAFT' %}bg-gray-100 text-gray-800
+            {% else %}bg-red-100 text-red-800{% endif %}">
+            {{ problem.get_status_display }}
+          </span>
+          
+          <span class="text-sm text-gray-500">
+            Created: {{ problem.created_at|date:"M d, Y H:i" }}
+          </span>
+          
+          {% if problem.updated_at != problem.created_at %}
+            <span class="text-sm text-gray-500">
+              Updated: {{ problem.updated_at|timesince }} ago
+            </span>
+          {% endif %}
+        </div>
+      {% endif %}
+    </div>
+
+    <form method="post" id="problem-form">
+      {% csrf_token %}
+      
+      <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        
+        <!-- Main Content -->
+        <div class="lg:col-span-2 space-y-6">
+          
+          <!-- Basic Information -->
+          <div class="bg-white rounded-xl shadow-lg p-6">
+            <h2 class="text-xl font-bold text-gray-900 mb-6">
+              <i class="fas fa-info-circle mr-2 text-blue-600"></i>
+              Basic Information
+            </h2>
+            
+            <div class="space-y-6">
+              <!-- Title -->
+              <div>
+                <label for="title" class="block text-sm font-medium text-gray-700 mb-2">
+                  Problem Title <span class="text-red-500">*</span>
+                </label>
+                {{ form.title }}
+                {% if form.title.help_text %}
+                  <p class="mt-1 text-sm text-gray-500">{{ form.title.help_text }}</p>
+                {% endif %}
+                {% if form.title.errors %}
+                  <p class="mt-1 text-sm text-red-600">{{ form.title.errors.0 }}</p>
+                {% endif %}
+              </div>
+
+              <!-- Problem Statement -->
+              <div>
+                <label for="statement" class="block text-sm font-medium text-gray-700 mb-2">
+                  Problem Statement <span class="text-red-500">*</span>
+                </label>
+                {{ form.statement }}
+                <p class="mt-1 text-sm text-gray-500">
+                  Describe the problem clearly. Include input/output format and examples.
+                </p>
+                {% if form.statement.errors %}
+                  <p class="mt-1 text-sm text-red-600">{{ form.statement.errors.0 }}</p>
+                {% endif %}
+              </div>
+
+              <!-- Constraints -->
+              <div>
+                <label for="constraints" class="block text-sm font-medium text-gray-700 mb-2">
+                  Constraints
+                </label>
+                {{ form.constraints }}
+                <p class="mt-1 text-sm text-gray-500">
+                  Specify input constraints, time/space complexity limits.
+                </p>
+              </div>
+
+              <!-- Hints -->
+              <div>
+                <label for="hints" class="block text-sm font-medium text-gray-700 mb-2">
+                  Hints (Optional)
+                </label>
+                <div id="hints-container">
+                  <div class="hint-input mb-3">
+                    <div class="flex items-center space-x-2">
+                      <input type="text" 
+                             name="hints[]" 
+                             placeholder="Enter a hint..."
+                             class="flex-1 px-3 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500">
+                      <button type="button" onclick="removeHint(this)" 
+                              class="p-2 text-red-600 hover:bg-red-50 rounded-md">
+                        <i class="fas fa-trash"></i>
+                      </button>
+                    </div>
+                  </div>
+                </div>
+                <button type="button" onclick="addHint()" 
+                        class="text-blue-600 text-sm hover:underline">
+                  <i class="fas fa-plus mr-1"></i>Add another hint
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Test Cases -->
+          <div class="bg-white rounded-xl shadow-lg p-6">
+            <div class="flex items-center justify-between mb-6">
+              <h2 class="text-xl font-bold text-gray-900">
+                <i class="fas fa-vial mr-2 text-green-600"></i>
+                Test Cases
+              </h2>
+              <button type="button" onclick="addTestCase()" 
+                      class="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition duration-200">
+                <i class="fas fa-plus mr-2"></i>Add Test Case
+              </button>
+            </div>
+
+            <div id="test-cases-container">
+              {{ test_formset.management_form }}
+              {% for form in test_formset %}
+                <div class="test-case-form mb-6 p-4 border border-gray-200 rounded-lg" data-form-index="{{ forloop.counter0 }}">
+                  <div class="flex items-center justify-between mb-4">
+                    <h3 class="text-lg font-semibold text-gray-800">
+                      Test Case {{ forloop.counter }}
+                    </h3>
+                    <div class="flex items-center space-x-2">
+                      <label class="flex items-center">
+                        {{ form.is_sample }}
+                        <span class="ml-2 text-sm text-gray-700">Sample Test Case</span>
+                      </label>
+                      <button type="button" onclick="removeTestCase(this)" 
+                              class="p-2 text-red-600 hover:bg-red-50 rounded-md">
+                        <i class="fas fa-trash"></i>
+                      </button>
+                    </div>
+                  </div>
+
+                  <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                      <label class="block text-sm font-medium text-gray-700 mb-2">
+                        Input Data <span class="text-red-500">*</span>
+                      </label>
+                      {{ form.input_data }}
+                    </div>
+                    <div>
+                      <label class="block text-sm font-medium text-gray-700 mb-2">
+                        Expected Output <span class="text-red-500">*</span>
+                      </label>
+                      {{ form.expected_output }}
+                    </div>
+                  </div>
+
+                  <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mt-4">
+                    <div>
+                      <label class="block text-sm font-medium text-gray-700 mb-2">
+                        Description
+                      </label>
+                      {{ form.description }}
+                    </div>
+                    <div>
+                      <label class="block text-sm font-medium text-gray-700 mb-2">
+                        Order
+                      </label>
+                      {{ form.order }}
+                    </div>
+                    <div>
+                      <label class="block text-sm font-medium text-gray-700 mb-2">
+                        Weight
+                      </label>
+                      {{ form.difficulty_weight }}
+                    </div>
+                  </div>
+
+                  <!-- Hidden fields -->
+                  {% for hidden in form.hidden_fields %}
+                    {{ hidden }}
+                  {% endfor %}
+                </div>
+              {% endfor %}
+            </div>
+          </div>
+
+          <!-- Code Templates -->
+          <div class="bg-white rounded-xl shadow-lg p-6">
+            <div class="flex items-center justify-between mb-6">
+              <h2 class="text-xl font-bold text-gray-900">
+                <i class="fas fa-code mr-2 text-purple-600"></i>
+                Code Templates
+              </h2>
+              <button type="button" onclick="addCodeTemplate()" 
+                      class="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition duration-200">
+                <i class="fas fa-plus mr-2"></i>Add Template
+              </button>
+            </div>
+
+            <div id="code-templates-container">
+              {{ template_formset.management_form }}
+              {% for form in template_formset %}
+                <div class="code-template-form mb-6 p-4 border border-gray-200 rounded-lg" data-form-index="{{ forloop.counter0 }}">
+                  <div class="flex items-center justify-between mb-4">
+                    <h3 class="text-lg font-semibold text-gray-800">
+                      Template {{ forloop.counter }}
+                    </h3>
+                    <button type="button" onclick="removeCodeTemplate(this)" 
+                            class="p-2 text-red-600 hover:bg-red-50 rounded-md">
+                      <i class="fas fa-trash"></i>
+                    </button>
+                  </div>
+
+                  <div class="mb-4">
+                    <label class="block text-sm font-medium text-gray-700 mb-2">
+                      Programming Language <span class="text-red-500">*</span>
+                    </label>
+                    {{ form.language }}
+                  </div>
+
+                  <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">
+                      Starter Code <span class="text-red-500">*</span>
+                    </label>
+                    <div id="code-editor-{{ forloop.counter0 }}" class="w-full h-64 border border-gray-300 rounded-lg"></div>
+                    {{ form.starter_code }}
+                  </div>
+
+                  <!-- Hidden fields -->
+                  {% for hidden in form.hidden_fields %}
+                    {{ hidden }}
+                  {% endfor %}
+                </div>
+              {% endfor %}
+            </div>
+          </div>
+        </div>
+
+        <!-- Sidebar -->
+        <div class="space-y-6">
+          
+          <!-- Problem Settings -->
+          <div class="bg-white rounded-xl shadow-lg p-6">
+            <h2 class="text-xl font-bold text-gray-900 mb-6">
+              <i class="fas fa-cog mr-2 text-gray-600"></i>
+              Settings
+            </h2>
+            
+            <div class="space-y-6">
+              <!-- Difficulty -->
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">
+                  Difficulty <span class="text-red-500">*</span>
+                </label>
+                {{ form.difficulty }}
+              </div>
+
+              <!-- Category -->
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">
+                  Category
+                </label>
+                {{ form.category }}
+              </div>
+
+              <!-- Time & Memory Limits -->
+              <div class="grid grid-cols-2 gap-4">
+                <div>
+                  <label class="block text-sm font-medium text-gray-700 mb-2">
+                    Time Limit (s)
+                  </label>
+                  {{ form.time_limit }}
+                </div>
+                <div>
+                  <label class="block text-sm font-medium text-gray-700 mb-2">
+                    Memory Limit (MB)
+                  </label>
+                  {{ form.memory_limit }}
+                </div>
+              </div>
+
+              <!-- Companies -->
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">
+                  Companies
+                </label>
+                {{ form.companies }}
+                <p class="mt-1 text-sm text-gray-500">
+                  Comma-separated list (e.g., Google, Amazon, Microsoft)
+                </p>
+              </div>
+
+              <!-- Tags -->
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">
+                  Tags
+                </label>
+                {{ form.tags }}
+                <div class="mt-2 flex flex-wrap gap-2">
+                  <button type="button" onclick="addQuickTag('array')" 
+                          class="px-2 py-1 bg-gray-100 text-gray-700 text-xs rounded-full hover:bg-gray-200">
+                    array
+                  </button>
+                  <button type="button" onclick="addQuickTag('dynamic-programming')" 
+                          class="px-2 py-1 bg-gray-100 text-gray-700 text-xs rounded-full hover:bg-gray-200">
+                    dynamic-programming
+                  </button>
+                  <button type="button" onclick="addQuickTag('graph')" 
+                          class="px-2 py-1 bg-gray-100 text-gray-700 text-xs rounded-full hover:bg-gray-200">
+                    graph
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Preview -->
+          <div class="bg-white rounded-xl shadow-lg p-6">
+            <h2 class="text-xl font-bold text-gray-900 mb-4">
+              <i class="fas fa-eye mr-2 text-indigo-600"></i>
+              Preview
+            </h2>
+            <button type="button" onclick="previewProblem()" 
+                    class="w-full px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition duration-200">
+              <i class="fas fa-search mr-2"></i>Preview Problem
+            </button>
+          </div>
+
+          <!-- Actions -->
+          <div class="bg-white rounded-xl shadow-lg p-6">
+            <h2 class="text-xl font-bold text-gray-900 mb-4">Actions</h2>
+            
+            <div class="space-y-3">
+              <button type="submit" name="action" value="save_draft"
+                      class="w-full px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition duration-200">

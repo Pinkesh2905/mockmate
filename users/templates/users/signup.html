@@ -1,46 +1,39 @@
 {% extends 'base.html' %}
-{% load form_filters %} {# This line is crucial for add_class filter #}
+{% load form_filters %}
 
 {% block title %}Sign Up | MockMate{% endblock %}
 
 {% block content %}
-<section class="min-h-screen py-12 px-4 bg-gradient-to-br from-purple-50 via-blue-50 to-indigo-100 relative overflow-hidden">
-  <!-- Animated background elements -->
-  <div class="absolute inset-0 overflow-hidden">
-    <div class="absolute -top-40 -right-40 w-80 h-80 bg-gradient-to-br from-blue-200 to-purple-200 rounded-full mix-blend-multiply filter blur-xl opacity-70 animate-pulse"></div>
-    <div class="absolute -bottom-40 -left-40 w-80 h-80 bg-gradient-to-br from-pink-200 to-yellow-200 rounded-full mix-blend-multiply filter blur-xl opacity-70 animate-pulse animation-delay-2000"></div>
-    <div class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-60 h-60 bg-gradient-to-br from-green-200 to-blue-200 rounded-full mix-blend-multiply filter blur-xl opacity-50 animate-pulse animation-delay-4000"></div>
-  </div>
-
-  <div class="relative max-w-md mx-auto">
-    <!-- Main card with enhanced styling -->
-    <div class="bg-white/90 backdrop-blur-lg p-8 rounded-3xl shadow-2xl border border-white/20 transform hover:scale-[1.02] transition-all duration-300">
+<section class="min-h-screen py-8 px-4 flex items-center justify-center">
+  <div class="relative max-w-md w-full mx-auto">
+    <!-- Main card -->
+    <div class="glass-elevated p-8 rounded-xl border border-slate-700/50 bg-slate-900/90 backdrop-blur-xl">
       
-      <!-- Header with gradient text and icon -->
+      <!-- Header -->
       <div class="text-center mb-8">
-        <div class="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full mb-4 transform hover:rotate-12 transition-transform duration-300">
-          <i class="fas fa-rocket text-white text-2xl"></i>
+        <div class="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-br from-blue-500 via-purple-500 to-indigo-500 rounded-full mb-4 shadow-lg">
+          <i class="ri-user-add-line text-white text-2xl"></i>
         </div>
-        <h2 class="text-3xl font-bold bg-gradient-to-r from-blue-600 via-purple-600 to-indigo-600 bg-clip-text text-transparent mb-2">
+        <h2 class="text-3xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-blue-400 via-purple-400 to-indigo-400 mb-2">
           Join MockMate
         </h2>
-        <p class="text-gray-600 text-sm">Start your interview prep journey today! 🎯</p>
+        <p class="text-slate-400 text-sm font-medium">Start your interview prep journey today</p>
       </div>
 
       <form method="post" class="space-y-6">
         {% csrf_token %}
 
-        {# Enhanced error block with better styling #}
+        <!-- Error display -->
         {% if form.errors %}
-          <div class="bg-gradient-to-r from-red-50 to-pink-50 border-l-4 border-red-400 text-red-700 px-6 py-4 rounded-r-xl shadow-sm animate-shake">
+          <div class="glass border-l-4 border-red-500 bg-red-500/10 text-red-300 px-4 py-3 rounded-r-lg border border-red-500/30">
             <div class="flex items-start">
-              <i class="fas fa-exclamation-triangle text-red-400 mt-0.5 mr-3"></i>
+              <i class="ri-error-warning-line text-red-400 mt-0.5 mr-3"></i>
               <div>
-                <strong class="font-semibold">Oops! Please fix these issues:</strong>
-                <ul class="text-sm list-disc ml-5 mt-2 space-y-1">
+                <strong class="font-semibold text-red-300">Please fix these issues:</strong>
+                <ul class="text-sm mt-2 space-y-1 text-red-200">
                   {% for field, errors in form.errors.items %}
                     {% for error in errors %}
-                      <li><strong>{{ field }}:</strong> {{ error }}</li>
+                      <li><strong class="text-red-300">{{ field }}:</strong> {{ error }}</li>
                     {% endfor %}
                   {% endfor %}
                 </ul>
@@ -49,137 +42,222 @@
           </div>
         {% endif %}
 
-        <!-- Username field with icon -->
-        <div class="group">
-          <label class="block text-sm font-semibold text-gray-700 mb-2 flex items-center">
-            <i class="fas fa-user text-blue-500 mr-2"></i>
+        <!-- Username field -->
+        <div class="form-group">
+          <label class="block text-sm font-semibold text-slate-300 mb-2 flex items-center gap-2">
+            <i class="ri-user-line text-blue-400"></i>
             Username
           </label>
           <div class="relative">
-            {{ form.username|add_class:"w-full px-4 py-4 pl-12 border-2 border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-300 group-hover:border-blue-300 bg-gray-50 focus:bg-white" }}
-            <i class="fas fa-at absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400 group-focus-within:text-blue-500 transition-colors"></i>
+            {{ form.username|add_class:"w-full px-4 py-3 pl-11 border border-slate-600 bg-slate-800 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all text-slate-200 font-medium placeholder:text-slate-500" }}
+            <i class="ri-at-line absolute left-3 top-1/2 transform -translate-y-1/2 text-slate-500"></i>
           </div>
           {% if form.username.errors %}
-            <p class="mt-2 text-sm text-red-600 flex items-center">
-              <i class="fas fa-exclamation-circle mr-1"></i>
-              {{ form.username.errors }}
+            <p class="mt-2 text-sm text-red-400 flex items-center font-medium">
+              <i class="ri-error-warning-line mr-1"></i>
+              {{ form.username.errors.0 }}
             </p>
           {% endif %}
         </div>
 
-        <!-- Email field with icon -->
-        <div class="group">
-          <label class="block text-sm font-semibold text-gray-700 mb-2 flex items-center">
-            <i class="fas fa-envelope text-purple-500 mr-2"></i>
+        <!-- Email field -->
+        <div class="form-group">
+          <label class="block text-sm font-semibold text-slate-300 mb-2 flex items-center gap-2">
+            <i class="ri-mail-line text-purple-400"></i>
             Email Address
           </label>
           <div class="relative">
-            {{ form.email|add_class:"w-full px-4 py-4 pl-12 border-2 border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all duration-300 group-hover:border-purple-300 bg-gray-50 focus:bg-white" }}
-            <i class="fas fa-paper-plane absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400 group-focus-within:text-purple-500 transition-colors"></i>
+            {{ form.email|add_class:"w-full px-4 py-3 pl-11 border border-slate-600 bg-slate-800 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all text-slate-200 font-medium placeholder:text-slate-500" }}
+            <i class="ri-mail-send-line absolute left-3 top-1/2 transform -translate-y-1/2 text-slate-500"></i>
           </div>
           {% if form.email.errors %}
-            <p class="mt-2 text-sm text-red-600 flex items-center">
-              <i class="fas fa-exclamation-circle mr-1"></i>
-              {{ form.email.errors }}
+            <p class="mt-2 text-sm text-red-400 flex items-center font-medium">
+              <i class="ri-error-warning-line mr-1"></i>
+              {{ form.email.errors.0 }}
             </p>
           {% endif %}
         </div>
 
-        <!-- Role selection with enhanced styling -->
-        <div class="group">
-          <label class="block text-sm font-semibold text-gray-700 mb-3 flex items-center">
-            <i class="fas fa-users text-indigo-500 mr-2"></i>
+        <!-- Role selection -->
+        <div class="form-group">
+          <label class="block text-sm font-semibold text-slate-300 mb-3 flex items-center gap-2">
+            <i class="ri-group-line text-emerald-400"></i>
             I am a:
           </label>
-          <div class="grid grid-cols-1 gap-3">
+          <div class="space-y-3">
             {% for radio in form.role %}
               <div class="relative">
-                <label for="{{ radio.id_for_label }}" class="flex items-center p-4 border-2 border-gray-200 rounded-xl cursor-pointer hover:border-indigo-300 hover:bg-indigo-50 transition-all duration-300 group">
+                <label for="{{ radio.id_for_label }}" class="flex items-center p-3 border border-slate-600 bg-slate-800/50 rounded-lg cursor-pointer hover:border-slate-500 hover:bg-slate-800/70 transition-all group">
                   {{ radio.tag }}
-                  <div class="flex items-center justify-center w-5 h-5 border-2 border-gray-300 rounded-full mr-3 group-hover:border-indigo-500 transition-colors">
-                    <div class="w-3 h-3 bg-gradient-to-r from-indigo-500 to-purple-500 rounded-full opacity-0 group-hover:opacity-100 transition-opacity"></div>
+                  <div class="flex items-center justify-center w-5 h-5 border border-slate-500 rounded-full mr-3 group-hover:border-emerald-400 transition-colors">
+                    <div class="w-3 h-3 bg-emerald-400 rounded-full opacity-0 scale-0 transition-all"></div>
                   </div>
-                  <span class="text-gray-700 font-medium group-hover:text-indigo-700 transition-colors">{{ radio.choice_label }}</span>
-                  <i class="fas fa-check-circle text-green-500 ml-auto opacity-0 group-hover:opacity-100 transition-all duration-300 transform scale-0 group-hover:scale-100"></i>
+                  <div class="flex flex-col">
+                    <span class="text-slate-200 font-medium group-hover:text-emerald-200 transition-colors">{{ radio.choice_label }}</span>
+                    <span class="text-xs text-slate-500 mt-1">
+                      {% if radio.choice_label == 'Student' %}
+                        Practice coding problems and take mock interviews
+                      {% elif radio.choice_label == 'Tutor' %}
+                        Help students and create educational content
+                      {% endif %}
+                    </span>
+                  </div>
+                  <i class="ri-check-line text-emerald-400 ml-auto opacity-0 scale-0 group-hover:opacity-100 group-hover:scale-100 transition-all"></i>
                 </label>
               </div>
             {% endfor %}
           </div>
           {% if form.role.errors %}
-            <p class="mt-2 text-sm text-red-600 flex items-center">
-              <i class="fas fa-exclamation-circle mr-1"></i>
-              {{ form.role.errors }}
+            <p class="mt-2 text-sm text-red-400 flex items-center font-medium">
+              <i class="ri-error-warning-line mr-1"></i>
+              {{ form.role.errors.0 }}
             </p>
           {% endif %}
         </div>
 
-        <!-- Password field with strength indicator -->
-        <div class="group">
-          <label class="block text-sm font-semibold text-gray-700 mb-2 flex items-center">
-            <i class="fas fa-lock text-green-500 mr-2"></i>
+        <!-- Password field -->
+        <div class="form-group">
+          <label class="block text-sm font-semibold text-slate-300 mb-2 flex items-center gap-2">
+            <i class="ri-lock-line text-orange-400"></i>
             Password
           </label>
           <div class="relative">
-            {{ form.password1|add_class:"w-full px-4 py-4 pl-12 pr-12 border-2 border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent transition-all duration-300 group-hover:border-green-300 bg-gray-50 focus:bg-white" }}
-            <i class="fas fa-key absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400 group-focus-within:text-green-500 transition-colors"></i>
-            <button type="button" class="absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-green-500 transition-colors" onclick="togglePassword(this, 'password1')">
-              <i class="fas fa-eye"></i>
+            {{ form.password1|add_class:"w-full px-4 py-3 pl-11 pr-11 border border-slate-600 bg-slate-800 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500 transition-all text-slate-200 font-medium placeholder:text-slate-500" }}
+            <i class="ri-key-line absolute left-3 top-1/2 transform -translate-y-1/2 text-slate-500"></i>
+            <button type="button" class="absolute right-3 top-1/2 transform -translate-y-1/2 text-slate-500 hover:text-orange-400 transition-colors" onclick="togglePassword(this, 'password1')">
+              <i class="ri-eye-line"></i>
             </button>
           </div>
           {% if form.password1.errors %}
-            <p class="mt-2 text-sm text-red-600 flex items-center">
-              <i class="fas fa-exclamation-circle mr-1"></i>
-              {{ form.password1.errors }}
+            <p class="mt-2 text-sm text-red-400 flex items-center font-medium">
+              <i class="ri-error-warning-line mr-1"></i>
+              {{ form.password1.errors.0 }}
             </p>
           {% endif %}
+          
+          <!-- Password strength indicator -->
+          <div class="mt-2">
+            <div class="text-xs text-slate-500 mb-1">Password strength:</div>
+            <div class="flex space-x-1">
+              <div id="strength-1" class="h-1 w-1/4 bg-slate-700 rounded transition-colors"></div>
+              <div id="strength-2" class="h-1 w-1/4 bg-slate-700 rounded transition-colors"></div>
+              <div id="strength-3" class="h-1 w-1/4 bg-slate-700 rounded transition-colors"></div>
+              <div id="strength-4" class="h-1 w-1/4 bg-slate-700 rounded transition-colors"></div>
+            </div>
+          </div>
         </div>
 
         <!-- Confirm password field -->
-        <div class="group">
-          <label class="block text-sm font-semibold text-gray-700 mb-2 flex items-center">
-            <i class="fas fa-shield-alt text-orange-500 mr-2"></i>
+        <div class="form-group">
+          <label class="block text-sm font-semibold text-slate-300 mb-2 flex items-center gap-2">
+            <i class="ri-shield-check-line text-green-400"></i>
             Confirm Password
           </label>
           <div class="relative">
-            {{ form.password2|add_class:"w-full px-4 py-4 pl-12 pr-12 border-2 border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all duration-300 group-hover:border-orange-300 bg-gray-50 focus:bg-white" }}
-            <i class="fas fa-check-double absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400 group-focus-within:text-orange-500 transition-colors"></i>
-            <button type="button" class="absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-orange-500 transition-colors" onclick="togglePassword(this, 'password2')">
-              <i class="fas fa-eye"></i>
+            {{ form.password2|add_class:"w-full px-4 py-3 pl-11 pr-11 border border-slate-600 bg-slate-800 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500 transition-all text-slate-200 font-medium placeholder:text-slate-500" }}
+            <i class="ri-check-double-line absolute left-3 top-1/2 transform -translate-y-1/2 text-slate-500"></i>
+            <button type="button" class="absolute right-3 top-1/2 transform -translate-y-1/2 text-slate-500 hover:text-green-400 transition-colors" onclick="togglePassword(this, 'password2')">
+              <i class="ri-eye-line"></i>
             </button>
           </div>
           {% if form.password2.errors %}
-            <p class="mt-2 text-sm text-red-600 flex items-center">
-              <i class="fas fa-exclamation-circle mr-1"></i>
-              {{ form.password2.errors }}
+            <p class="mt-2 text-sm text-red-400 flex items-center font-medium">
+              <i class="ri-error-warning-line mr-1"></i>
+              {{ form.password2.errors.0 }}
             </p>
           {% endif %}
         </div>
 
-        <!-- Enhanced submit button -->
-        <button type="submit" class="group w-full px-8 py-4 bg-gradient-to-r from-blue-500 via-purple-500 to-indigo-600 text-white rounded-xl font-bold text-lg hover:from-blue-600 hover:via-purple-600 hover:to-indigo-700 transform hover:scale-105 hover:-translate-y-1 transition-all duration-300 shadow-lg hover:shadow-2xl flex items-center justify-center relative overflow-hidden">
-          <div class="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent -skew-x-12 -translate-x-full group-hover:translate-x-full transition-transform duration-1000"></div>
-          <span class="relative flex items-center">
-            Create Account
-            <i class="fas fa-rocket ml-2 group-hover:translate-x-1 transition-transform duration-300"></i>
-          </span>
+        <!-- Submit button -->
+        <button type="submit" class="w-full px-6 py-3 bg-gradient-to-r from-blue-600 via-purple-600 to-indigo-600 text-white rounded-lg font-semibold text-lg hover:from-blue-700 hover:via-purple-700 hover:to-indigo-700 transform hover:scale-[1.02] transition-all shadow-lg hover:shadow-xl flex items-center justify-center gap-2">
+          <span class="signup-text">Create Account</span>
+          <i class="ri-arrow-right-line"></i>
         </button>
       </form>
 
-      <!-- Enhanced login link -->
-      <div class="mt-8 text-center">
-        <p class="text-gray-600 mb-3">Already part of the MockMate family?</p>
-        <a href="{% url 'login' %}" class="inline-flex items-center px-6 py-3 border-2 border-blue-200 text-blue-600 rounded-xl font-semibold hover:bg-blue-50 hover:border-blue-300 transform hover:scale-105 transition-all duration-300 group">
-          <i class="fas fa-sign-in-alt mr-2 group-hover:translate-x-1 transition-transform"></i>
-          Login Here
+      <!-- Login link -->
+      <div class="mt-6 text-center">
+        <p class="text-slate-400 mb-3 font-medium">Already have an account?</p>
+        <a href="{% url 'login' %}" class="inline-flex items-center px-4 py-2 border border-slate-600 bg-slate-800/50 text-slate-300 rounded-lg font-medium hover:bg-slate-800/70 hover:border-slate-500 hover:text-slate-200 transition-all">
+          <i class="ri-login-box-line mr-2"></i>
+          Sign In
         </a>
       </div>
+      
+      <!-- Terms -->
+      <div class="mt-4 text-center">
+        <p class="text-xs text-slate-500">
+          By creating an account, you agree to our 
+          <a href="#" class="text-blue-400 hover:text-blue-300 underline">Terms of Service</a> 
+          and 
+          <a href="#" class="text-blue-400 hover:text-blue-300 underline">Privacy Policy</a>
+        </p>
+      </div>
     </div>
-
-    <!-- Fun floating elements -->
-    <div class="absolute -top-6 -right-6 w-12 h-12 bg-gradient-to-br from-yellow-300 to-orange-400 rounded-full animate-bounce opacity-80"></div>
-    <div class="absolute -bottom-6 -left-6 w-8 h-8 bg-gradient-to-br from-pink-300 to-red-400 rounded-full animate-pulse opacity-80"></div>
   </div>
 </section>
+
+<style>
+/* Custom radio button styling */
+input[type="radio"] {
+  appearance: none;
+  width: 20px;
+  height: 20px;
+  border: 2px solid #64748b;
+  border-radius: 50%;
+  background-color: transparent;
+  margin-right: 12px;
+  position: relative;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+input[type="radio"]:checked {
+  border-color: #10b981;
+  background-color: #10b981;
+}
+
+input[type="radio"]:checked::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background-color: white;
+  transform: translate(-50%, -50%);
+}
+
+input[type="radio"]:checked + div .w-3 {
+  opacity: 1 !important;
+  transform: scale(1) !important;
+}
+
+input[type="radio"]:checked + div .ri-check-line {
+  opacity: 1 !important;
+  transform: scale(1) !important;
+}
+
+input[type="radio"]:checked + label,
+input[type="radio"]:checked ~ * {
+  border-color: #10b981 !important;
+  background-color: rgba(16, 185, 129, 0.1) !important;
+}
+
+/* Password strength colors */
+.strength-weak { background-color: #ef4444 !important; }
+.strength-fair { background-color: #f97316 !important; }
+.strength-good { background-color: #eab308 !important; }
+.strength-strong { background-color: #22c55e !important; }
+
+/* Loading state */
+button[type="submit"]:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+  transform: none !important;
+}
+</style>
 
 <script>
 function togglePassword(button, fieldName) {
@@ -188,55 +266,98 @@ function togglePassword(button, fieldName) {
   
   if (field.type === 'password') {
     field.type = 'text';
-    icon.classList.remove('fa-eye');
-    icon.classList.add('fa-eye-slash');
+    icon.classList.remove('ri-eye-line');
+    icon.classList.add('ri-eye-off-line');
   } else {
     field.type = 'password';
-    icon.classList.remove('fa-eye-slash');
-    icon.classList.add('fa-eye');
+    icon.classList.remove('ri-eye-off-line');
+    icon.classList.add('ri-eye-line');
   }
 }
+
+// Password strength checker
+function checkPasswordStrength(password) {
+  let strength = 0;
+  
+  if (password.length >= 8) strength++;
+  if (/[a-z]/.test(password) && /[A-Z]/.test(password)) strength++;
+  if (/\d/.test(password)) strength++;
+  if (/[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/.test(password)) strength++;
+  
+  return strength;
+}
+
+function updatePasswordStrength(strength) {
+  const indicators = ['strength-1', 'strength-2', 'strength-3', 'strength-4'];
+  
+  indicators.forEach((id, index) => {
+    const element = document.getElementById(id);
+    if (element) {
+      element.className = element.className.replace(/strength-\w+/g, '');
+      
+      if (index < strength) {
+        if (strength === 1) element.classList.add('strength-weak');
+        else if (strength === 2) element.classList.add('strength-fair');
+        else if (strength === 3) element.classList.add('strength-good');
+        else if (strength === 4) element.classList.add('strength-strong');
+      } else {
+        element.classList.add('bg-slate-700');
+      }
+    }
+  });
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+  // Password strength monitoring
+  const passwordField = document.querySelector('input[name="password1"]');
+  if (passwordField) {
+    passwordField.addEventListener('input', function() {
+      const strength = checkPasswordStrength(this.value);
+      updatePasswordStrength(strength);
+    });
+  }
+  
+  // Form submission handling
+  const form = document.querySelector('form');
+  if (form) {
+    form.addEventListener('submit', function(e) {
+      const submitBtn = form.querySelector('button[type="submit"]');
+      if (submitBtn) {
+        submitBtn.disabled = true;
+        const btnText = submitBtn.querySelector('.signup-text');
+        if (btnText) {
+          btnText.textContent = 'Creating Account...';
+          
+          setTimeout(() => {
+            submitBtn.disabled = false;
+            btnText.textContent = 'Create Account';
+          }, 10000);
+        }
+      }
+    });
+  }
+  
+  // Role selection enhancement
+  const roleInputs = document.querySelectorAll('input[name="role"]');
+  roleInputs.forEach(input => {
+    input.addEventListener('change', function() {
+      roleInputs.forEach(radio => {
+        const label = radio.closest('label');
+        if (label) {
+          label.classList.remove('border-emerald-500', 'bg-emerald-500/10');
+          label.classList.add('border-slate-600');
+        }
+      });
+      
+      if (this.checked) {
+        const label = this.closest('label');
+        if (label) {
+          label.classList.remove('border-slate-600');
+          label.classList.add('border-emerald-500', 'bg-emerald-500/10');
+        }
+      }
+    });
+  });
+});
 </script>
-
-<style>
-@keyframes shake {
-  0%, 100% { transform: translateX(0); }
-  25% { transform: translateX(-5px); }
-  75% { transform: translateX(5px); }
-}
-
-.animate-shake {
-  animation: shake 0.5s ease-in-out;
-}
-
-.animation-delay-2000 {
-  animation-delay: 2s;
-}
-
-.animation-delay-4000 {
-  animation-delay: 4s;
-}
-
-/* Custom radio button styling */
-input[type="radio"]:checked + div {
-  border-color: #6366f1 !important;
-  background-color: #eef2ff !important;
-}
-
-input[type="radio"]:checked + div .w-3 {
-  opacity: 1 !important;
-  transform: scale(1) !important;
-}
-
-input[type="radio"]:checked + div .fa-check-circle {
-  opacity: 1 !important;
-  transform: scale(1) !important;
-}
-
-/* Focus states for better accessibility */
-input:focus + .fas,
-input:focus-within + .fas {
-  transform: translateY(-50%) scale(1.1);
-}
-</style>
 {% endblock %}

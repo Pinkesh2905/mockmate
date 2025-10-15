@@ -1,0 +1,126 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block content %}
+<div class="max-w-7xl mx-auto px-6 py-10">
+  <!-- Page Title -->
+  <h1 class="text-3xl font-extrabold text-gray-900 mb-6">🧑‍🏫 Aptitude Management</h1>
+
+  <!-- Tabs -->
+  <div class="flex space-x-4 border-b pb-2 mb-6">
+    <a href="?tab=topics" class="px-3 py-2 rounded-lg text-sm font-medium {% if active_tab == 'topics' %}bg-blue-600 text-white{% else %}text-gray-600 hover:bg-gray-100{% endif %}">Topics</a>
+    <a href="?tab=problems" class="px-3 py-2 rounded-lg text-sm font-medium {% if active_tab == 'problems' %}bg-blue-600 text-white{% else %}text-gray-600 hover:bg-gray-100{% endif %}">Problems</a>
+    <a href="?tab=sets" class="px-3 py-2 rounded-lg text-sm font-medium {% if active_tab == 'sets' %}bg-blue-600 text-white{% else %}text-gray-600 hover:bg-gray-100{% endif %}">Practice Sets</a>
+  </div>
+
+  <!-- Topic Management -->
+  {% if active_tab == "topics" %}
+  <div class="bg-white rounded-xl shadow p-6 mb-8">
+    <h2 class="text-xl font-bold mb-4">📘 Manage Topics</h2>
+    <form method="post" class="flex items-center space-x-3">
+      {% csrf_token %}
+      {{ topic_form.name|add_class:"flex-1 border-gray-300 rounded-lg" }}
+      <button type="submit" name="add_topic" class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">Add</button>
+    </form>
+
+    <ul class="mt-6 space-y-2">
+      {% for topic in topics %}
+      <li class="flex justify-between items-center border-b py-2">
+        <span>{{ topic.name }}</span>
+        <form method="post" class="inline">
+          {% csrf_token %}
+          <input type="hidden" name="delete_topic" value="{{ topic.id }}">
+          <button type="submit" class="text-red-600 hover:underline">Delete</button>
+        </form>
+      </li>
+      {% empty %}
+      <p class="text-gray-500">No topics added yet.</p>
+      {% endfor %}
+    </ul>
+  </div>
+  {% endif %}
+
+  <!-- Problem Management -->
+  {% if active_tab == "problems" %}
+  <div class="bg-white rounded-xl shadow p-6 mb-8">
+    <h2 class="text-xl font-bold mb-4">📝 Manage Problems</h2>
+    <form method="post" class="space-y-4">
+      {% csrf_token %}
+      <div>
+        <label class="block text-sm font-medium">Topic</label>
+        {{ problem_form.topic|add_class:"w-full border-gray-300 rounded-lg" }}
+      </div>
+      <div>
+        <label class="block text-sm font-medium">Question</label>
+        {{ problem_form.question_text|add_class:"w-full border-gray-300 rounded-lg" }}
+      </div>
+      <div>
+        <label class="block text-sm font-medium">Options</label>
+        {{ problem_form.option_a|add_class:"w-full border-gray-300 rounded-lg mb-2" }}
+        {{ problem_form.option_b|add_class:"w-full border-gray-300 rounded-lg mb-2" }}
+        {{ problem_form.option_c|add_class:"w-full border-gray-300 rounded-lg mb-2" }}
+        {{ problem_form.option_d|add_class:"w-full border-gray-300 rounded-lg" }}
+      </div>
+      <div>
+        <label class="block text-sm font-medium">Correct Option</label>
+        {{ problem_form.correct_option|add_class:"w-full border-gray-300 rounded-lg" }}
+      </div>
+      <div>
+        <label class="block text-sm font-medium">Explanation (optional)</label>
+        {{ problem_form.explanation|add_class:"w-full border-gray-300 rounded-lg" }}
+      </div>
+      <button type="submit" name="add_problem" class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">Add Problem</button>
+    </form>
+
+    <ul class="mt-6 space-y-2">
+      {% for problem in problems %}
+      <li class="flex justify-between items-center border-b py-2">
+        <span>{{ problem.question_text|truncatechars:60 }}</span>
+        <form method="post" class="inline">
+          {% csrf_token %}
+          <input type="hidden" name="delete_problem" value="{{ problem.id }}">
+          <button type="submit" class="text-red-600 hover:underline">Delete</button>
+        </form>
+      </li>
+      {% empty %}
+      <p class="text-gray-500">No problems added yet.</p>
+      {% endfor %}
+    </ul>
+  </div>
+  {% endif %}
+
+  <!-- Practice Set Management -->
+  {% if active_tab == "sets" %}
+  <div class="bg-white rounded-xl shadow p-6 mb-8">
+    <h2 class="text-xl font-bold mb-4">📚 Manage Practice Sets</h2>
+    <form method="post" class="space-y-4">
+      {% csrf_token %}
+      <div>
+        <label class="block text-sm font-medium">Set Title</label>
+        {{ set_form.title|add_class:"w-full border-gray-300 rounded-lg" }}
+      </div>
+      <div>
+        <label class="block text-sm font-medium">Select Problems</label>
+        {{ set_form.problems|add_class:"w-full border-gray-300 rounded-lg h-40" }}
+      </div>
+      <button type="submit" name="add_set" class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">Create Set</button>
+    </form>
+
+    <ul class="mt-6 space-y-2">
+      {% for set in practice_sets %}
+      <li class="flex justify-between items-center border-b py-2">
+        <span>{{ set.title }}</span>
+        <form method="post" class="inline">
+          {% csrf_token %}
+          <input type="hidden" name="delete_set" value="{{ set.id }}">
+          <button type="submit" class="text-red-600 hover:underline">Delete</button>
+        </form>
+      </li>
+      {% empty %}
+      <p class="text-gray-500">No sets created yet.</p>
+      {% endfor %}
+    </ul>
+  </div>
+  {% endif %}
+</div>
+{% endblock %}

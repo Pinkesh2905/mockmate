@@ -1,49 +1,184 @@
 {% extends 'base.html' %}
 {% block content %}
-<div class="max-w-5xl mx-auto p-6">
-  <h2 class="text-2xl font-semibold mb-6">Search results for "{{ query }}"</h2>
+<div class="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50">
+  <div class="max-w-6xl mx-auto p-6 py-8">
+    <!-- Header Section -->
+    <div class="text-center mb-12">
+      <div class="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-r from-blue-500 to-indigo-600 rounded-2xl mb-4">
+        <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+        </svg>
+      </div>
+      <h1 class="text-4xl font-bold text-gray-900 mb-2">Search Results</h1>
+      <p class="text-lg text-gray-600">Found results for <span class="font-semibold text-indigo-600">"{{ query }}"</span></p>
+    </div>
 
-  {% if users %}
-    <h3 class="text-xl font-bold mb-2">👤 Users</h3>
-    <ul class="mb-6 space-y-2">
-      {% for user in users %}
-        <li>
-          <a href="{% url 'users:public_profile' user.username %}" class="text-blue-600 hover:underline">
-            {{ user.get_full_name|default:user.username }}
+    <!-- Results Counter -->
+    {% if users or courses or posts %}
+      <div class="bg-white/70 backdrop-blur-sm rounded-2xl p-4 mb-8 border border-white/20 shadow-sm">
+        <div class="flex flex-wrap gap-4 text-sm text-gray-600">
+          {% if users %}<span class="flex items-center gap-1"><span class="w-2 h-2 bg-green-400 rounded-full"></span>{{ users|length }} User{{ users|length|pluralize }}</span>{% endif %}
+          {% if courses %}<span class="flex items-center gap-1"><span class="w-2 h-2 bg-blue-400 rounded-full"></span>{{ courses|length }} Course{{ courses|length|pluralize }}</span>{% endif %}
+          {% if posts %}<span class="flex items-center gap-1"><span class="w-2 h-2 bg-purple-400 rounded-full"></span>{{ posts|length }} Post{{ posts|length|pluralize }}</span>{% endif %}
+        </div>
+      </div>
+    {% endif %}
+
+    <!-- Users Section -->
+    {% if users %}
+      <div class="mb-12">
+        <div class="flex items-center gap-3 mb-6">
+          <div class="flex items-center justify-center w-10 h-10 bg-gradient-to-r from-green-400 to-emerald-500 rounded-xl">
+            <svg class="w-5 h-5 text-white" fill="currentColor" viewBox="0 0 20 20">
+              <path fill-rule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clip-rule="evenodd"></path>
+            </svg>
+          </div>
+          <h2 class="text-2xl font-bold text-gray-900">Users</h2>
+          <span class="bg-green-100 text-green-800 text-xs font-medium px-2.5 py-0.5 rounded-full">{{ users|length }}</span>
+        </div>
+        
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          {% for user in users %}
+            <a href="{% url 'users:public_profile' user.username %}" class="group">
+              <div class="bg-white/80 backdrop-blur-sm rounded-2xl p-6 border border-white/20 shadow-sm hover:shadow-xl hover:bg-white transition-all duration-300 transform hover:-translate-y-1">
+                <div class="flex items-center gap-4">
+                  <div class="w-12 h-12 bg-gradient-to-r from-green-400 to-emerald-500 rounded-xl flex items-center justify-center text-white font-semibold text-lg">
+                    {{ user.get_full_name|default:user.username|first|upper }}
+                  </div>
+                  <div class="flex-1">
+                    <h3 class="font-semibold text-gray-900 group-hover:text-green-600 transition-colors">
+                      {{ user.get_full_name|default:user.username }}
+                    </h3>
+                    <p class="text-sm text-gray-500">@{{ user.username }}</p>
+                  </div>
+                </div>
+              </div>
+            </a>
+          {% endfor %}
+        </div>
+      </div>
+    {% endif %}
+
+    <!-- Courses Section -->
+    {% if courses %}
+      <div class="mb-12">
+        <div class="flex items-center gap-3 mb-6">
+          <div class="flex items-center justify-center w-10 h-10 bg-gradient-to-r from-blue-400 to-indigo-500 rounded-xl">
+            <svg class="w-5 h-5 text-white" fill="currentColor" viewBox="0 0 20 20">
+              <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+            </svg>
+          </div>
+          <h2 class="text-2xl font-bold text-gray-900">Courses</h2>
+          <span class="bg-blue-100 text-blue-800 text-xs font-medium px-2.5 py-0.5 rounded-full">{{ courses|length }}</span>
+        </div>
+        
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          {% for course in courses %}
+            <a href="{% url 'courses:detail' course.id %}" class="group">
+              <div class="bg-white/80 backdrop-blur-sm rounded-2xl p-6 border border-white/20 shadow-sm hover:shadow-xl hover:bg-white transition-all duration-300 transform hover:-translate-y-1">
+                <div class="flex items-start gap-4">
+                  <div class="w-12 h-12 bg-gradient-to-r from-blue-400 to-indigo-500 rounded-xl flex items-center justify-center text-white font-semibold text-sm">
+                    📚
+                  </div>
+                  <div class="flex-1">
+                    <h3 class="font-semibold text-gray-900 group-hover:text-blue-600 transition-colors mb-2 line-clamp-2">
+                      {{ course.title }}
+                    </h3>
+                    <div class="flex items-center justify-between">
+                      <span class="text-sm text-gray-500">Course</span>
+                      <svg class="w-4 h-4 text-gray-400 group-hover:text-blue-500 group-hover:translate-x-1 transition-all" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+                      </svg>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </a>
+          {% endfor %}
+        </div>
+      </div>
+    {% endif %}
+
+    <!-- Posts Section -->
+    {% if posts %}
+      <div class="mb-12">
+        <div class="flex items-center gap-3 mb-6">
+          <div class="flex items-center justify-center w-10 h-10 bg-gradient-to-r from-purple-400 to-pink-500 rounded-xl">
+            <svg class="w-5 h-5 text-white" fill="currentColor" viewBox="0 0 20 20">
+              <path fill-rule="evenodd" d="M3 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1z" clip-rule="evenodd"></path>
+            </svg>
+          </div>
+          <h2 class="text-2xl font-bold text-gray-900">Posts</h2>
+          <span class="bg-purple-100 text-purple-800 text-xs font-medium px-2.5 py-0.5 rounded-full">{{ posts|length }}</span>
+        </div>
+        
+        <div class="space-y-6">
+          {% for post in posts %}
+            <div class="bg-white/80 backdrop-blur-sm rounded-2xl p-6 border border-white/20 shadow-sm hover:shadow-lg transition-all duration-300">
+              <div class="flex items-start gap-4">
+                <div class="w-10 h-10 bg-gradient-to-r from-purple-400 to-pink-500 rounded-xl flex items-center justify-center text-white font-semibold">
+                  {{ post.author.username|first|upper }}
+                </div>
+                <div class="flex-1">
+                  <div class="flex items-center gap-2 mb-3">
+                    <h4 class="font-medium text-gray-900">{{ post.author.get_full_name|default:post.author.username }}</h4>
+                    <span class="text-gray-400">•</span>
+                    <span class="text-sm text-gray-500">@{{ post.author.username }}</span>
+                  </div>
+                  <p class="text-gray-700 mb-4 leading-relaxed">{{ post.content|truncatewords:25 }}</p>
+                  <div class="flex items-center justify-between">
+                    <a href="{% url 'posts:post_detail' post.id %}" class="inline-flex items-center gap-2 text-sm font-medium text-purple-600 hover:text-purple-700 transition-colors">
+                      Read Full Post
+                      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+                      </svg>
+                    </a>
+                    <div class="flex items-center gap-4 text-xs text-gray-400">
+                      <span class="flex items-center gap-1">
+                        <svg class="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
+                          <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z" clip-rule="evenodd"></path>
+                        </svg>
+                        {{ post.created_at|timesince }} ago
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          {% endfor %}
+        </div>
+      </div>
+    {% endif %}
+
+    <!-- No Results State -->
+    {% if not users and not courses and not posts %}
+      <div class="text-center py-16">
+        <div class="inline-flex items-center justify-center w-20 h-20 bg-gray-100 rounded-3xl mb-6">
+          <svg class="w-10 h-10 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+          </svg>
+        </div>
+        <h3 class="text-2xl font-bold text-gray-900 mb-2">No results found</h3>
+        <p class="text-gray-600 mb-8 max-w-md mx-auto">
+          We couldn't find anything matching <span class="font-semibold">"{{ query }}"</span>. 
+          Try adjusting your search terms or exploring different keywords.
+        </p>
+        <div class="flex flex-col sm:flex-row gap-4 justify-center">
+          <a href="/" class="inline-flex items-center justify-center px-6 py-3 bg-indigo-600 text-white font-medium rounded-xl hover:bg-indigo-700 transition-colors">
+            <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path>
+            </svg>
+            Go Home
           </a>
-        </li>
-      {% endfor %}
-    </ul>
-  {% endif %}
-
-  {% if courses %}
-    <h3 class="text-xl font-bold mb-2">📘 Courses</h3>
-    <ul class="mb-6 space-y-2">
-      {% for course in courses %}
-        <li>
-          <a href="{% url 'courses:detail' course.slug %}" class="text-blue-600 hover:underline">
-            {{ course.title }}
-          </a>
-        </li>
-      {% endfor %}
-    </ul>
-  {% endif %}
-
-  {% if posts %}
-    <h3 class="text-xl font-bold mb-2">✏️ Posts</h3>
-    <ul class="space-y-4">
-      {% for post in posts %}
-        <li class="p-4 bg-white rounded-lg shadow border">
-          <p class="text-gray-800">{{ post.content|truncatewords:20 }}</p>
-          <p class="text-sm text-gray-500 mt-1">— {{ post.author.username }}</p>
-          <a href="{% url 'posts:detail' post.id %}" class="text-sm text-blue-600 hover:underline">Read More</a>
-        </li>
-      {% endfor %}
-    </ul>
-  {% endif %}
-
-  {% if not users and not courses and not posts %}
-    <p class="text-gray-500">No results found.</p>
-  {% endif %}
+          <button onclick="history.back()" class="inline-flex items-center justify-center px-6 py-3 bg-gray-100 text-gray-700 font-medium rounded-xl hover:bg-gray-200 transition-colors">
+            <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
+            </svg>
+            Go Back
+          </button>
+        </div>
+      </div>
+    {% endif %}
+  </div>
 </div>
 {% endblock %}

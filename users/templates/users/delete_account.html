@@ -1,0 +1,65 @@
+{% extends "base.html" %}
+
+{% block title %}Delete Account{% endblock %}
+
+{% block content %}
+<div class="min-h-screen bg-red-50 flex flex-col justify-center items-center py-12 px-4 sm:px-6 lg:px-8">
+    <div class="max-w-md w-full mx-auto">
+
+        <!-- Display Django Messages -->
+        {% if messages %}
+            <div class="mb-6">
+                {% for message in messages %}
+                    <div class="rounded-md p-4 {% if message.tags == 'error' %} bg-red-100 text-red-800 {% else %} bg-yellow-100 text-yellow-800 {% endif %}" role="alert">
+                        <p class="font-medium">{{ message }}</p>
+                    </div>
+                {% endfor %}
+            </div>
+        {% endif %}
+
+        <div class="bg-white py-8 px-4 shadow-2xl rounded-2xl sm:px-10 border-2 border-red-200">
+            <div class="text-center">
+                <div class="mx-auto flex items-center justify-center h-16 w-16 rounded-full bg-red-100 mb-5">
+                    <svg class="h-9 w-9 text-red-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126zM12 15.75h.007v.007H12v-.007z" />
+                    </svg>
+                </div>
+                <h2 class="text-3xl font-extrabold text-gray-900">
+                    Delete Your Account
+                </h2>
+                <p class="mt-4 text-md font-semibold text-red-700">
+                    This action is permanent and cannot be undone.
+                </p>
+                <p class="mt-2 text-sm text-gray-600">
+                    All of your profile data, posts, and associated content will be permanently removed. To confirm, please enter your password.
+                </p>
+            </div>
+
+            <form class="mt-8 space-y-6" method="POST" action="{% url 'users:delete_account' %}">
+                {% csrf_token %}
+                
+                <div>
+                    <label for="password" class="sr-only">Password</label>
+                    <input id="password" name="password" type="password" autocomplete="current-password" required
+                           class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500 placeholder-gray-500"
+                           placeholder="Enter your password to confirm">
+                </div>
+
+                <div>
+                    <button type="submit" class="group relative w-full flex justify-center py-3 px-4 border border-transparent text-sm font-medium rounded-lg text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 transition-colors duration-300">
+                        I understand, delete my account
+                    </button>
+                </div>
+            </form>
+
+            <div class="mt-6 text-center">
+                <p class="text-sm text-gray-600">
+                    <a href="{% url 'users:account_settings' %}" class="font-medium text-gray-700 hover:text-gray-900 hover:underline">
+                        No, take me back to settings
+                    </a>
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

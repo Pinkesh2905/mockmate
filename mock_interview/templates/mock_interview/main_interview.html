@@ -1,684 +1,455 @@
 {% extends "base.html" %}
 {% load static %}
 {% load form_filters %}
-{% block title %}AI Mock Interview — MockMate{% endblock %}
+{% block title %}AI Mock Interview | MockMate{% endblock %}
 
 {% block extra_css %}
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<script src="https://cdn.tailwindcss.com"></script>
+<script>
+  tailwind.config = {
+    theme: {
+      extend: {
+        colors: {
+          primary: {
+            50: '#eff6ff',
+            500: '#3b82f6',
+            600: '#2563eb',
+            700: '#1d4ed8',
+            900: '#1e3a8a'
+          },
+          glass: 'rgba(255, 255, 255, 0.08)',
+          'glass-border': 'rgba(255, 255, 255, 0.12)'
+        },
+        backdropBlur: {
+          'xs': '2px',
+        }
+      }
+    }
+  }
+</script>
 <style>
-  * {
-    box-sizing: border-box;
-  }
-  
-  body { 
-    font-family: 'Inter', sans-serif;
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    min-height: 100vh;
-  }
-  
-  /* Enhanced animations */
-  @keyframes pulse-glow {
-    0%, 100% { box-shadow: 0 0 20px rgba(59, 130, 246, 0.4); }
-    50% { box-shadow: 0 0 40px rgba(59, 130, 246, 0.8); }
+  /* Custom animations and glass effects */
+  @keyframes pulse-ring {
+    0% { box-shadow: 0 0 0 0 rgba(59, 130, 246, 0.4); }
+    70% { box-shadow: 0 0 0 20px rgba(59, 130, 246, 0); }
+    100% { box-shadow: 0 0 0 0 rgba(59, 130, 246, 0); }
   }
   
   @keyframes listening-pulse {
-    0%, 100% { 
-      transform: scale(1);
-      box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.7);
-    }
-    50% { 
-      transform: scale(1.02);
-      box-shadow: 0 0 0 10px rgba(239, 68, 68, 0);
-    }
+    0%, 100% { transform: scale(1); opacity: 1; }
+    50% { transform: scale(1.05); opacity: 0.8; }
   }
   
-  @keyframes ai-speaking-glow {
-    0%, 100% { 
-      background: linear-gradient(135deg, #8B5CF6, #A855F7);
-      box-shadow: 0 0 30px rgba(139, 92, 246, 0.5);
-    }
-    50% { 
-      background: linear-gradient(135deg, #A855F7, #C084FC);
-      box-shadow: 0 0 50px rgba(139, 92, 246, 0.8);
-    }
-  }
-  
-  @keyframes gradient-shift {
-    0% { background-position: 0% 50%; }
-    50% { background-position: 100% 50%; }
-    100% { background-position: 0% 50%; }
-  }
-  
-  @keyframes slide-up {
-    from { opacity: 0; transform: translateY(20px); }
-    to { opacity: 1; transform: translateY(0); }
-  }
-  
-  @keyframes bounce-in {
-    0% { transform: scale(0.3); opacity: 0; }
-    50% { transform: scale(1.05); }
-    70% { transform: scale(0.9); }
-    100% { transform: scale(1); opacity: 1; }
-  }
-  
-  @keyframes typing-dots {
+  @keyframes typing-bounce {
     0%, 60%, 100% { transform: translateY(0); }
     30% { transform: translateY(-8px); }
   }
   
-  /* Enhanced visualizer styles */
-  @keyframes visualizer-wave {
-    0%, 100% { transform: scaleY(0.3); opacity: 0.6; }
-    50% { transform: scaleY(1); opacity: 1; }
-  }
+  .pulse-ring { animation: pulse-ring 2s infinite; }
+  .listening-pulse { animation: listening-pulse 1.5s infinite; }
+  .typing-dot { animation: typing-bounce 1.4s ease-in-out infinite; }
+  .typing-dot:nth-child(1) { animation-delay: 0s; }
+  .typing-dot:nth-child(2) { animation-delay: 0.2s; }
+  .typing-dot:nth-child(3) { animation-delay: 0.4s; }
   
-  .visualizer-bar {
-    animation: visualizer-wave var(--duration, 0.5s) ease-in-out infinite;
-  }
-  
-  /* Glass morphism */
   .glass-card {
-    background: rgba(255, 255, 255, 0.95);
-    backdrop-filter: blur(20px) saturate(180%);
-    border: 1px solid rgba(255, 255, 255, 0.3);
-    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+    background: rgba(255, 255, 255, 0.08);
+    backdrop-filter: blur(20px);
+    border: 1px solid rgba(255, 255, 255, 0.12);
   }
   
-  .glass-dark {
-    background: rgba(31, 41, 55, 0.9);
-    backdrop-filter: blur(20px) saturate(180%);
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    color: white;
+  .gradient-bg {
+    background: linear-gradient(135deg, #0f172a 0%, #1e293b 50%, #334155 100%);
   }
-  
-  /* Enhanced button styles */
-  .btn-primary {
-    background: linear-gradient(135deg, #3B82F6, #1D4ED8);
-    border: none;
-    color: white;
-    font-weight: 600;
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    position: relative;
-    overflow: hidden;
-  }
-  
-  .btn-primary::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: -100%;
-    width: 100%;
-    height: 100%;
-    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
-    transition: left 0.5s;
-  }
-  
-  .btn-primary:hover::before {
-    left: 100%;
-  }
-  
-  .btn-primary:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 20px 25px -5px rgba(59, 130, 246, 0.4);
-  }
-  
-  .btn-danger {
-    background: linear-gradient(135deg, #EF4444, #DC2626);
-    color: white;
-    font-weight: 600;
-    border: none;
-    transition: all 0.3s ease;
-  }
-  
-  .btn-danger:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 20px 25px -5px rgba(239, 68, 68, 0.4);
-  }
-  
-  .btn-success {
-    background: linear-gradient(135deg, #10B981, #059669);
-    color: white;
-    font-weight: 600;
-    border: none;
-    transition: all 0.3s ease;
-  }
-  
-  .btn-warning {
-    background: linear-gradient(135deg, #F59E0B, #D97706);
-    color: white;
-    font-weight: 600;
-    border: none;
-    transition: all 0.3s ease;
-  }
-  
-  /* State classes */
-  .listening-active {
-    animation: listening-pulse 1.5s infinite;
-    background: linear-gradient(135deg, #EF4444, #F97316, #EAB308) !important;
-    background-size: 200% 200%;
-    animation: gradient-shift 2s ease infinite, listening-pulse 1.5s infinite;
-  }
-  
-  .ai-speaking {
-    animation: ai-speaking-glow 2s ease-in-out infinite;
-  }
-  
-  .message-appear {
-    animation: slide-up 0.4s ease-out;
-  }
-  
-  .bounce-in {
-    animation: bounce-in 0.6s ease-out;
-  }
-  
-  /* Typing indicator */
-  .typing-indicator span {
-    display: inline-block;
-    animation: typing-dots 1.4s ease-in-out infinite;
-    font-size: 1.2rem;
-    margin: 0 2px;
-  }
-  
-  .typing-indicator span:nth-child(1) { animation-delay: 0s; }
-  .typing-indicator span:nth-child(2) { animation-delay: 0.2s; }
-  .typing-indicator span:nth-child(3) { animation-delay: 0.4s; }
   
   /* Custom scrollbar */
   .custom-scrollbar::-webkit-scrollbar { width: 8px; }
-  .custom-scrollbar::-webkit-scrollbar-track { background: #f1f5f9; border-radius: 4px; }
-  .custom-scrollbar::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
-  .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+  .custom-scrollbar::-webkit-scrollbar-track { background: rgba(148, 163, 184, 0.1); }
+  .custom-scrollbar::-webkit-scrollbar-thumb { 
+    background: rgba(148, 163, 184, 0.4); 
+    border-radius: 4px; 
+  }
+  .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: rgba(148, 163, 184, 0.6); }
   
-  /* Progress enhancements */
-  .progress-ring {
-    transform: rotate(-90deg);
+  /* Volume slider custom styling */
+  .volume-slider {
+    -webkit-appearance: none;
+    appearance: none;
+    height: 6px;
+    background: rgba(148, 163, 184, 0.3);
+    border-radius: 3px;
+    outline: none;
   }
   
-  .progress-ring-circle {
-    transition: stroke-dasharray 0.35s;
-    transform: rotate(0deg);
-    transform-origin: 50% 50%;
+  .volume-slider::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 18px;
+    height: 18px;
+    background: #3b82f6;
+    border-radius: 50%;
+    cursor: pointer;
+    box-shadow: 0 2px 8px rgba(59, 130, 246, 0.4);
+    transition: all 0.2s ease;
   }
   
-  /* Visualizer container */
-  .visualizer-container {
-    background: linear-gradient(135deg, #1F2937, #374151, #4B5563);
-    border-radius: 16px;
-    overflow: hidden;
-    position: relative;
+  .volume-slider::-webkit-slider-thumb:hover {
+    transform: scale(1.2);
+    box-shadow: 0 4px 16px rgba(59, 130, 246, 0.6);
   }
   
-  .visualizer-overlay {
-    background: linear-gradient(135deg, rgba(59,130,246,0.1), rgba(139,92,246,0.1));
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    pointer-events: none;
-  }
-  
-  /* Enhanced modal */
-  .modal-backdrop {
-    background: rgba(0, 0, 0, 0.6);
-    backdrop-filter: blur(8px);
-  }
-  
-  /* Responsive improvements */
-  @media (max-width: 768px) {
-    .glass-card { margin: 1rem; }
-    .btn-primary, .btn-danger, .btn-success, .btn-warning { 
-      font-size: 0.9rem;
-      padding: 0.75rem 1rem;
-    }
-  }
-  
-  /* Status indicators */
-  .status-online {
-    background: #10B981;
-    box-shadow: 0 0 10px rgba(16, 185, 129, 0.5);
-  }
-  
-  .status-speaking {
-    background: #8B5CF6;
-    box-shadow: 0 0 10px rgba(139, 92, 246, 0.5);
-  }
-  
-  .status-listening {
-    background: #EF4444;
-    box-shadow: 0 0 10px rgba(239, 68, 68, 0.5);
-  }
-  
-  /* Enhanced visualizer bars */
-  #ai-visualizer-canvas {
-    filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.3));
+  .volume-slider::-moz-range-thumb {
+    width: 18px;
+    height: 18px;
+    background: #3b82f6;
+    border-radius: 50%;
+    border: none;
+    cursor: pointer;
   }
 </style>
 {% endblock %}
 
 {% block content %}
-<div class="min-h-screen py-4 px-2">
-  <div class="max-w-7xl mx-auto">
-    
-    <!-- Enhanced Header -->
-    <div class="glass-card rounded-3xl shadow-2xl p-8 mb-6 transition-all duration-300 hover:shadow-3xl">
-      <div class="flex flex-col lg:flex-row items-center justify-between">
-        <div class="flex items-center space-x-6 mb-6 lg:mb-0">
-          <div class="relative">
-            <div class="w-16 h-16 bg-gradient-to-br from-blue-500 via-purple-600 to-pink-500 rounded-2xl flex items-center justify-center shadow-xl">
-              <i class="fas fa-brain text-white text-2xl"></i>
-            </div>
-            <div id="header-status-indicator" class="absolute -bottom-1 -right-1 w-5 h-5 status-online rounded-full border-3 border-white"></div>
+<div class="min-h-screen gradient-bg text-white">
+  <!-- Header Section -->
+  <div class="bg-black/20 backdrop-blur-sm border-b border-white/10 sticky top-0 z-50">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="flex items-center justify-between h-20">
+        <!-- Logo and Title -->
+        <div class="flex items-center space-x-4">
+          <div class="relative w-12 h-12 bg-gradient-to-r from-blue-500 to-purple-600 rounded-xl flex items-center justify-center">
+            <i class="fas fa-user-graduate text-xl text-white"></i>
+            <div id="header-status" class="absolute -top-1 -right-1 w-4 h-4 bg-green-500 rounded-full border-2 border-white pulse-ring"></div>
           </div>
           <div>
-            <h1 class="text-3xl font-bold bg-gradient-to-r from-gray-800 via-gray-700 to-gray-600 bg-clip-text text-transparent">
+            <h1 class="text-2xl font-bold bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent">
               AI Mock Interview
             </h1>
-            <p class="text-gray-500 mt-1 font-medium">{{ job_role }} Position</p>
-            <p class="text-sm text-gray-400">Powered by Advanced AI</p>
+            <p class="text-sm text-gray-300">{{ job_role }}</p>
           </div>
         </div>
         
-        <!-- Enhanced Progress Indicators -->
-        <div class="flex items-center space-x-8">
-          <div class="text-center group">
-            <div class="relative">
-              <svg class="w-16 h-16 progress-ring">
-                <circle cx="32" cy="32" r="28" stroke="#E5E7EB" stroke-width="4" fill="transparent"/>
-                <circle id="question-progress-circle" cx="32" cy="32" r="28" stroke="#3B82F6" stroke-width="4" 
-                        fill="transparent" stroke-dasharray="0 176" class="progress-ring-circle"/>
+        <!-- Progress Indicators -->
+        <div class="hidden md:flex items-center space-x-8">
+          <div class="text-center">
+            <div class="w-16 h-16 relative">
+              <svg class="w-full h-full transform -rotate-90">
+                <circle cx="32" cy="32" r="28" stroke="rgba(148, 163, 184, 0.2)" stroke-width="3" fill="none"/>
+                <circle id="question-progress" cx="32" cy="32" r="28" stroke="#3b82f6" stroke-width="3" 
+                        fill="none" stroke-dasharray="0 176" stroke-linecap="round" class="transition-all duration-500"/>
               </svg>
               <div class="absolute inset-0 flex items-center justify-center">
-                <div id="question-counter" class="text-lg font-bold text-blue-600">Q1</div>
+                <span id="question-counter" class="text-lg font-bold">1</span>
               </div>
             </div>
-            <div class="text-xs text-gray-500 mt-1 group-hover:text-gray-700 transition-colors">Question</div>
+            <p class="text-xs text-gray-400 mt-2 font-medium">QUESTION</p>
           </div>
           
-          <div class="text-center group">
-            <div class="relative">
-              <svg class="w-16 h-16 progress-ring">
-                <circle cx="32" cy="32" r="28" stroke="#E5E7EB" stroke-width="4" fill="transparent"/>
-                <circle id="time-progress-circle" cx="32" cy="32" r="28" stroke="#10B981" stroke-width="4" 
-                        fill="transparent" stroke-dasharray="0 176" class="progress-ring-circle"/>
+          <div class="text-center">
+            <div class="w-16 h-16 relative">
+              <svg class="w-full h-full transform -rotate-90">
+                <circle cx="32" cy="32" r="28" stroke="rgba(148, 163, 184, 0.2)" stroke-width="3" fill="none"/>
+                <circle id="time-progress" cx="32" cy="32" r="28" stroke="#10b981" stroke-width="3" 
+                        fill="none" stroke-dasharray="0 176" stroke-linecap="round" class="transition-all duration-500"/>
               </svg>
               <div class="absolute inset-0 flex items-center justify-center">
-                <div id="timer-display" class="text-sm font-bold text-green-600">00:00</div>
+                <span id="timer-display" class="text-sm font-bold">00:00</span>
               </div>
             </div>
-            <div class="text-xs text-gray-500 mt-1 group-hover:text-gray-700 transition-colors">Duration</div>
+            <p class="text-xs text-gray-400 mt-2 font-medium">TIME</p>
+          </div>
+        </div>
+        
+        <!-- Interview Status -->
+        <div id="interview-status" class="glass-card px-4 py-2 rounded-full flex items-center space-x-2 text-sm font-medium">
+          <div class="w-3 h-3 bg-green-500 rounded-full pulse-ring"></div>
+          <span>Ready to Start</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Main Content -->
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <div class="grid grid-cols-1 xl:grid-cols-3 gap-8">
+      
+      <!-- Left Column - Video & Controls -->
+      <div class="xl:col-span-1 space-y-6">
+        
+        <!-- Video Section -->
+        <div class="glass-card rounded-2xl overflow-hidden">
+          <div class="p-4 border-b border-white/10">
+            <h3 class="text-lg font-semibold flex items-center space-x-2">
+              <i class="fas fa-video text-blue-400"></i>
+              <span>Your Camera</span>
+            </h3>
+          </div>
+          <div class="relative aspect-video bg-gray-900">
+            <video id="user-video" autoplay playsinline muted class="w-full h-full object-cover"></video>
+            <div id="video-overlay" class="absolute inset-0 bg-gradient-to-br from-gray-900/90 to-blue-900/90 flex items-center justify-center">
+              <div class="text-center">
+                <div class="w-20 h-20 bg-white/10 rounded-2xl flex items-center justify-center mb-4 mx-auto backdrop-blur-sm">
+                  <i class="fas fa-camera text-3xl text-white"></i>
+                </div>
+                <h4 class="text-xl font-bold mb-2">Camera Setup</h4>
+                <p class="text-gray-300 max-w-xs">Allow camera and microphone access to begin your professional interview</p>
+              </div>
+            </div>
+            <div id="recording-indicator" class="absolute top-4 right-4 bg-red-500 text-white px-3 py-2 rounded-full text-sm font-bold flex items-center space-x-2 hidden">
+              <div class="w-2 h-2 bg-white rounded-full animate-pulse"></div>
+              <span>REC</span>
+            </div>
+          </div>
+        </div>
+        
+        <!-- AI Interviewer -->
+        <div class="glass-card rounded-2xl overflow-hidden">
+          <div class="p-4 border-b border-white/10">
+            <h3 class="text-lg font-semibold flex items-center space-x-2">
+              <div class="relative">
+                <i class="fas fa-robot text-purple-400"></i>
+                <div id="ai-status-dot" class="absolute -top-1 -right-1 w-3 h-3 bg-green-500 rounded-full border border-white"></div>
+              </div>
+              <span>Sarah - AI Interviewer</span>
+            </h3>
+          </div>
+          <div class="relative aspect-video bg-gradient-to-br from-gray-900 to-purple-900">
+            <canvas id="ai-visualizer-canvas" class="absolute inset-0 w-full h-full"></canvas>
+            <div class="absolute inset-0 flex items-center justify-center">
+              <div id="ai-avatar" class="w-24 h-24 bg-white/20 rounded-full flex items-center justify-center backdrop-blur-sm border border-white/30 transition-all duration-300">
+                <i class="fas fa-user-tie text-3xl text-white"></i>
+              </div>
+            </div>
+            <div id="ai-status-text" class="absolute top-4 left-4 bg-black/40 text-white px-3 py-2 rounded-lg text-sm backdrop-blur-sm">
+              <i class="fas fa-brain mr-2"></i>
+              <span>Ready to Interview</span>
+            </div>
+            <button id="hints-btn" class="absolute top-4 right-4 bg-yellow-500/20 hover:bg-yellow-500/30 text-yellow-300 px-3 py-2 rounded-lg text-sm font-medium backdrop-blur-sm border border-yellow-400/30 transition-all duration-200 hidden">
+              <i class="fas fa-lightbulb mr-2"></i>
+              <span>Get Hints</span>
+            </button>
+          </div>
+        </div>
+        
+        <!-- Session Info -->
+        <div class="glass-card rounded-2xl p-6">
+          <h3 class="text-lg font-semibold mb-4 flex items-center space-x-2">
+            <i class="fas fa-clipboard-list text-green-400"></i>
+            <span>Session Details</span>
+          </h3>
+          <div class="space-y-3">
+            <div class="flex justify-between">
+              <span class="text-gray-400">Role:</span>
+              <span class="font-semibold">{{ job_role }}</span>
+            </div>
+            <div class="flex justify-between">
+              <span class="text-gray-400">Duration:</span>
+              <span class="font-semibold">20-25 min</span>
+            </div>
+            <div class="border-t border-white/10 pt-3">
+              <p class="text-gray-400 text-sm mb-2">Key Skills:</p>
+              <div class="flex flex-wrap gap-2">
+                {% for skill in key_skills|split:"," %}
+                  <span class="bg-blue-500/20 text-blue-300 px-3 py-1 rounded-full text-sm border border-blue-400/30">
+                    {{ skill|trim_whitespace }}
+                  </span>
+                {% endfor %}
+              </div>
+            </div>
           </div>
           
-          <div class="text-center group">
-            <div class="relative">
-              <svg class="w-16 h-16 progress-ring">
-                <circle cx="32" cy="32" r="28" stroke="#E5E7EB" stroke-width="4" fill="transparent"/>
-                <circle id="overall-progress-circle" cx="32" cy="32" r="28" stroke="#8B5CF6" stroke-width="4" 
-                        fill="transparent" stroke-dasharray="0 176" class="progress-ring-circle"/>
-              </svg>
-              <div class="absolute inset-0 flex items-center justify-center">
-                <div id="progress-percent" class="text-sm font-bold text-purple-600">0%</div>
-              </div>
+          <!-- Volume Control -->
+          <div class="mt-6 pt-4 border-t border-white/10">
+            <div class="flex items-center space-x-3 mb-3">
+              <i class="fas fa-volume-up text-gray-400"></i>
+              <input type="range" id="volume-slider" min="0" max="1" step="0.1" value="0.8" 
+                     class="flex-1 volume-slider cursor-pointer">
+              <span id="volume-display" class="text-sm font-medium w-12">80%</span>
             </div>
-            <div class="text-xs text-gray-500 mt-1 group-hover:text-gray-700 transition-colors">Progress</div>
+            <button id="test-audio-btn" class="w-full bg-gray-700 hover:bg-gray-600 text-white py-2 px-4 rounded-lg text-sm font-medium transition-colors">
+              <i class="fas fa-volume-up mr-2"></i>Test Audio
+            </button>
           </div>
         </div>
       </div>
       
-      <!-- Enhanced Progress Bar -->
-      <div class="mt-6">
-        <div class="flex justify-between items-center mb-2">
-          <span class="text-sm font-medium text-gray-600">Interview Progress</span>
-          <span id="progress-text" class="text-sm text-gray-500">Getting started...</span>
-        </div>
-        <div class="w-full bg-gray-200 rounded-full h-3 overflow-hidden">
-          <div id="progress-bar" class="h-3 rounded-full bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500 transition-all duration-700 ease-out" style="width: 0%"></div>
+      <!-- Center Column - Chat -->
+      <div class="xl:col-span-1">
+        <div class="glass-card rounded-2xl h-[700px] flex flex-col">
+          <div class="p-4 border-b border-white/10 flex items-center justify-between">
+            <h3 class="text-lg font-semibold flex items-center space-x-2">
+              <i class="fas fa-comments text-blue-400"></i>
+              <span>Interview Conversation</span>
+            </h3>
+            <div id="chat-progress" class="hidden flex items-center space-x-4 text-sm">
+              <div class="text-center">
+                <div id="response-count" class="text-xl font-bold text-blue-400">0</div>
+                <div class="text-xs text-gray-400">Responses</div>
+              </div>
+              <div class="text-center">
+                <div id="avg-length" class="text-xl font-bold text-green-400">0</div>
+                <div class="text-xs text-gray-400">Avg Words</div>
+              </div>
+            </div>
+          </div>
+          
+          <div id="chat-messages" class="flex-1 p-4 overflow-y-auto custom-scrollbar">
+            <div id="chat-empty" class="h-full flex flex-col items-center justify-center text-center">
+              <div class="w-16 h-16 bg-blue-500/20 rounded-full flex items-center justify-center mb-4">
+                <i class="fas fa-comment-dots text-2xl text-blue-400"></i>
+              </div>
+              <h4 class="text-xl font-bold mb-2">Ready to Begin</h4>
+              <p class="text-gray-400 max-w-sm">Your conversation with Sarah will appear here once you start the interview</p>
+            </div>
+          </div>
         </div>
       </div>
-    </div>
-
-    <div class="grid grid-cols-1 xl:grid-cols-3 gap-6">
-
-      <!-- LEFT: Candidate Section -->
-      <section class="xl:col-span-1 glass-card rounded-3xl shadow-2xl p-6 transition-all duration-300 hover:shadow-3xl">
-        <div class="flex items-center justify-between mb-6">
-          <h2 class="text-xl font-bold text-gray-800 flex items-center">
-            <i class="fas fa-user-circle mr-3 text-blue-500"></i>
-            Your Space
-          </h2>
-          <div class="flex items-center space-x-2">
-            <div id="connection-status" class="text-xs bg-green-100 text-green-700 px-3 py-1 rounded-full font-medium">
-              <i class="fas fa-circle text-green-500 mr-1"></i>
-              Ready
-            </div>
-          </div>
-        </div>
-
-        <!-- Enhanced Video Preview -->
-        <div class="relative w-full aspect-video bg-gradient-to-br from-gray-900 via-gray-800 to-gray-700 rounded-2xl overflow-hidden mb-6 group shadow-xl">
-          <video id="user-video" autoplay playsinline muted class="w-full h-full object-cover"></video>
-          <div id="video-overlay" class="absolute inset-0 flex items-center justify-center bg-gradient-to-br from-gray-900 via-purple-900 to-gray-900 text-white text-center p-6 transition-all duration-500">
-            <div class="bounce-in">
-              <div class="w-20 h-20 bg-white bg-opacity-20 rounded-full flex items-center justify-center mb-4 mx-auto backdrop-blur-sm">
-                <i class="fas fa-video text-4xl opacity-80"></i>
-              </div>
-              <div class="text-xl font-bold mb-2">Camera Setup Required</div>
-              <div class="text-sm opacity-90 mb-4">Allow camera and microphone access to begin your interview</div>
-              <div class="flex items-center justify-center space-x-4 text-xs opacity-70">
-                <span><i class="fas fa-video mr-1"></i>Camera</span>
-                <span><i class="fas fa-microphone mr-1"></i>Audio</span>
-              </div>
-            </div>
-          </div>
+      
+      <!-- Right Column - Controls -->
+      <div class="xl:col-span-1 space-y-6">
+        
+        <!-- Interview Controls -->
+        <div class="glass-card rounded-2xl p-6">
+          <h3 class="text-lg font-semibold mb-6 flex items-center space-x-2">
+            <i class="fas fa-gamepad text-green-400"></i>
+            <span>Interview Controls</span>
+          </h3>
           
-          <!-- Enhanced Recording Indicator -->
-          <div id="recording-indicator" class="absolute top-4 right-4 hidden z-10">
-            <div class="flex items-center bg-red-500 text-white px-4 py-2 rounded-full text-sm font-medium shadow-lg">
-              <div class="w-3 h-3 bg-white rounded-full mr-2 animate-pulse"></div>
-              <span>RECORDING</span>
-            </div>
-          </div>
-          
-          <!-- Camera controls overlay -->
-          <div class="absolute bottom-4 left-4 right-4 flex justify-between items-center opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-            <button id="toggle-video-btn" class="bg-white bg-opacity-20 backdrop-blur-sm text-white p-3 rounded-full hover:bg-opacity-30 transition-all">
-              <i class="fas fa-video"></i>
-            </button>
-            <button id="toggle-audio-btn" class="bg-white bg-opacity-20 backdrop-blur-sm text-white p-3 rounded-full hover:bg-opacity-30 transition-all">
-              <i class="fas fa-microphone"></i>
-            </button>
-          </div>
-        </div>
-
-        <!-- Enhanced Control Buttons -->
-        <div class="space-y-4 mb-6">
-          <button id="start-interview-btn" class="w-full btn-primary text-white px-8 py-4 rounded-2xl font-bold text-lg flex items-center justify-center space-x-3 shadow-xl transform transition-all duration-300 hover:scale-105 relative overflow-hidden">
-            <i class="fas fa-play-circle text-xl"></i>
-            <span>Start Interview</span>
-            <div class="absolute inset-0 bg-gradient-to-r from-transparent via-white to-transparent opacity-0 transform -translate-x-full group-hover:translate-x-full transition-transform duration-700"></div>
-          </button>
-          
-          <div class="grid grid-cols-2 gap-4">
-            <button id="pause-btn" class="btn-warning px-6 py-3 rounded-xl font-semibold flex items-center justify-center space-x-2 transition-all duration-200 shadow-lg hover:shadow-xl hidden">
-              <i class="fas fa-pause"></i>
-              <span>Pause</span>
-            </button>
-            <button id="end-interview-btn" class="btn-danger px-6 py-3 rounded-xl font-semibold flex items-center justify-center space-x-2 transition-all duration-200 shadow-lg hover:shadow-xl">
-              <i class="fas fa-stop-circle"></i>
-              <span>End</span>
-            </button>
-          </div>
-        </div>
-
-        <!-- Enhanced Interview Info Card -->
-        <div class="bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 border-l-4 border-blue-400 p-6 rounded-2xl shadow-inner mb-6">
-          <h4 class="font-bold text-gray-800 mb-4 flex items-center">
-            <i class="fas fa-info-circle text-blue-500 mr-2"></i>
-            Interview Details
-          </h4>
-          <div class="space-y-3 text-sm">
-            <div class="flex items-center">
-              <i class="fas fa-briefcase text-blue-500 w-6"></i>
-              <span class="font-semibold text-gray-700 mr-2">Position:</span>
-              <span class="text-gray-800 bg-white px-2 py-1 rounded-lg">{{ job_role }}</span>
-            </div>
-            <div class="flex items-start">
-              <i class="fas fa-code text-blue-500 w-6 mt-1"></i>
-              <div>
-                <span class="font-semibold text-gray-700">Key Skills:</span>
-                <div class="flex flex-wrap gap-1 mt-1">
-                  {% for skill in key_skills|split:"," %}
-                    <span class="text-xs bg-blue-100 text-blue-800 px-2 py-1 rounded-full">{{ skill|trim_whitespace }}</span>
-                  {% endfor %}
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <!-- Enhanced Audio Controls -->
-        <div class="bg-gray-50 border border-gray-200 rounded-2xl p-4 mb-4">
-          <h4 class="font-bold text-gray-800 mb-3 flex items-center">
-            <i class="fas fa-volume-up mr-2 text-purple-500"></i>
-            Audio Settings
-          </h4>
-          <div class="space-y-3">
-            <div class="flex items-center space-x-3">
-              <label class="text-sm text-gray-600 font-medium">Volume:</label>
-              <input type="range" id="volume-slider" min="0" max="1" step="0.1" value="0.8" 
-                     class="flex-1 h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer slider">
-              <span id="volume-display" class="text-sm text-gray-600 font-semibold min-w-[3rem]">80%</span>
-            </div>
-            <button id="test-audio-btn" class="w-full text-sm bg-purple-500 hover:bg-purple-600 text-white px-4 py-2 rounded-lg transition-all font-medium">
+          <div class="space-y-4">
+            <button id="start-interview-btn" class="w-full bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white py-4 px-6 rounded-xl text-lg font-bold transition-all duration-200 transform hover:scale-105 shadow-lg hover:shadow-xl">
               <i class="fas fa-play mr-2"></i>
-              Test Audio
+              <span>Start Interview</span>
             </button>
+            
+            <div class="grid grid-cols-2 gap-3">
+              <button id="pause-btn" class="bg-yellow-500 hover:bg-yellow-600 text-white py-3 px-4 rounded-lg font-semibold transition-colors hidden">
+                <i class="fas fa-pause mr-2"></i>Pause
+              </button>
+              <button id="end-interview-btn" class="bg-red-500 hover:bg-red-600 text-white py-3 px-4 rounded-lg font-semibold transition-colors">
+                <i class="fas fa-stop mr-2"></i>End
+              </button>
+            </div>
           </div>
         </div>
-
-        <!-- Quick Tips -->
-        <div class="bg-gradient-to-br from-green-50 to-emerald-50 border border-green-200 rounded-2xl p-4">
-          <h4 class="font-bold text-green-800 mb-3 flex items-center">
-            <i class="fas fa-lightbulb mr-2 text-yellow-500"></i>
-            Interview Tips
-          </h4>
-          <ul class="text-sm text-green-700 space-y-2">
-            <li class="flex items-start"><i class="fas fa-check-circle text-green-500 mr-2 mt-0.5"></i>Speak clearly and maintain eye contact</li>
-            <li class="flex items-start"><i class="fas fa-check-circle text-green-500 mr-2 mt-0.5"></i>Use STAR method for behavioral questions</li>
-            <li class="flex items-start"><i class="fas fa-check-circle text-green-500 mr-2 mt-0.5"></i>Take a moment to think before answering</li>
-            <li class="flex items-start"><i class="fas fa-check-circle text-green-500 mr-2 mt-0.5"></i>Provide specific examples from experience</li>
-          </ul>
-        </div>
-      </section>
-
-      <!-- RIGHT: AI Chat Section -->
-      <section class="xl:col-span-2 glass-card rounded-3xl shadow-2xl p-6 flex flex-col transition-all duration-300 hover:shadow-3xl">
-        <div class="flex items-center justify-between mb-6">
-          <h2 class="text-xl font-bold text-gray-800 flex items-center">
-            <div class="relative mr-3">
-              <i class="fas fa-robot text-purple-500 text-xl"></i>
-              <div id="ai-status-dot" class="absolute -top-1 -right-1 w-3 h-3 status-online rounded-full"></div>
-            </div>
-            AI Interviewer
-          </h2>
-          <div class="flex items-center space-x-3">
-            <div id="interview-status" class="text-sm px-4 py-2 bg-gray-100 text-gray-600 rounded-full font-medium">
-              <i class="fas fa-circle text-gray-400 mr-2"></i>
-              Initializing...
-            </div>
-            <button id="hints-btn" class="text-sm bg-yellow-100 hover:bg-yellow-200 text-yellow-800 px-4 py-2 rounded-full transition-all duration-200 font-medium hidden shadow-md hover:shadow-lg">
-              <i class="fas fa-question-circle mr-1"></i>
-              Get Hints
-            </button>
-          </div>
-        </div>
-
-        <!-- Enhanced AI Visualizer -->
-        <div class="relative w-full h-48 visualizer-container mb-6 shadow-xl">
-          <div class="visualizer-overlay"></div>
-          <canvas id="ai-visualizer-canvas" class="w-full h-full absolute inset-0 z-10"></canvas>
+        
+        <!-- Speech Controls -->
+        <div class="glass-card rounded-2xl p-6">
+          <h3 class="text-lg font-semibold mb-6 flex items-center space-x-2">
+            <i class="fas fa-microphone text-purple-400"></i>
+            <span>Voice Response</span>
+          </h3>
           
-          <!-- AI Avatar -->
-          <div class="absolute inset-0 flex items-center justify-center z-20">
-            <div id="ai-avatar" class="text-white transition-all duration-500">
-              <div class="relative">
-                <div class="w-20 h-20 bg-white bg-opacity-20 rounded-full flex items-center justify-center backdrop-blur-sm">
-                  <i class="fas fa-user-tie text-4xl"></i>
+          <div class="space-y-4">
+            <button id="speak-button" class="w-full bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white py-4 px-6 rounded-xl text-lg font-bold transition-all duration-200 transform hover:scale-105 shadow-lg relative overflow-hidden" disabled>
+              <i class="fas fa-microphone mr-2"></i>
+              <span id="speak-button-text">Press to Speak</span>
+              <div id="listening-animation" class="hidden absolute inset-0 flex items-center justify-center">
+                <div class="flex space-x-1">
+                  <div class="w-2 h-2 bg-white rounded-full typing-dot"></div>
+                  <div class="w-2 h-2 bg-white rounded-full typing-dot"></div>
+                  <div class="w-2 h-2 bg-white rounded-full typing-dot"></div>
                 </div>
-                <div class="absolute inset-0 rounded-full border-2 border-white opacity-20 animate-ping"></div>
               </div>
-            </div>
-          </div>
-          
-          <!-- AI Status Indicators -->
-          <div class="absolute top-4 left-4 z-30">
-            <div id="ai-status-text" class="bg-white bg-opacity-20 backdrop-blur-sm text-white px-3 py-1 rounded-full text-sm font-medium">
-              <i class="fas fa-brain mr-1"></i>
-              Ready
-            </div>
-          </div>
-          
-          <div class="absolute bottom-4 right-4 z-30">
-            <div id="audio-level-indicator" class="bg-white bg-opacity-20 backdrop-blur-sm text-white px-3 py-1 rounded-full text-xs font-medium hidden">
-              <i class="fas fa-volume-up mr-1"></i>
-              <span id="audio-level-text">0%</span>
-            </div>
-          </div>
-        </div>
-
-        <!-- Enhanced Chat History -->
-        <div id="chat-container" class="flex-1 flex flex-col min-h-0">
-          <div id="chat-history" class="flex-1 bg-gray-50 rounded-2xl border-2 border-gray-100 p-6 overflow-y-auto custom-scrollbar shadow-inner" style="min-height: 300px; max-height: 400px;">
-            <div id="chat-empty" class="text-center text-gray-500 py-12">
-              <div class="w-16 h-16 bg-gray-200 rounded-full flex items-center justify-center mx-auto mb-4">
-                <i class="fas fa-comments text-2xl text-gray-400"></i>
-              </div>
-              <div class="text-lg font-medium mb-2">Ready to Begin</div>
-              <div class="text-sm opacity-75">Your interview conversation will appear here</div>
-            </div>
-          </div>
-        </div>
-
-        <!-- Enhanced Speech Controls -->
-        <div class="mt-6 space-y-4">
-          <!-- Main Speech Button -->
-          <button id="speak-button" class="w-full bg-gradient-to-r from-purple-600 via-pink-600 to-red-500 hover:from-purple-700 hover:via-pink-700 hover:to-red-600 text-white px-8 py-5 rounded-2xl font-bold text-lg flex items-center justify-center space-x-4 transition-all duration-300 shadow-xl hover:shadow-2xl hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100 relative overflow-hidden" disabled>
-            <i class="fas fa-microphone text-2xl z-10"></i>
-            <span class="text-xl z-10" id="speak-button-text">Speak Your Answer</span>
-            <div class="hidden z-10" id="listening-animation">
-              <div class="typing-indicator text-white">
-                <span>●</span>
-                <span>●</span>
-                <span>●</span>
-              </div>
-            </div>
-            <div class="absolute inset-0 bg-gradient-to-r from-transparent via-white to-transparent opacity-0 transform -translate-x-full transition-transform duration-700"></div>
-          </button>
-          
-          <!-- Secondary Controls -->
-          <div class="grid grid-cols-2 gap-4">
-            <button id="stop-speaking-btn" class="bg-gray-600 hover:bg-gray-700 text-white px-6 py-3 rounded-xl font-semibold flex items-center justify-center space-x-2 transition-all duration-200 shadow-lg hover:shadow-xl hidden">
-              <i class="fas fa-stop"></i>
-              <span>Stop Recording</span>
             </button>
             
-            <button id="skip-question-btn" class="bg-orange-500 hover:bg-orange-600 text-white px-6 py-3 rounded-xl font-semibold flex items-center justify-center space-x-2 transition-all duration-200 shadow-lg hover:shadow-xl hidden">
-              <i class="fas fa-forward"></i>
-              <span>Skip Question</span>
-            </button>
-          </div>
-
-          <!-- Enhanced Status Display -->
-          <div class="text-center">
-            <div id="stt-status" class="text-sm text-gray-500 py-3 px-4 bg-gray-100 rounded-xl font-medium">
-              <i class="fas fa-info-circle text-blue-500 mr-2"></i>
-              Click "Speak Your Answer" to record (Chrome/Edge recommended)
+            <div class="grid grid-cols-2 gap-3">
+              <button id="stop-speaking-btn" class="bg-gray-600 hover:bg-gray-700 text-white py-2 px-4 rounded-lg font-medium transition-colors hidden">
+                <i class="fas fa-stop mr-2"></i>Stop
+              </button>
+              <button id="skip-question-btn" class="bg-gray-600 hover:bg-gray-700 text-white py-2 px-4 rounded-lg font-medium transition-colors hidden">
+                <i class="fas fa-forward mr-2"></i>Skip
+              </button>
             </div>
             
-            <!-- Enhanced Confidence Meter -->
-            <div id="confidence-meter" class="hidden mt-4 bg-white p-4 rounded-xl border shadow-sm">
-              <div class="flex justify-between items-center mb-2">
-                <span class="text-xs font-semibold text-gray-600">Speech Recognition Confidence</span>
-                <span id="confidence-percentage" class="text-xs font-bold text-gray-700">0%</span>
+            <!-- Status Display -->
+            <div id="stt-status" class="glass-card p-4 rounded-lg flex items-center space-x-3 text-sm">
+              <i class="fas fa-info-circle text-blue-400"></i>
+              <span>Click "Start Interview" to begin your session</span>
+            </div>
+            
+            <!-- Confidence Meter -->
+            <div id="confidence-meter" class="hidden glass-card p-4 rounded-lg">
+              <div class="flex justify-between items-center mb-3">
+                <span class="text-sm font-medium">Speech Clarity</span>
+                <span id="confidence-percentage" class="text-sm font-bold text-green-400">0%</span>
               </div>
-              <div class="w-full bg-gray-200 rounded-full h-3 overflow-hidden">
-                <div id="confidence-bar" class="bg-gradient-to-r from-red-500 via-yellow-500 to-green-500 h-3 rounded-full transition-all duration-300" style="width: 0%"></div>
-              </div>
-              <div class="flex justify-between text-xs text-gray-500 mt-1">
-                <span>Low</span>
-                <span>High</span>
+              <div class="w-full bg-gray-700 rounded-full h-2">
+                <div id="confidence-bar" class="bg-gradient-to-r from-red-400 via-yellow-400 to-green-400 h-2 rounded-full transition-all duration-500" style="width: 0%"></div>
               </div>
             </div>
           </div>
         </div>
-      </section>
+      </div>
     </div>
+  </div>
+</div>
 
-    <!-- Enhanced Floating Action Panel -->
-    <div id="floating-panel" class="fixed bottom-6 right-6 space-y-3 z-40 hidden">
-      <div class="flex flex-col space-y-3">
-        <button id="practice-mode-btn" class="bg-blue-500 hover:bg-blue-600 text-white w-14 h-14 rounded-full shadow-2xl flex items-center justify-center transition-all duration-300 hover:scale-110 group">
-          <i class="fas fa-dumbbell text-xl group-hover:animate-bounce"></i>
+<!-- Hints Modal -->
+<div id="hints-modal" class="fixed inset-0 z-50 hidden">
+  <div class="fixed inset-0 bg-black/70 backdrop-blur-sm" onclick="hideHintsModal()"></div>
+  <div class="fixed inset-0 flex items-center justify-center p-4">
+    <div class="glass-card rounded-2xl p-8 max-w-2xl w-full max-h-[80vh] overflow-y-auto custom-scrollbar transform scale-95 opacity-0 transition-all duration-300" id="hints-modal-content">
+      <div class="text-center mb-6">
+        <div class="w-16 h-16 bg-yellow-500/20 rounded-full flex items-center justify-center mx-auto mb-4">
+          <i class="fas fa-lightbulb text-2xl text-yellow-400"></i>
+        </div>
+        <h3 class="text-2xl font-bold mb-2">Interview Guidance</h3>
+        <p class="text-gray-400">Strategic tips to help you excel with the current question</p>
+      </div>
+      <div id="hints-content" class="space-y-4 mb-8">
+        <!-- Hints will be loaded here -->
+      </div>
+      <div class="flex justify-center space-x-4">
+        <button onclick="hideHintsModal()" class="bg-blue-500 hover:bg-blue-600 text-white px-6 py-3 rounded-lg font-semibold transition-colors">
+          <i class="fas fa-check mr-2"></i>Got It, Thanks!
         </button>
-        <button id="feedback-btn" class="bg-green-500 hover:bg-green-600 text-white w-14 h-14 rounded-full shadow-2xl flex items-center justify-center transition-all duration-300 hover:scale-110 group">
-          <i class="fas fa-chart-line text-xl group-hover:animate-pulse"></i>
-        </button>
-        <button id="settings-btn" class="bg-gray-500 hover:bg-gray-600 text-white w-14 h-14 rounded-full shadow-2xl flex items-center justify-center transition-all duration-300 hover:scale-110 group">
-          <i class="fas fa-cog text-xl group-hover:animate-spin"></i>
-        </button>
-        <button id="help-btn" class="bg-purple-500 hover:bg-purple-600 text-white w-14 h-14 rounded-full shadow-2xl flex items-center justify-center transition-all duration-300 hover:scale-110 group">
-          <i class="fas fa-question text-xl group-hover:animate-bounce"></i>
+        <button onclick="hideHintsModal()" class="bg-gray-600 hover:bg-gray-700 text-white px-6 py-3 rounded-lg font-semibold transition-colors">
+          <i class="fas fa-times mr-2"></i>Close
         </button>
       </div>
     </div>
   </div>
 </div>
 
-<!-- Enhanced Hints Modal -->
-<div id="hints-modal" class="fixed inset-0 modal-backdrop z-50 hidden flex items-center justify-center p-4">
-  <div class="glass-card rounded-3xl max-w-lg w-full p-8 transform transition-all duration-300 scale-95 opacity-0" id="hints-modal-content">
-    <div class="flex items-center justify-between mb-6">
-      <h3 class="text-xl font-bold text-gray-800 flex items-center">
-        <i class="fas fa-lightbulb text-yellow-500 mr-3 text-2xl"></i>
-        Helpful Hints
-      </h3>
-      <button id="close-hints-modal" class="text-gray-400 hover:text-gray-600 p-2 hover:bg-gray-100 rounded-full transition-all">
-        <i class="fas fa-times text-xl"></i>
-      </button>
-    </div>
-    <div id="hints-content" class="space-y-4">
-      <!-- Hints will be populated here -->
-    </div>
-    <div class="mt-6 text-center">
-      <button id="close-hints-btn" class="btn-primary px-6 py-3 rounded-xl">
-        <i class="fas fa-check mr-2"></i>
-        Got it, thanks!
-      </button>
-    </div>
+<!-- Loading Overlay -->
+<div id="loading-overlay" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center hidden">
+  <div class="text-center">
+    <div class="w-16 h-16 border-4 border-blue-500/30 border-t-blue-500 rounded-full animate-spin mb-4"></div>
+    <div id="loading-text" class="text-xl font-semibold text-white">Initializing AI Interview...</div>
   </div>
 </div>
 
-<!-- Enhanced Notification Container -->
-<div id="notification-container" class="fixed top-6 right-6 z-50 space-y-2"></div>
+<!-- Notification Container -->
+<div id="notification-container" class="fixed top-4 right-4 z-50 space-y-4 max-w-sm"></div>
 
 <!-- Hidden Audio Element -->
-<audio id="ai-audio-element" preload="auto" crossorigin="anonymous" style="display: none;"></audio>
-
-<!-- Enhanced Typing Indicator Template -->
-<div id="typing-indicator-template" class="hidden">
-  <div class="mb-4 flex message-appear">
-    <div class="bg-gradient-to-r from-purple-100 to-pink-100 text-gray-900 mr-auto p-4 rounded-2xl max-w-[85%] shadow-sm border border-purple-200">
-      <div class="flex items-center justify-between mb-2">
-        <div class="text-xs font-bold text-purple-600 flex items-center">
-          <i class="fas fa-robot mr-1"></i>
-          AI Interviewer
-        </div>
-        <div class="text-xs text-gray-500">typing...</div>
-      </div>
-      <div class="typing-indicator">
-        <span>●</span>
-        <span>●</span>
-        <span>●</span>
-      </div>
-    </div>
-  </div>
-</div>
+<audio id="ai-audio-element" preload="auto" crossorigin="anonymous" class="hidden"></audio>
 
 <script>
-// Enhanced JavaScript with better audio visualization and UI improvements
+// Enhanced MockMate Interview System
 const SESSION_ID = {{ session_id }};
 const CSRF_TOKEN = "{{ csrf_token }}";
 const INITIAL_CHAT = JSON.parse('{{ initial_chat_history_json|escapejs }}' || "[]");
-const INTERVIEW_PROGRESS = {{ interview_progress|safe }};
+const INTERVIEW_PROGRESS = JSON.parse('{{ interview_progress|escapejs }}');
 
 // Enhanced DOM Elements
 const elements = {
-  chatHistory: document.getElementById('chat-history'),
+  // Chat and messaging
+  chatMessages: document.getElementById('chat-messages'),
   chatEmpty: document.getElementById('chat-empty'),
+  chatProgress: document.getElementById('chat-progress'),
+  responseCount: document.getElementById('response-count'),
+  avgLength: document.getElementById('avg-length'),
+  
+  // Status indicators
   interviewStatus: document.getElementById('interview-status'),
   sttStatus: document.getElementById('stt-status'),
+  headerStatus: document.getElementById('header-status'),
+  aiStatusDot: document.getElementById('ai-status-dot'),
+  aiStatusText: document.getElementById('ai-status-text'),
+  
+  // Control buttons
   startBtn: document.getElementById('start-interview-btn'),
   endBtn: document.getElementById('end-interview-btn'),
   pauseBtn: document.getElementById('pause-btn'),
@@ -687,866 +458,763 @@ const elements = {
   stopSpeakBtn: document.getElementById('stop-speaking-btn'),
   skipBtn: document.getElementById('skip-question-btn'),
   hintsBtn: document.getElementById('hints-btn'),
+  testAudioBtn: document.getElementById('test-audio-btn'),
+  
+  // Video and audio
   userVideo: document.getElementById('user-video'),
   videoOverlay: document.getElementById('video-overlay'),
   recordingIndicator: document.getElementById('recording-indicator'),
-  visualizerCanvas: document.getElementById('ai-visualizer-canvas'),
-  aiAvatar: document.getElementById('ai-avatar'),
-  aiStatusDot: document.getElementById('ai-status-dot'),
-  aiStatusText: document.getElementById('ai-status-text'),
-  headerStatusIndicator: document.getElementById('header-status-indicator'),
-  questionCounter: document.getElementById('question-counter'),
-  timerDisplay: document.getElementById('timer-display'),
-  progressPercent: document.getElementById('progress-percent'),
-  progressBar: document.getElementById('progress-bar'),
-  progressText: document.getElementById('progress-text'),
-  confidenceMeter: document.getElementById('confidence-meter'),
-  confidenceBar: document.getElementById('confidence-bar'),
-  confidencePercentage: document.getElementById('confidence-percentage'),
-  floatingPanel: document.getElementById('floating-panel'),
-  hintsModal: document.getElementById('hints-modal'),
-  hintsModalContent: document.getElementById('hints-modal-content'),
-  hintsContent: document.getElementById('hints-content'),
-  closeHintsModal: document.getElementById('close-hints-modal'),
-  closeHintsBtn: document.getElementById('close-hints-btn'),
-  listeningAnimation: document.getElementById('listening-animation'),
   aiAudioElement: document.getElementById('ai-audio-element'),
   volumeSlider: document.getElementById('volume-slider'),
   volumeDisplay: document.getElementById('volume-display'),
-  testAudioBtn: document.getElementById('test-audio-btn'),
-  connectionStatus: document.getElementById('connection-status'),
-  audioLevelIndicator: document.getElementById('audio-level-indicator'),
-  audioLevelText: document.getElementById('audio-level-text'),
+  
+  // Visualizer and avatar
+  visualizerCanvas: document.getElementById('ai-visualizer-canvas'),
+  aiAvatar: document.getElementById('ai-avatar'),
+  
+  // Progress indicators
+  questionCounter: document.getElementById('question-counter'),
+  timerDisplay: document.getElementById('timer-display'),
+  questionProgress: document.getElementById('question-progress'),
+  timeProgress: document.getElementById('time-progress'),
+  
+  // Confidence meter
+  confidenceMeter: document.getElementById('confidence-meter'),
+  confidenceBar: document.getElementById('confidence-bar'),
+  confidencePercentage: document.getElementById('confidence-percentage'),
+  
+  // Modals and overlays
+  hintsModal: document.getElementById('hints-modal'),
+  hintsModalContent: document.getElementById('hints-modal-content'),
+  hintsContent: document.getElementById('hints-content'),
+  loadingOverlay: document.getElementById('loading-overlay'),
+  loadingText: document.getElementById('loading-text'),
   notificationContainer: document.getElementById('notification-container'),
   
-  // Progress circles
-  questionProgressCircle: document.getElementById('question-progress-circle'),
-  timeProgressCircle: document.getElementById('time-progress-circle'),
-  overallProgressCircle: document.getElementById('overall-progress-circle')
+  // Animations
+  listeningAnimation: document.getElementById('listening-animation')
 };
 
 // Enhanced State Management
 let state = {
-  audioQueue: [],
-  isPlaying: false,
-  audioCtx: null,
-  audioSource: null,
-  analyser: null,
-  recognition: null,
-  isListening: false,
-  interviewActive: false,
-  currentQuestion: 1,
+  sessionId: SESSION_ID,
+  currentQuestion: INTERVIEW_PROGRESS.total_questions || 1,
   startTime: null,
   isPaused: false,
-  chatHistory: [...INITIAL_CHAT],
-  currentAudio: null,
-  visualizerAnimationId: null,
+  isInitialized: false,
+  interviewActive: false,
+  interviewComplete: false,
+  
   mediaStream: null,
-  isInitialized: false
+  isListening: false,
+  isPlaying: false,
+  audioQueue: [],
+  audioCtx: null,
+  analyser: null,
+  recognition: null,
+  currentVolume: 0.8,
+  
+  chatHistory: [...INITIAL_CHAT],
+  lastUserResponse: '',
+  awaitingResponse: false,
+  totalResponses: 0,
+  totalWords: 0,
+  
+  visualizerAnimationId: null,
+  currentConfidence: 0,
+  lastUpdateTime: 0,
+  progressTimer: null,
+  
+  consecutiveErrors: 0,
+  lastErrorTime: 0,
+  maxRetries: 3
 };
 
-// Initialize visualizer context
-const vizCtx = elements.visualizerCanvas.getContext('2d');
-const CIRCLE_CIRCUMFERENCE = 176; // 2 * π * 28
-
-/* =================== ENHANCED UTILITY FUNCTIONS =================== */
-
-function safeText(text) {
-  return text == null ? '' : String(text);
-}
-
-function escapeHtml(unsafe) {
-  if (!unsafe) return '';
-  return unsafe
-    .replaceAll('&', '&amp;')
-    .replaceAll('<', '&lt;')
-    .replaceAll('>', '&gt;')
-    .replaceAll('"', '&quot;')
-    .replaceAll("'", '&#039;');
-}
-
+// Utility Functions
 function formatTime(seconds) {
   const mins = Math.floor(seconds / 60);
   const secs = seconds % 60;
   return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
 }
 
-function updateCircularProgress(circle, percentage) {
-  const offset = CIRCLE_CIRCUMFERENCE - (percentage / 100) * CIRCLE_CIRCUMFERENCE;
-  circle.style.strokeDasharray = `${CIRCLE_CIRCUMFERENCE} ${CIRCLE_CIRCUMFERENCE}`;
-  circle.style.strokeDashoffset = offset;
+function debounce(func, wait) {
+  let timeout;
+  return function executedFunction(...args) {
+    const later = () => {
+      clearTimeout(timeout);
+      func(...args);
+    };
+    clearTimeout(timeout);
+    timeout = setTimeout(later, wait);
+  };
 }
 
+// Progress Updates
 function updateProgress() {
   if (state.startTime) {
     const elapsed = Math.floor((Date.now() - state.startTime) / 1000);
     elements.timerDisplay.textContent = formatTime(elapsed);
     
-    // Update time progress (20 minutes = 1200 seconds)
     const timeProgress = Math.min((elapsed / 1200) * 100, 100);
-    updateCircularProgress(elements.timeProgressCircle, timeProgress);
+    const questionProgress = Math.min((state.currentQuestion / 12) * 100, 100);
     
-    // Update overall progress
-    const questionProgress = Math.min((state.currentQuestion / 10) * 100, 100);
-    const overallProgress = (timeProgress * 0.6) + (questionProgress * 0.4);
+    updateCircularProgress(elements.timeProgress, timeProgress);
+    updateCircularProgress(elements.questionProgress, questionProgress);
     
-    elements.progressPercent.textContent = `${Math.round(overallProgress)}%`;
-    elements.progressBar.style.width = `${overallProgress}%`;
-    updateCircularProgress(elements.overallProgressCircle, overallProgress);
-    
-    // Update progress text
-    if (overallProgress < 25) {
-      elements.progressText.textContent = "Getting started...";
-    } else if (overallProgress < 50) {
-      elements.progressText.textContent = "Building momentum...";
-    } else if (overallProgress < 75) {
-      elements.progressText.textContent = "Making great progress...";
-    } else {
-      elements.progressText.textContent = "Almost complete...";
+    if (state.totalResponses > 0) {
+      elements.responseCount.textContent = state.totalResponses;
+      elements.avgLength.textContent = Math.round(state.totalWords / state.totalResponses);
+      elements.chatProgress.classList.remove('hidden');
     }
   }
   
-  elements.questionCounter.textContent = `Q${state.currentQuestion}`;
-  const questionProgressPercent = Math.min((state.currentQuestion / 10) * 100, 100);
-  updateCircularProgress(elements.questionProgressCircle, questionProgressPercent);
+  elements.questionCounter.textContent = state.currentQuestion.toString();
 }
 
-/* =================== ENHANCED AUDIO & VISUALIZER =================== */
-
-function ensureAudioContext() {
-  if (!state.audioCtx) {
-    state.audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-    
-    if (state.audioCtx.state === 'suspended') {
-      state.audioCtx.resume();
-    }
-  }
-  return state.audioCtx;
+function updateCircularProgress(circle, percentage) {
+  const circumference = 176;
+  const offset = circumference - (percentage / 100) * circumference;
+  circle.style.strokeDasharray = `${circumference} ${circumference}`;
+  circle.style.strokeDashoffset = offset;
 }
 
-function setupVisualizer() {
-  const canvas = elements.visualizerCanvas;
-  const container = canvas.parentElement;
-  
-  const devicePixelRatio = window.devicePixelRatio || 1;
-  const rect = container.getBoundingClientRect();
-  
-  canvas.width = rect.width * devicePixelRatio;
-  canvas.height = rect.height * devicePixelRatio;
-  canvas.style.width = rect.width + 'px';
-  canvas.style.height = rect.height + 'px';
-  
-  vizCtx.scale(devicePixelRatio, devicePixelRatio);
-}
-
-function createAdvancedVisualizer(sourceNode) {
-  const audioCtx = ensureAudioContext();
-  
-  if (state.analyser) {
-    state.analyser.disconnect();
-  }
-  
-  state.analyser = audioCtx.createAnalyser();
-  state.analyser.fftSize = 512;
-  state.analyser.smoothingTimeConstant = 0.85;
-  
-  sourceNode.connect(state.analyser);
-  sourceNode.connect(audioCtx.destination);
-  
-  setupVisualizer();
-  startAdvancedVisualizerAnimation();
-}
-
-function startAdvancedVisualizerAnimation() {
-  if (state.visualizerAnimationId) {
-    cancelAnimationFrame(state.visualizerAnimationId);
-  }
-  
-  const bufferLength = state.analyser.frequencyBinCount;
-  const dataArray = new Uint8Array(bufferLength);
-  let frame = 0;
-  
-  function animate() {
-    if (!state.isPlaying || !state.analyser) {
-      stopVisualizerAnimation();
-      return;
-    }
-    
-    state.visualizerAnimationId = requestAnimationFrame(animate);
-    frame++;
-    
-    state.analyser.getByteFrequencyData(dataArray);
-    
-    const canvas = elements.visualizerCanvas;
-    const width = canvas.width / (window.devicePixelRatio || 1);
-    const height = canvas.height / (window.devicePixelRatio || 1);
-    const centerX = width / 2;
-    const centerY = height / 2;
-    
-    // Clear with subtle gradient
-    const bgGradient = vizCtx.createRadialGradient(centerX, centerY, 0, centerX, centerY, Math.max(width, height));
-    bgGradient.addColorStop(0, 'rgba(31, 41, 55, 0.1)');
-    bgGradient.addColorStop(1, 'rgba(31, 41, 55, 0.05)');
-    vizCtx.fillStyle = bgGradient;
-    vizCtx.fillRect(0, 0, width, height);
-    
-    // Calculate average intensity
-    const avgIntensity = dataArray.reduce((a, b) => a + b) / bufferLength / 255;
-    
-    // Update audio level indicator
-    const audioLevelPercent = Math.round(avgIntensity * 100);
-    elements.audioLevelText.textContent = `${audioLevelPercent}%`;
-    if (avgIntensity > 0.1) {
-      elements.audioLevelIndicator.classList.remove('hidden');
-    } else {
-      elements.audioLevelIndicator.classList.add('hidden');
-    }
-    
-    // Draw circular frequency bars
-    const numBars = Math.min(64, bufferLength / 4);
-    const radius = Math.min(width, height) / 4;
-    
-    for (let i = 0; i < numBars; i++) {
-      const angle = (i / numBars) * Math.PI * 2 - Math.PI / 2;
-      const barHeight = (dataArray[i * 4] / 255) * radius * 0.8;
-      const intensity = dataArray[i * 4] / 255;
-      
-      const startX = centerX + Math.cos(angle) * radius;
-      const startY = centerY + Math.sin(angle) * radius;
-      const endX = centerX + Math.cos(angle) * (radius + barHeight);
-      const endY = centerY + Math.sin(angle) * (radius + barHeight);
-      
-      // Create dynamic gradient for each bar
-      const barGradient = vizCtx.createLinearGradient(startX, startY, endX, endY);
-      
-      if (intensity > 0.7) {
-        barGradient.addColorStop(0, `rgba(236, 72, 153, ${0.8 + intensity * 0.2})`);
-        barGradient.addColorStop(1, `rgba(251, 146, 60, ${intensity})`);
-      } else if (intensity > 0.4) {
-        barGradient.addColorStop(0, `rgba(59, 130, 246, ${0.6 + intensity * 0.4})`);
-        barGradient.addColorStop(1, `rgba(139, 92, 246, ${intensity})`);
-      } else {
-        barGradient.addColorStop(0, `rgba(34, 197, 94, ${0.4 + intensity * 0.4})`);
-        barGradient.addColorStop(1, `rgba(59, 130, 246, ${intensity})`);
-      }
-      
-      vizCtx.strokeStyle = barGradient;
-      vizCtx.lineWidth = 3;
-      vizCtx.lineCap = 'round';
-      vizCtx.beginPath();
-      vizCtx.moveTo(startX, startY);
-      vizCtx.lineTo(endX, endY);
-      vizCtx.stroke();
-    }
-    
-    // Draw pulsing center circles
-    for (let i = 0; i < 3; i++) {
-      const phase = (frame * 0.02) + (i * Math.PI * 0.5);
-      const pulseRadius = 15 + (Math.sin(phase) * 5) + (avgIntensity * 20);
-      const opacity = 0.1 + (Math.sin(phase) * 0.05) + (avgIntensity * 0.3);
-      
-      vizCtx.beginPath();
-      vizCtx.arc(centerX, centerY, pulseRadius + (i * 10), 0, 2 * Math.PI);
-      vizCtx.fillStyle = `rgba(255, 255, 255, ${opacity})`;
-      vizCtx.fill();
-    }
-    
-    // Draw waveform
-    vizCtx.beginPath();
-    vizCtx.strokeStyle = `rgba(255, 255, 255, ${0.3 + avgIntensity * 0.4})`;
-    vizCtx.lineWidth = 2;
-    
-    for (let i = 0; i < bufferLength; i++) {
-      const x = (i / bufferLength) * width;
-      const y = centerY + ((dataArray[i] / 255 - 0.5) * height * 0.3);
-      
-      if (i === 0) {
-        vizCtx.moveTo(x, y);
-      } else {
-        vizCtx.lineTo(x, y);
-      }
-    }
-    vizCtx.stroke();
-  }
-  
-  animate();
-}
-
-function stopVisualizerAnimation() {
-  if (state.visualizerAnimationId) {
-    cancelAnimationFrame(state.visualizerAnimationId);
-    state.visualizerAnimationId = null;
-  }
-  
-  // Clear canvas with fade effect
-  const canvas = elements.visualizerCanvas;
-  const width = canvas.width / (window.devicePixelRatio || 1);
-  const height = canvas.height / (window.devicePixelRatio || 1);
-  
-  vizCtx.fillStyle = 'rgba(31, 41, 55, 0.1)';
-  vizCtx.fillRect(0, 0, width, height);
-  
-  elements.audioLevelIndicator.classList.add('hidden');
-}
-
-async function enqueueAndPlay(dataUrl) {
-  if (!dataUrl) {
-    console.warn('No audio data URL provided');
-    return;
-  }
-  
-  console.log('Enqueueing audio, queue length:', state.audioQueue.length);
-  state.audioQueue.push(dataUrl);
-  
-  if (!state.isPlaying) {
-    await playNextAudio();
-  }
-}
-
-async function playNextAudio() {
-  if (state.audioQueue.length === 0) {
-    console.log('Audio queue empty, stopping playback');
-    state.isPlaying = false;
-    updateUIForAudioStop(); // This will handle starting recognition
-    return;
-  }
-
-  const dataUrl = state.audioQueue.shift();
-  state.isPlaying = true;
-  
-  console.log('Playing audio from queue, remaining:', state.audioQueue.length);
-  updateUIForAudioStart();
-
-  try {
-    // The key fix: create a new Audio element each time
-    const audio = new Audio();
-    audio.src = dataUrl;
-    audio.volume = parseFloat(elements.volumeSlider.value);
-    audio.crossOrigin = "anonymous";
-    
-    const audioCtx = ensureAudioContext();
-    
-    // Wait for audio to be ready
-    await new Promise((resolve, reject) => {
-      const timeoutId = setTimeout(() => reject(new Error('Audio load timeout')), 10000);
-      
-      audio.oncanplaythrough = () => {
-        clearTimeout(timeoutId);
-        resolve();
-      };
-      audio.onerror = (e) => {
-        clearTimeout(timeoutId);
-        reject(e);
-      };
-      audio.load();
-    });
-    
-    // Create a new audio source for visualization
-    const source = audioCtx.createMediaElementSource(audio);
-    createAdvancedVisualizer(source); // Connects to source and disconnects old one internally
-    
-    // Set up event listeners
-    audio.onended = () => {
-      console.log('Audio playback ended');
-      state.isPlaying = false;
-      setTimeout(() => playNextAudio(), 200);
-    };
-    
-    audio.onerror = (e) => {
-      console.error("Audio playback error:", e);
-      state.isPlaying = false;
-      showNotification('Audio playback failed', 'error');
-      setTimeout(() => playNextAudio(), 200);
-    };
-    
-    // Play audio
-    console.log('Starting audio playback');
-    await audio.play();
-    console.log('Audio playback started successfully');
-    
-  } catch (err) {
-    console.error("playNextAudio error:", err);
-    state.isPlaying = false;
-    updateUIForAudioStop();
-    showNotification('Audio playback failed: ' + err.message, 'error');
-    setTimeout(() => playNextAudio(), 200);
-  }
-}
-
-function updateUIForAudioStart() {
-  elements.aiAvatar.style.transform = 'scale(1.1)';
-  elements.aiStatusDot.className = 'absolute -top-1 -right-1 w-3 h-3 status-speaking rounded-full';
-  elements.aiStatusText.innerHTML = '<i class="fas fa-volume-up mr-1"></i>Speaking';
-  elements.headerStatusIndicator.className = 'absolute -bottom-1 -right-1 w-5 h-5 status-speaking rounded-full border-3 border-white';
-  elements.speakBtn.disabled = true;
-  elements.speakBtn.classList.add('ai-speaking');
-  elements.interviewStatus.innerHTML = '<i class="fas fa-volume-up text-purple-500 mr-2"></i>AI is speaking...';
-}
-
-function updateUIForAudioStop() {
-  elements.aiAvatar.style.transform = 'scale(1)';
-  elements.aiStatusDot.className = 'absolute -top-1 -right-1 w-3 h-3 status-online rounded-full';
-  elements.aiStatusText.innerHTML = '<i class="fas fa-brain mr-1"></i>Ready';
-  elements.headerStatusIndicator.className = 'absolute -bottom-1 -right-1 w-5 h-5 status-online rounded-full border-3 border-white';
-  elements.speakBtn.disabled = false;
-  elements.speakBtn.classList.remove('ai-speaking');
-  elements.interviewStatus.innerHTML = '<i class="fas fa-microphone text-green-500 mr-2"></i>Your turn — speak now';
-  elements.hintsBtn.classList.remove('hidden');
-  stopVisualizerAnimation();
-  if (state.interviewActive && !state.isPaused) {
-    startSpeechRecognition();
-  }
-}
-
-/* =================== ENHANCED MESSAGE HANDLING =================== */
-
-function showTypingIndicator() {
-  const template = document.getElementById('typing-indicator-template');
-  const indicator = template.cloneNode(true);
-  indicator.id = 'typing-indicator-active';
-  indicator.classList.remove('hidden');
-  indicator.classList.add('message-appear');
-  
-  elements.chatHistory.appendChild(indicator);
-  elements.chatHistory.scrollTop = elements.chatHistory.scrollHeight;
-  return indicator;
-}
-
-function removeTypingIndicator() {
-  const indicator = document.getElementById('typing-indicator-active');
-  if (indicator) {
-    indicator.remove();
-  }
-}
-
-function appendMessage(role, text, options = {}) {
-  elements.chatEmpty && elements.chatEmpty.remove();
-  removeTypingIndicator();
-  
-  const wrapper = document.createElement('div');
-  wrapper.className = 'mb-6 flex message-appear';
-  
-  const bubble = document.createElement('div');
-  bubble.className = 'p-5 rounded-2xl max-w-[85%] shadow-lg transition-all duration-200 hover:shadow-xl';
-  bubble.style.wordBreak = 'break-word';
-  
-  const timestamp = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-  
-  if (role === 'user') {
-    wrapper.classList.add('justify-end');
-    bubble.classList.add('bg-gradient-to-br', 'from-blue-500', 'via-blue-600', 'to-purple-600', 'text-white', 'ml-auto', 'border', 'border-blue-400');
-    bubble.innerHTML = `
-      <div class="flex items-center justify-between mb-3">
-        <div class="text-xs font-bold flex items-center opacity-90">
-          <i class="fas fa-user mr-2"></i>
-          You
-        </div>
-        <div class="text-xs opacity-75">${timestamp}</div>
-      </div>
-      <div class="leading-relaxed text-sm">${escapeHtml(text)}</div>
-    `;
-  } else {
-    wrapper.classList.add('justify-start');
-    bubble.classList.add('bg-white', 'text-gray-900', 'mr-auto', 'border-2', 'border-purple-200');
-    bubble.innerHTML = `
-      <div class="flex items-center justify-between mb-3">
-        <div class="text-xs font-bold text-purple-600 flex items-center">
-          <i class="fas fa-robot mr-2"></i>
-          AI Interviewer
-        </div>
-        <div class="text-xs text-gray-500">${timestamp}</div>
-      </div>
-      <div class="leading-relaxed text-sm">${escapeHtml(text)}</div>
-    `;
-  }
-  
-  wrapper.appendChild(bubble);
-  elements.chatHistory.appendChild(wrapper);
-  elements.chatHistory.scrollTop = elements.chatHistory.scrollHeight;
-}
-
-/* =================== ENHANCED AI INTERACTION =================== */
-
-async function callAiBackend(userResponse, requestType = 'normal') {
-  const typingIndicator = showTypingIndicator();
-  elements.interviewStatus.innerHTML = '<i class="fas fa-brain text-purple-500 mr-2 animate-pulse"></i>AI is thinking...';
-  elements.speakBtn.disabled = true;
-  elements.stopSpeakBtn.disabled = true;
-  elements.hintsBtn.classList.add('hidden');
-  elements.aiStatusText.innerHTML = '<i class="fas fa-brain mr-1 animate-pulse"></i>Thinking...';
-
-  const url = "{% url 'mock_interview:ai_interaction_api' session_id=session_id %}";
-  
-  try {
-    console.log('Calling AI backend with:', { userResponse, requestType });
-    
-    const response = await fetch(url, {
-      method: 'POST',
-      headers: { 
-        'Content-Type': 'application/json', 
-        'X-CSRFToken': CSRF_TOKEN 
-      },
-      body: JSON.stringify({ 
-        user_response: userResponse || "", 
-        chat_history: state.chatHistory,
-        request_type: requestType
-      })
-    });
-    
-    if (!response.ok) {
-      const errorData = await response.json().catch(() => ({error: 'unknown'}));
-      throw new Error(errorData.error || `HTTP ${response.status}`);
-    }
-    
-    const data = await response.json();
-    console.log('AI Response received:', data);
-    
-    if (data.success) {
-      // Update chat history
-      if (userResponse) {
-        appendMessage('user', userResponse);
-        state.chatHistory.push({role: 'user', parts: [{text: userResponse}]});
-      }
-      
-      if (data.ai_response_text) {
-        appendMessage('model', data.ai_response_text);
-        state.chatHistory.push({role: 'model', parts: [{text: data.ai_response_text}]});
-      }
-
-      // Update progress
-      if (data.interview_progress) {
-        state.currentQuestion = data.interview_progress.current_question;
-        updateProgress();
-      }
-
-      // Handle audio response
-      if (data.ai_audio_url && data.ai_audio_url.trim().length > 0) {
-        console.log('Audio URL received:', data.ai_audio_url);
-        // Convert relative URL to absolute URL if needed
-        const audioUrl = data.ai_audio_url.startsWith('/') 
-          ? window.location.origin + data.ai_audio_url 
-          : data.ai_audio_url;
-        await enqueueAndPlay(audioUrl);
-      } else {
-        console.log('No valid audio URL received');
-        updateUIForAudioStop();
-        if (data.debug_info) {
-          console.log('Debug info:', data.debug_info);
-        }
-      }
-
-      // Handle interview completion
-      if (data.interview_complete) {
-        handleInterviewCompletion();
-      }
-      
-    } else {
-      throw new Error(data.error || 'Unknown AI error');
-    }
-  } catch (error) {
-    console.error("AI backend error", error);
-    removeTypingIndicator();
-    updateUIForAudioStop();
-    elements.interviewStatus.innerHTML = '<i class="fas fa-exclamation-triangle text-red-500 mr-2"></i>Error occurred. Please try again.';
-    showNotification('AI Error: ' + error.message, 'error');
-  }
-}
-
-function handleInterviewCompletion() {
-  elements.interviewStatus.innerHTML = '<i class="fas fa-check-circle text-green-500 mr-2"></i>Interview completed!';
-  elements.speakBtn.disabled = true;
-  elements.stopSpeakBtn.disabled = true;
-  elements.hintsBtn.classList.add('hidden');
-  elements.aiStatusText.innerHTML = '<i class="fas fa-trophy mr-1"></i>Complete';
-  
-  // Show completion animation
-  showNotification('🎉 Interview completed successfully! Redirecting to review...', 'success');
-  
-  // Update progress to 100%
-  elements.progressPercent.textContent = '100%';
-  elements.progressBar.style.width = '100%';
-  elements.progressText.textContent = 'Interview completed!';
-  updateCircularProgress(elements.overallProgressCircle, 100);
-  
-  // Redirect to review after delay
-  setTimeout(() => {
-    window.location.href = "{% url 'mock_interview:review_interview' session_id=session_id %}";
-  }, 4000);
-}
-
-/* =================== ENHANCED SPEECH RECOGNITION =================== */
-
-function setupSpeechRecognition() {
-  const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-  
-  if (!SpeechRecognition) {
-    elements.sttStatus.innerHTML = '<i class="fas fa-exclamation-triangle text-red-500 mr-2"></i>Speech recognition not supported in this browser.';
-    elements.speakBtn.disabled = true;
-    showNotification('Speech recognition not supported. Please use Chrome or Edge.', 'warning');
-    return;
-  }
-
-  state.recognition = new SpeechRecognition();
-  state.recognition.lang = 'en-US';
-  state.recognition.interimResults = true;
-  state.recognition.continuous = false;
-  state.recognition.maxAlternatives = 1;
-
-  state.recognition.onstart = () => {
-    console.log('Speech recognition started');
-    state.isListening = true;
-    elements.sttStatus.innerHTML = '<i class="fas fa-microphone text-red-500 mr-2 animate-pulse"></i>Listening... Speak clearly and naturally';
-    elements.speakBtn.classList.add('listening-active');
-    elements.speakBtnText.textContent = 'Listening...';
-    elements.listeningAnimation.classList.remove('hidden');
-    elements.speakBtn.querySelector('i').classList.add('hidden');
-    elements.stopSpeakBtn.classList.remove('hidden');
-    elements.stopSpeakBtn.disabled = false;
-    elements.confidenceMeter.classList.remove('hidden');
-    elements.aiStatusText.innerHTML = '<i class="fas fa-ear-listen mr-1"></i>Listening';
-    elements.headerStatusIndicator.className = 'absolute -bottom-1 -right-1 w-5 h-5 status-listening rounded-full border-3 border-white';
-  };
-
-  state.recognition.onresult = (event) => {
-    let finalTranscript = '';
-    let interimTranscript = '';
-    let highestConfidence = 0;
-    
-    for (let i = event.resultIndex; i < event.results.length; i++) {
-      const transcript = event.results[i][0].transcript;
-      const confidence = event.results[i][0].confidence || 0;
-      
-      if (event.results[i].isFinal) {
-        finalTranscript += transcript;
-        highestConfidence = Math.max(highestConfidence, confidence);
-      } else {
-        interimTranscript += transcript;
-        highestConfidence = Math.max(highestConfidence, confidence);
-      }
-    }
-    
-    // Update confidence meter
-    const confidencePercent = Math.round(highestConfidence * 100);
-    elements.confidenceBar.style.width = `${confidencePercent}%`;
-    elements.confidencePercentage.textContent = `${confidencePercent}%`;
-    
-    if (confidencePercent > 70) {
-      elements.confidenceBar.className = 'bg-gradient-to-r from-green-400 to-green-600 h-3 rounded-full transition-all duration-300';
-    } else if (confidencePercent > 40) {
-      elements.confidenceBar.className = 'bg-gradient-to-r from-yellow-400 to-yellow-600 h-3 rounded-full transition-all duration-300';
-    } else {
-      elements.confidenceBar.className = 'bg-gradient-to-r from-red-400 to-red-600 h-3 rounded-full transition-all duration-300';
-    }
-    
-    if (finalTranscript.trim()) {
-      console.log('Final transcript:', finalTranscript);
-      resetSpeechUI();
-      elements.sttStatus.innerHTML = `<i class="fas fa-check text-green-500 mr-2"></i>Captured: "${finalTranscript.trim()}"`;
-      callAiBackend(finalTranscript.trim());
-    } else if (interimTranscript.trim()) {
-      elements.sttStatus.innerHTML = `<i class="fas fa-microphone text-blue-500 mr-2 animate-pulse"></i>"${interimTranscript.trim()}"`;
-    }
-  };
-
-  state.recognition.onerror = (event) => {
-    console.error("Speech recognition error", event);
-    resetSpeechUI();
-    
-    const errorMessages = {
-      'no-speech': 'No speech detected. Please try speaking again.',
-      'audio-capture': 'Microphone not accessible. Check your microphone permissions.',
-      'not-allowed': 'Microphone access denied. Please allow microphone access in your browser settings.',
-      'network': 'Network error. Please check your internet connection.',
-      'aborted': 'Speech recognition was cancelled.',
-      'language-not-supported': 'Language not supported. Please use English.'
-    };
-    
-    const message = errorMessages[event.error] || `Speech recognition error: ${event.error}`;
-    elements.sttStatus.innerHTML = `<i class="fas fa-exclamation-triangle text-red-500 mr-2"></i>${message}`;
-    showNotification(message, 'error');
-  };
-
-  state.recognition.onend = () => {
-    console.log('Speech recognition ended');
-    if (state.isListening) {
-      resetSpeechUI();
-      elements.sttStatus.innerHTML = '<i class="fas fa-microphone text-blue-500 mr-2"></i>Click "Speak Your Answer" to record again';
-    }
-  };
-}
-
-function resetSpeechUI() {
-  state.isListening = false;
-  elements.speakBtn.classList.remove('listening-active');
-  elements.speakBtnText.textContent = 'Speak Your Answer';
-  elements.listeningAnimation.classList.add('hidden');
-  elements.speakBtn.querySelector('i').classList.remove('hidden');
-  elements.stopSpeakBtn.classList.add('hidden');
-  elements.confidenceMeter.classList.add('hidden');
-  elements.headerStatusIndicator.className = 'absolute -bottom-1 -right-1 w-5 h-5 status-online rounded-full border-3 border-white';
-}
-
-/* =================== ENHANCED MEDIA SETUP =================== */
-
-async function initMedia() {
-  try {
-    elements.connectionStatus.innerHTML = '<i class="fas fa-spinner fa-spin text-yellow-500 mr-1"></i>Connecting...';
-    
-    const constraints = {
-      video: {
-        width: { ideal: 1920, min: 1280 },
-        height: { ideal: 1080, min: 720 },
-        facingMode: 'user',
-        frameRate: { ideal: 30 }
-      },
-      audio: {
-        echoCancellation: true,
-        noiseSuppression: true,
-        autoGainControl: true,
-        sampleRate: { ideal: 48000 }
-      }
-    };
-    
-    state.mediaStream = await navigator.mediaDevices.getUserMedia(constraints);
-    elements.userVideo.srcObject = state.mediaStream;
-    elements.videoOverlay.classList.add('hidden');
-    elements.recordingIndicator.classList.remove('hidden');
-    elements.connectionStatus.innerHTML = '<i class="fas fa-check-circle text-green-500 mr-1"></i>Connected';
-    
-    // Initialize audio context
-    await ensureAudioContext();
-    
-    showNotification('🎥 Camera and microphone connected successfully!', 'success');
-
-    // Initialize interview
-    state.isInitialized = true;
-    if (state.chatHistory.length === 0) {
-      await callAiBackend(null, 'start');
-    } else {
-      // Resume existing interview
-      state.chatHistory.forEach(msg => {
-        appendMessage(msg.role === 'model' ? 'model' : 'user', msg.parts[0].text);
-      });
-      
-      const lastMessage = state.chatHistory[state.chatHistory.length - 1];
-      if (lastMessage && lastMessage.role === 'model') {
-        updateUIForAudioStop();
-      }
-    }
-    
-  } catch (error) {
-    console.error("Media initialization failed", error);
-    elements.connectionStatus.innerHTML = '<i class="fas fa-exclamation-triangle text-red-500 mr-1"></i>Failed';
-    elements.videoOverlay.classList.remove('hidden');
-    elements.videoOverlay.innerHTML = `
-      <div class="bounce-in text-center">
-        <div class="w-20 h-20 bg-red-500 bg-opacity-20 rounded-full flex items-center justify-center mx-auto mb-4">
-          <i class="fas fa-exclamation-triangle text-4xl text-red-400"></i>
-        </div>
-        <div class="text-xl font-bold mb-2 text-red-300">Media Access Required</div>
-        <div class="text-sm mb-4 opacity-90">Please allow camera and microphone access to continue</div>
-        <button onclick="initMedia()" class="bg-blue-500 hover:bg-blue-600 text-white px-6 py-3 rounded-xl font-medium transition-all transform hover:scale-105">
-          <i class="fas fa-redo mr-2"></i>Try Again
-        </button>
-      </div>
-    `;
-    
-    showNotification('Media access required. Please allow camera and microphone permissions.', 'warning');
-    elements.speakBtn.disabled = true;
-  }
-}
-
-/* =================== ENHANCED NOTIFICATION SYSTEM =================== */
-
+// Notification System
 function showNotification(message, type = 'info', duration = 5000) {
   const notification = document.createElement('div');
-  notification.className = `transform transition-all duration-500 translate-x-full`;
   
-  const colors = {
-    success: 'bg-gradient-to-r from-green-500 to-green-600 text-white',
-    error: 'bg-gradient-to-r from-red-500 to-red-600 text-white',
-    warning: 'bg-gradient-to-r from-yellow-500 to-yellow-600 text-white',
-    info: 'bg-gradient-to-r from-blue-500 to-blue-600 text-white'
+  const bgColors = {
+    success: 'bg-green-500/20 border-green-400/30 text-green-300',
+    error: 'bg-red-500/20 border-red-400/30 text-red-300',
+    warning: 'bg-yellow-500/20 border-yellow-400/30 text-yellow-300',
+    info: 'bg-blue-500/20 border-blue-400/30 text-blue-300'
   };
   
   const icons = {
     success: 'fas fa-check-circle',
-    error: 'fas fa-exclamation-circle',
-    warning: 'fas fa-exclamation-triangle',
+    error: 'fas fa-exclamation-triangle',
+    warning: 'fas fa-exclamation-circle',
     info: 'fas fa-info-circle'
   };
   
+  notification.className = `glass-card ${bgColors[type]} border rounded-lg p-4 flex items-start space-x-3 transform translate-x-full transition-transform duration-300`;
+  
   notification.innerHTML = `
-    <div class="max-w-sm p-4 rounded-2xl shadow-2xl ${colors[type]} backdrop-blur-sm">
-      <div class="flex items-start space-x-3">
-        <i class="${icons[type]} text-xl"></i>
-        <div class="flex-1">
-          <div class="text-sm font-medium leading-relaxed">${message}</div>
-        </div>
-        <button onclick="this.closest('.transform').remove()" class="text-white opacity-70 hover:opacity-100 transition-opacity">
-          <i class="fas fa-times"></i>
-        </button>
-      </div>
-    </div>
+    <i class="${icons[type]} text-lg mt-0.5"></i>
+    <div class="flex-1 font-medium">${message}</div>
+    <button onclick="this.closest('div').remove()" class="text-current opacity-70 hover:opacity-100">
+      <i class="fas fa-times"></i>
+    </button>
   `;
   
   elements.notificationContainer.appendChild(notification);
   
-  // Slide in animation
   setTimeout(() => {
     notification.classList.remove('translate-x-full');
   }, 100);
   
-  // Auto remove
-  setTimeout(() => {
-    notification.classList.add('translate-x-full');
+  if (duration > 0) {
     setTimeout(() => {
-      if (notification.parentNode) {
-        notification.remove();
-      }
-    }, 500);
-  }, duration);
+      notification.classList.add('translate-x-full');
+      setTimeout(() => notification.remove(), 300);
+    }, duration);
+  }
+  
+  return notification;
 }
 
-/* =================== ENHANCED HINTS SYSTEM =================== */
+// Status Updates
+function updateInterviewStatus(status, statusClass = 'bg-green-500') {
+  const statusElement = elements.interviewStatus;
+  statusElement.innerHTML = `
+    <div class="w-3 h-3 ${statusClass} rounded-full pulse-ring"></div>
+    <span>${status}</span>
+  `;
+}
 
-async function getHints() {
-  const lastAiMessage = [...state.chatHistory].reverse().find(msg => msg.role === 'model');
-  if (!lastAiMessage) return;
+function updateSpeechStatus(message, type = 'info') {
+  const typeClasses = {
+    info: 'text-blue-400',
+    success: 'text-green-400',
+    error: 'text-red-400',
+    warning: 'text-yellow-400'
+  };
+  
+  const icons = {
+    info: 'fas fa-info-circle',
+    success: 'fas fa-check-circle',
+    error: 'fas fa-exclamation-triangle',
+    warning: 'fas fa-exclamation-circle'
+  };
+  
+  elements.sttStatus.innerHTML = `
+    <i class="${icons[type]} ${typeClasses[type]}"></i>
+    <span>${message}</span>
+  `;
+}
 
-  const url = "{% url 'mock_interview:get_interview_hints_api' session_id=session_id %}";
+// Audio Functions
+function updateVolume() {
+  const volume = parseFloat(elements.volumeSlider.value);
+  state.currentVolume = volume;
+  elements.volumeDisplay.textContent = Math.round(volume * 100) + '%';
+  elements.aiAudioElement.volume = volume;
+}
+
+async function testAudio() {
+  try {
+    showLoadingOverlay('Testing audio system...');
+    
+    const response = await fetch('/mock-interview/api/health/', {
+      method: 'GET',
+      headers: {
+        'X-CSRFToken': CSRF_TOKEN,
+        'Content-Type': 'application/json',
+      }
+    });
+    
+    const healthData = await response.json();
+    hideLoadingOverlay();
+    
+    if (healthData.text_generation && healthData.tts_functional) {
+      showNotification('Audio system is working perfectly!', 'success');
+    } else {
+      showNotification('Audio system has limited functionality. Some features may not work optimally.', 'warning', 8000);
+    }
+  } catch (error) {
+    hideLoadingOverlay();
+    console.error('Audio test failed:', error);
+    showNotification('Audio test failed. Please check your connection and try again.', 'error');
+  }
+}
+
+// Media Setup
+async function setupMediaDevices() {
+  try {
+    showLoadingOverlay('Setting up camera and microphone...');
+    
+    const stream = await navigator.mediaDevices.getUserMedia({
+      video: {
+        width: { ideal: 1280 },
+        height: { ideal: 720 },
+        facingMode: 'user'
+      },
+      audio: {
+        echoCancellation: true,
+        noiseSuppression: true,
+        sampleRate: 44100
+      }
+    });
+    
+    state.mediaStream = stream;
+    elements.userVideo.srcObject = stream;
+    elements.videoOverlay.classList.add('hidden');
+    
+    if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
+      const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+      state.recognition = new SpeechRecognition();
+      
+      state.recognition.continuous = true;
+      state.recognition.interimResults = true;
+      state.recognition.lang = 'en-US';
+      state.recognition.maxAlternatives = 1;
+      
+      setupSpeechRecognitionHandlers();
+      updateSpeechStatus('Voice recognition ready', 'success');
+    } else {
+      updateSpeechStatus('Voice recognition not supported in this browser', 'warning');
+    }
+    
+    hideLoadingOverlay();
+    showNotification('Camera and microphone setup completed successfully!', 'success');
+    return true;
+    
+  } catch (error) {
+    hideLoadingOverlay();
+    console.error('Media setup failed:', error);
+    
+    let errorMessage = 'Failed to access camera and microphone. ';
+    if (error.name === 'NotAllowedError') {
+      errorMessage += 'Please allow camera and microphone access and refresh the page.';
+    } else if (error.name === 'NotFoundError') {
+      errorMessage += 'No camera or microphone found.';
+    } else {
+      errorMessage += 'Please check your devices and try again.';
+    }
+    
+    showNotification(errorMessage, 'error', 10000);
+    return false;
+  }
+}
+
+// Speech Recognition Handlers
+function setupSpeechRecognitionHandlers() {
+  if (!state.recognition) return;
+  
+  let speechBuffer = '';
+  let lastSpeechTime = 0;
+  let silenceTimer = null;
+  
+  state.recognition.onstart = () => {
+    state.isListening = true;
+    elements.speakBtn.classList.add('listening-pulse');
+    elements.listeningAnimation.classList.remove('hidden');
+    elements.speakBtnText.classList.add('hidden');
+    updateSpeechStatus('Listening for your response...', 'info');
+    updateInterviewStatus('Listening', 'bg-red-500');
+  };
+  
+  state.recognition.onresult = (event) => {
+    let interimTranscript = '';
+    let finalTranscript = '';
+    
+    for (let i = event.resultIndex; i < event.results.length; i++) {
+      const transcript = event.results[i][0].transcript;
+      if (event.results[i].isFinal) {
+        finalTranscript += transcript + ' ';
+      } else {
+        interimTranscript += transcript;
+      }
+    }
+    
+    if (finalTranscript) {
+      speechBuffer += finalTranscript;
+      lastSpeechTime = Date.now();
+      
+      const confidence = event.results[event.results.length - 1][0].confidence;
+      if (confidence) {
+        updateConfidenceMeter(confidence * 100);
+      }
+    }
+    
+    clearTimeout(silenceTimer);
+    if (speechBuffer.trim()) {
+      silenceTimer = setTimeout(() => {
+        if (Date.now() - lastSpeechTime > 2000) {
+          stopListening();
+        }
+      }, 2000);
+    }
+    
+    const currentText = speechBuffer + interimTranscript;
+    if (currentText.trim()) {
+      updateSpeechStatus(`Recording: "${currentText.trim()}"`, 'info');
+    }
+  };
+  
+  state.recognition.onerror = (event) => {
+    console.error('Speech recognition error:', event.error);
+    state.isListening = false;
+    elements.speakBtn.classList.remove('listening-pulse');
+    elements.listeningAnimation.classList.add('hidden');
+    elements.speakBtnText.classList.remove('hidden');
+    
+    let errorMessage = 'Speech recognition error: ';
+    switch(event.error) {
+      case 'no-speech':
+        errorMessage += 'No speech detected. Please try again.';
+        break;
+      case 'audio-capture':
+        errorMessage += 'Microphone not accessible.';
+        break;
+      case 'not-allowed':
+        errorMessage += 'Microphone permission denied.';
+        break;
+      default:
+        errorMessage += 'Please try again.';
+    }
+    
+    updateSpeechStatus(errorMessage, 'error');
+    resetSpeechButton();
+  };
+  
+  state.recognition.onend = () => {
+    state.isListening = false;
+    elements.speakBtn.classList.remove('listening-pulse');
+    elements.listeningAnimation.classList.add('hidden');
+    elements.speakBtnText.classList.remove('hidden');
+    
+    if (speechBuffer.trim() && state.interviewActive) {
+      submitUserResponse(speechBuffer.trim());
+      speechBuffer = '';
+    } else {
+      resetSpeechButton();
+    }
+  };
+}
+
+// Confidence Meter
+function updateConfidenceMeter(confidence) {
+  if (!elements.confidenceMeter.classList.contains('hidden')) {
+    state.currentConfidence = confidence;
+    elements.confidenceBar.style.width = `${confidence}%`;
+    elements.confidencePercentage.textContent = `${Math.round(confidence)}%`;
+  }
+}
+
+// AI Interaction
+async function submitUserResponse(userInput) {
+  if (!userInput.trim() || state.awaitingResponse) return;
+  
+  state.awaitingResponse = true;
+  state.lastUserResponse = userInput;
   
   try {
-    const response = await fetch(url, {
+    showLoadingOverlay('Processing your response...');
+    updateInterviewStatus('Processing', 'bg-yellow-500');
+    updateSpeechStatus('Processing your response...', 'info');
+    
+    addMessageToChat('user', userInput);
+    
+    state.totalResponses++;
+    state.totalWords += userInput.split(' ').length;
+    updateProgress();
+    
+    const response = await fetch(`/mock-interview/${state.sessionId}/ai_interaction/`, {
       method: 'POST',
-      headers: { 
-        'Content-Type': 'application/json', 
-        'X-CSRFToken': CSRF_TOKEN 
+      headers: {
+        'X-CSRFToken': CSRF_TOKEN,
+        'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        current_question: lastAiMessage.parts[0].text,
-        context: 'User requested hints'
+        user_response: userInput,
+        chat_history: state.chatHistory,
+        request_type: 'normal'
       })
     });
     
+    if (!response.ok) {
+      throw new Error(`Server error: ${response.status}`);
+    }
+    
     const data = await response.json();
     
-    if (data.success && data.hints) {
-      displayHints(data.hints);
+    if (data.success) {
+      addMessageToChat('assistant', data.ai_response_text);
+      
+      if (data.ai_audio_url) {
+        await playAIResponse(data.ai_response_text, data.ai_audio_url);
+      }
+      
+      if (data.interview_progress) {
+        state.currentQuestion = data.interview_progress.current_question;
+        updateProgress();
+      }
+      
+      if (data.interview_complete) {
+        handleInterviewCompletion();
+      } else {
+        resetSpeechButton();
+        elements.hintsBtn.classList.remove('hidden');
+      }
+      
+      state.consecutiveErrors = 0;
+      
     } else {
-      displayHints([
-        "Take a moment to structure your thoughts using the STAR method (Situation, Task, Action, Result)",
-        "Think of a specific example from your experience that demonstrates the skills they're asking about",
-        "Break your answer into clear parts: context, what you did, and the positive outcome"
-      ]);
+      throw new Error(data.error || 'Unknown error occurred');
+    }
+    
+  } catch (error) {
+    console.error('AI interaction failed:', error);
+    handleInteractionError(error);
+  } finally {
+    state.awaitingResponse = false;
+    hideLoadingOverlay();
+  }
+}
+
+// Chat Functions
+function addMessageToChat(role, message, autoScroll = true) {
+  if (elements.chatEmpty && !elements.chatEmpty.classList.contains('hidden')) {
+    elements.chatEmpty.classList.add('hidden');
+  }
+  
+  const messageElement = document.createElement('div');
+  messageElement.className = `mb-4 animate-pulse`;
+  
+  if (role === 'user') {
+    messageElement.innerHTML = `
+      <div class="flex justify-end">
+        <div class="bg-gradient-to-r from-blue-500 to-purple-600 text-white rounded-2xl rounded-br-md px-4 py-3 max-w-xs lg:max-w-sm shadow-lg">
+          <div class="font-medium mb-1 text-sm opacity-80">You</div>
+          <div class="text-sm leading-relaxed">${message}</div>
+        </div>
+      </div>
+    `;
+  } else {
+    messageElement.innerHTML = `
+      <div class="flex justify-start">
+        <div class="glass-card text-white rounded-2xl rounded-bl-md px-4 py-3 max-w-xs lg:max-w-sm border border-white/20">
+          <div class="font-medium mb-1 text-sm text-purple-300 flex items-center">
+            <i class="fas fa-robot mr-2"></i>Sarah
+          </div>
+          <div class="text-sm leading-relaxed">${message}</div>
+        </div>
+      </div>
+    `;
+  }
+  
+  // Add to chat history
+  state.chatHistory.push({ role: role === 'user' ? 'user' : 'assistant', content: message });
+  
+  elements.chatMessages.appendChild(messageElement);
+  
+  if (autoScroll) {
+    elements.chatMessages.scrollTop = elements.chatMessages.scrollHeight;
+  }
+  
+  // Remove animation after it completes
+  setTimeout(() => messageElement.classList.remove('animate-pulse'), 400);
+}
+
+// Audio Playback
+async function playAIResponse(text, audioUrl) {
+  try {
+    updateInterviewStatus('AI Speaking', 'bg-blue-500');
+    elements.aiAvatar.classList.add('pulse-ring');
+    elements.aiStatusText.innerHTML = '<i class="fas fa-volume-up mr-2"></i><span>Speaking...</span>';
+    
+    state.isPlaying = true;
+    elements.aiAudioElement.src = audioUrl;
+    elements.aiAudioElement.volume = state.currentVolume;
+    
+    await elements.aiAudioElement.play();
+    
+    elements.aiAudioElement.onended = () => {
+      state.isPlaying = false;
+      elements.aiAvatar.classList.remove('pulse-ring');
+      elements.aiStatusText.innerHTML = '<i class="fas fa-brain mr-2"></i><span>Ready to Interview</span>';
+      updateInterviewStatus('Interview Active', 'bg-green-500');
+    };
+    
+  } catch (error) {
+    console.error('Audio playback failed:', error);
+    state.isPlaying = false;
+    elements.aiAvatar.classList.remove('pulse-ring');
+    elements.aiStatusText.innerHTML = '<i class="fas fa-brain mr-2"></i><span>Ready to Interview</span>';
+    updateInterviewStatus('Interview Active', 'bg-green-500');
+    showNotification('Audio playback failed. Check your connection.', 'warning');
+  }
+}
+
+// Interview Control Functions
+async function startInterview() {
+  try {
+    elements.startBtn.disabled = true;
+    showLoadingOverlay('Preparing interview environment...');
+    
+    const mediaSetup = await setupMediaDevices();
+    if (!mediaSetup) {
+      elements.startBtn.disabled = false;
+      return;
+    }
+    
+    const response = await fetch(`/mock-interview/${state.sessionId}/start/`, {
+      method: 'POST',
+      headers: {
+        'X-CSRFToken': CSRF_TOKEN,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        resume_session: INTERVIEW_PROGRESS && INTERVIEW_PROGRESS.in_progress
+      })
+    });
+    
+    if (!response.ok) {
+      throw new Error(`Failed to start interview: ${response.status}`);
+    }
+    
+    const data = await response.json();
+    
+    if (data.success) {
+      state.interviewActive = true;
+      state.startTime = Date.now();
+      state.currentQuestion = data.current_question || 1;
+      
+      updateInterviewStatus('Interview Active', 'bg-green-500');
+      elements.startBtn.classList.add('hidden');
+      elements.pauseBtn.classList.remove('hidden');
+      elements.speakBtn.disabled = false;
+      elements.recordingIndicator.classList.remove('hidden');
+      elements.confidenceMeter.classList.remove('hidden');
+      
+      state.progressTimer = setInterval(updateProgress, 1000);
+      
+      if (data.ai_response_text) {
+        addMessageToChat('assistant', data.ai_response_text);
+        
+        if (data.ai_audio_url) {
+          await playAIResponse(data.ai_response_text, data.ai_audio_url);
+        }
+      }
+      
+      hideLoadingOverlay();
+      showNotification('Interview started successfully! Good luck!', 'success');
+      
+      elements.hintsBtn.classList.remove('hidden');
+      
+      setTimeout(() => elements.speakBtn.focus(), 500);
+      
+    } else {
+      throw new Error(data.error || 'Failed to start interview');
+    }
+    
+  } catch (error) {
+    console.error('Failed to start interview:', error);
+    hideLoadingOverlay();
+    elements.startBtn.disabled = false;
+    showNotification(`Failed to start interview: ${error.message}`, 'error', 8000);
+    updateInterviewStatus('Ready to Start', 'bg-green-500');
+  }
+}
+
+async function endInterview() {
+  if (!confirm('Are you sure you want to end the interview? This action cannot be undone.')) {
+    return;
+  }
+  
+  try {
+    showLoadingOverlay('Ending interview...');
+    
+    const response = await fetch(`/mock-interview/${state.sessionId}/ai_interaction/`, {
+      method: 'POST',
+      headers: {
+        'X-CSRFToken': CSRF_TOKEN,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        user_response: '',
+        chat_history: state.chatHistory,
+        request_type: 'end_interview'
+      })
+    });
+    
+    if (response.ok) {
+      const data = await response.json();
+      if (data.interview_complete) {
+        handleInterviewCompletion();
+        return;
+      }
+    }
+    
+    // Fallback if API call fails
+    handleInterviewCompletion();
+    
+  } catch (error) {
+    console.error('Failed to end interview properly:', error);
+    handleInterviewCompletion(); // Still end the interview
+  } finally {
+    hideLoadingOverlay();
+  }
+}
+
+function pauseInterview() {
+  state.isPaused = !state.isPaused;
+  
+  if (state.isPaused) {
+    if (state.progressTimer) clearInterval(state.progressTimer);
+    if (state.isListening) stopListening();
+    if (state.isPlaying) elements.aiAudioElement.pause();
+    
+    elements.pauseBtn.innerHTML = '<i class="fas fa-play mr-2"></i>Resume';
+    elements.speakBtn.disabled = true;
+    updateInterviewStatus('Paused', 'bg-yellow-500');
+    showNotification('Interview paused', 'info', 3000);
+  } else {
+    state.progressTimer = setInterval(updateProgress, 1000);
+    elements.pauseBtn.innerHTML = '<i class="fas fa-pause mr-2"></i>Pause';
+    elements.speakBtn.disabled = false;
+    updateInterviewStatus('Interview Active', 'bg-green-500');
+    showNotification('Interview resumed', 'info', 3000);
+  }
+}
+
+function skipQuestion() {
+  if (!state.interviewActive || state.awaitingResponse) return;
+  
+  if (confirm('Are you sure you want to skip this question?')) {
+    submitUserResponse('I would like to skip this question and move to the next one.');
+  }
+}
+
+// Speech Control Functions
+function toggleListening() {
+  if (state.isListening) {
+    stopListening();
+  } else {
+    startListening();
+  }
+}
+
+function startListening() {
+  if (!state.recognition || !state.interviewActive || state.isPaused) {
+    updateSpeechStatus('Speech recognition not available', 'error');
+    return;
+  }
+  
+  try {
+    state.recognition.start();
+    elements.stopSpeakBtn.classList.remove('hidden');
+    elements.skipBtn.classList.remove('hidden');
+  } catch (error) {
+    console.error('Failed to start listening:', error);
+    updateSpeechStatus('Failed to start voice recognition', 'error');
+  }
+}
+
+function stopListening() {
+  if (state.recognition && state.isListening) {
+    state.recognition.stop();
+  }
+  elements.stopSpeakBtn.classList.add('hidden');
+  elements.skipBtn.classList.add('hidden');
+}
+
+function resetSpeechButton() {
+  elements.speakBtn.classList.remove('listening-pulse');
+  elements.listeningAnimation.classList.add('hidden');
+  elements.speakBtnText.classList.remove('hidden');
+  elements.speakBtn.disabled = !state.interviewActive || state.isPaused;
+  elements.stopSpeakBtn.classList.add('hidden');
+  elements.skipBtn.classList.add('hidden');
+  
+  updateInterviewStatus(state.interviewActive ? 'Interview Active' : 'Ready to Start', 'bg-green-500');
+}
+
+// Hints System
+async function loadInterviewHints() {
+  try {
+    elements.hintsContent.innerHTML = `
+      <div class="glass-card p-4 rounded-lg border border-yellow-400/30">
+        <div class="text-lg font-bold text-yellow-400 mb-2">Loading personalized hints...</div>
+        <div class="text-gray-300">Analyzing your current question context for strategic guidance.</div>
+      </div>
+    `;
+    
+    const response = await fetch(`/mock-interview/${state.sessionId}/hints/`, {
+      method: 'POST',
+      headers: {
+        'X-CSRFToken': CSRF_TOKEN,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        current_question: state.currentQuestion,
+        chat_history: state.chatHistory,
+        session_context: {
+          total_responses: state.totalResponses,
+          average_confidence: state.currentConfidence
+        }
+      })
+    });
+    
+    if (response.ok) {
+      const data = await response.json();
+      displayHints(data.hints || getDefaultHints());
+    } else {
+      displayHints(getDefaultHints());
     }
   } catch (error) {
-    console.error("Failed to get hints", error);
-    displayHints([
-      "Consider using specific examples from your work or academic experience",
-      "Structure your response with a clear beginning, middle, and end",
-      "Take your time - it's better to think for a moment than to rush your answer"
-    ]);
+    console.error('Failed to load hints:', error);
+    displayHints(getDefaultHints());
   }
 }
 
@@ -1555,320 +1223,384 @@ function displayHints(hints) {
   
   hints.forEach((hint, index) => {
     const hintElement = document.createElement('div');
-    hintElement.className = 'flex items-start space-x-4 p-4 bg-gradient-to-r from-yellow-50 to-orange-50 border-l-4 border-yellow-400 rounded-lg shadow-sm hover:shadow-md transition-shadow';
+    hintElement.className = 'glass-card p-4 rounded-lg border border-yellow-400/30 mb-4 last:mb-0';
     hintElement.innerHTML = `
-      <div class="flex-shrink-0 w-8 h-8 bg-gradient-to-r from-yellow-400 to-orange-400 text-white rounded-full flex items-center justify-center text-sm font-bold">
-        ${index + 1}
-      </div>
-      <div class="flex-1">
-        <div class="text-sm text-gray-700 leading-relaxed">${hint}</div>
-      </div>
+      <div class="text-lg font-bold text-yellow-400 mb-2">${hint.title}</div>
+      <div class="text-gray-300 leading-relaxed">${hint.description}</div>
     `;
     elements.hintsContent.appendChild(hintElement);
   });
-  
-  // Animate modal appearance
+}
+
+function getDefaultHints() {
+  return [
+    {
+      title: "Use the STAR Method",
+      description: "Structure your answers with Situation, Task, Action, and Result to provide comprehensive responses that showcase your experience effectively."
+    },
+    {
+      title: "Be Specific and Quantifiable",
+      description: "Include concrete examples, numbers, and measurable outcomes whenever possible. This demonstrates real impact and achievement."
+    },
+    {
+      title: "Show Your Thought Process",
+      description: "Explain how you approach problems and make decisions. Interviewers want to understand your reasoning and analytical skills."
+    },
+    {
+      title: "Connect to the Role",
+      description: "Relate your experiences and skills directly to the position you're applying for. Show how your background makes you an ideal fit."
+    }
+  ];
+}
+
+function showHintsModal() {
   elements.hintsModal.classList.remove('hidden');
   setTimeout(() => {
     elements.hintsModalContent.classList.remove('scale-95', 'opacity-0');
     elements.hintsModalContent.classList.add('scale-100', 'opacity-100');
-  }, 10);
+  }, 50);
+  
+  loadInterviewHints();
 }
 
 function hideHintsModal() {
-  elements.hintsModalContent.classList.add('scale-95', 'opacity-0');
   elements.hintsModalContent.classList.remove('scale-100', 'opacity-100');
+  elements.hintsModalContent.classList.add('scale-95', 'opacity-0');
   
   setTimeout(() => {
     elements.hintsModal.classList.add('hidden');
   }, 300);
 }
 
-/* =================== ENHANCED EVENT LISTENERS =================== */
+// Utility Functions for Loading and Error Handling
+function showLoadingOverlay(message) {
+  elements.loadingText.textContent = message;
+  elements.loadingOverlay.classList.remove('hidden');
+}
 
-// Start Interview
-elements.startBtn.addEventListener('click', async () => {
-  state.interviewActive = true;
-  state.startTime = Date.now();
-  
-  elements.startBtn.disabled = true;
-  elements.startBtn.innerHTML = '<i class="fas fa-spinner fa-spin mr-3"></i>Initializing Interview...';
-  
-  await initMedia();
-  setupSpeechRecognition();
-  
-  elements.startBtn.classList.add('hidden');
-  elements.pauseBtn.classList.remove('hidden');
-  elements.skipBtn.classList.remove('hidden');
-  elements.floatingPanel.classList.remove('hidden');
-  
-  // Start progress timer
-  const progressInterval = setInterval(() => {
-    if (state.interviewActive) {
-      updateProgress();
-    } else {
-      clearInterval(progressInterval);
-    }
-  }, 1000);
-  
-  showNotification('Interview started! The AI will speak first, then you can respond.', 'info');
-});
+function hideLoadingOverlay() {
+  elements.loadingOverlay.classList.add('hidden');
+}
 
-// End Interview
-elements.endBtn.addEventListener('click', () => {
-  if (confirm('Are you sure you want to end the interview? This action cannot be undone.')) {
-    state.interviewActive = false;
-    
-    // Stop media streams
-    if (state.mediaStream) {
-      state.mediaStream.getTracks().forEach(track => track.stop());
-    }
-    
-    // Stop audio
-    if (elements.aiAudioElement) {
-      elements.aiAudioElement.pause();
-      elements.aiAudioElement.src = '';
-    }
-    
-    // Stop speech recognition
-    if (state.recognition && state.isListening) {
-      state.recognition.stop();
-    }
-    
-    stopVisualizerAnimation();
-    
-    elements.interviewStatus.innerHTML = '<i class="fas fa-stop-circle text-red-500 mr-2"></i>Interview ended. Preparing review...';
-    showNotification('Interview ended. Preparing your comprehensive review...', 'info');
-    
+function handleInteractionError(error) {
+  state.consecutiveErrors++;
+  console.error('Interaction error:', error);
+  
+  if (state.consecutiveErrors < state.maxRetries) {
+    showNotification(`Error occurred. Retrying... (${state.consecutiveErrors}/${state.maxRetries})`, 'warning', 5000);
     setTimeout(() => {
-      window.location.href = "{% url 'mock_interview:review_interview' session_id=session_id %}";
+      resetSpeechButton();
     }, 2000);
-  }
-});
-
-// Pause/Resume Interview
-elements.pauseBtn.addEventListener('click', () => {
-  state.isPaused = !state.isPaused;
-  
-  if (state.isPaused) {
-    elements.pauseBtn.innerHTML = '<i class="fas fa-play mr-2"></i>Resume';
-    elements.pauseBtn.className = elements.pauseBtn.className.replace('btn-warning', 'btn-success');
-    elements.speakBtn.disabled = true;
-    elements.interviewStatus.innerHTML = '<i class="fas fa-pause text-yellow-500 mr-2"></i>Interview paused';
-    
-    if (elements.aiAudioElement && !elements.aiAudioElement.paused) {
-      elements.aiAudioElement.pause();
-    }
-    
-    if (state.recognition && state.isListening) {
-      state.recognition.stop();
-    }
-    
-    showNotification('Interview paused. Click Resume when ready to continue.', 'info');
   } else {
-    elements.pauseBtn.innerHTML = '<i class="fas fa-pause mr-2"></i>Pause';
-    elements.pauseBtn.className = elements.pauseBtn.className.replace('btn-success', 'btn-warning');
-    elements.speakBtn.disabled = false;
-    elements.interviewStatus.innerHTML = '<i class="fas fa-microphone text-green-500 mr-2"></i>Your turn — speak now';
-    showNotification('Interview resumed. You can now continue speaking.', 'success');
+    showNotification('Multiple errors occurred. Please refresh the page or try again later.', 'error', 10000);
+    updateSpeechStatus('Multiple errors detected. Please refresh the page.', 'error');
   }
-});
+}
 
-// Speak Button
-elements.speakBtn.addEventListener('click', () => {
-  if (state.recognition && !state.isListening && !state.isPaused && !state.isPlaying) {
-    try {
-      state.recognition.start();
-    } catch (e) {
-      console.warn("Recognition start failed", e);
-      showNotification('Speech recognition failed to start. Please try again.', 'error');
+function handleInterviewCompletion() {
+  state.interviewComplete = true;
+  state.interviewActive = false;
+  
+  if (state.progressTimer) clearInterval(state.progressTimer);
+  if (state.recognition && state.isListening) state.recognition.stop();
+  if (state.mediaStream) {
+    state.mediaStream.getTracks().forEach(track => track.stop());
+  }
+  
+  updateInterviewStatus('Completed', 'bg-blue-500');
+  elements.speakBtn.disabled = true;
+  elements.hintsBtn.classList.add('hidden');
+  elements.recordingIndicator.classList.add('hidden');
+  
+  setTimeout(() => {
+    window.location.href = `/mock-interview/${state.sessionId}/review/`;
+  }, 2000);
+  
+  showNotification('Interview completed! Redirecting to review page...', 'success', 3000);
+}
+
+// Event Listeners Setup
+function setupEventListeners() {
+  elements.startBtn.addEventListener('click', startInterview);
+  elements.endBtn.addEventListener('click', endInterview);
+  elements.pauseBtn.addEventListener('click', pauseInterview);
+  
+  elements.speakBtn.addEventListener('click', toggleListening);
+  elements.stopSpeakBtn.addEventListener('click', stopListening);
+  elements.skipBtn.addEventListener('click', skipQuestion);
+  
+  elements.testAudioBtn.addEventListener('click', testAudio);
+  elements.volumeSlider.addEventListener('input', updateVolume);
+  
+  elements.hintsBtn.addEventListener('click', showHintsModal);
+  
+  // Keyboard shortcuts
+  document.addEventListener('keydown', (event) => {
+    if (!state.interviewActive) return;
+    
+    if (event.code === 'Space' && !event.target.matches('input, textarea')) {
+      event.preventDefault();
+      toggleListening();
     }
-  }
-});
+    
+    if (event.code === 'Escape' && state.isListening) {
+      event.preventDefault();
+      stopListening();
+    }
+  });
+  
+  // Handle page unload
+  window.addEventListener('beforeunload', (event) => {
+    if (state.interviewActive && !state.interviewComplete) {
+      event.preventDefault();
+      event.returnValue = 'Your interview is still in progress. Are you sure you want to leave?';
+      return event.returnValue;
+    }
+  });
+}
 
-// Stop Speaking
-elements.stopSpeakBtn.addEventListener('click', () => {
+// Initialize Visualizer
+function initializeVisualizer() {
+  const canvas = elements.visualizerCanvas;
+  if (!canvas) return;
+  
+  const ctx = canvas.getContext('2d');
+  canvas.width = canvas.offsetWidth;
+  canvas.height = canvas.offsetHeight;
+  
+  const particles = [];
+  for (let i = 0; i < 30; i++) {
+    particles.push({
+      x: Math.random() * canvas.width,
+      y: Math.random() * canvas.height,
+      vx: (Math.random() - 0.5) * 0.5,
+      vy: (Math.random() - 0.5) * 0.5,
+      size: Math.random() * 2 + 1,
+      opacity: Math.random() * 0.5 + 0.1
+    });
+  }
+  
+  function animate() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    
+    particles.forEach(particle => {
+      particle.x += particle.vx;
+      particle.y += particle.vy;
+      
+      if (particle.x < 0 || particle.x > canvas.width) particle.vx *= -1;
+      if (particle.y < 0 || particle.y > canvas.height) particle.vy *= -1;
+      
+      ctx.beginPath();
+      ctx.arc(particle.x, particle.y, particle.size, 0, Math.PI * 2);
+      ctx.fillStyle = `rgba(147, 51, 234, ${particle.opacity})`;
+      ctx.fill();
+    });
+    
+    state.visualizerAnimationId = requestAnimationFrame(animate);
+  }
+  
+  animate();
+}
+
+// Main Initialization Function
+async function initializeInterface() {
+  try {
+    console.log('Initializing MockMate Professional Interview System...');
+    
+    setupEventListeners();
+    updateVolume();
+    
+    
+    updateProgress();
+    initializeVisualizer();
+    
+    if (INTERVIEW_PROGRESS && INTERVIEW_PROGRESS.in_progress) {
+      elements.startBtn.innerHTML = '<i class="fas fa-play mr-2"></i><span>Resume Interview</span>';
+      updateInterviewStatus('Ready to Resume', 'bg-yellow-500');
+      updateSpeechStatus('Click "Resume Interview" to continue your session', 'info');
+      state.currentQuestion = INTERVIEW_PROGRESS.current_question || 1;
+    }
+    
+    try {
+      state.audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    } catch (e) {
+      console.warn('AudioContext not supported:', e);
+    }
+    
+    // Handle window resize for visualizer canvas
+    window.addEventListener('resize', debounce(() => {
+      if (elements.visualizerCanvas) {
+        elements.visualizerCanvas.width = elements.visualizerCanvas.offsetWidth;
+        elements.visualizerCanvas.height = elements.visualizerCanvas.offsetHeight;
+      }
+    }, 250));
+    
+    // Handle page visibility changes
+    document.addEventListener('visibilitychange', () => {
+      if (document.hidden && state.isListening) {
+        console.log('Page hidden, stopping speech recognition');
+        stopListening();
+      }
+    });
+    
+    state.isInitialized = true;
+    console.log('MockMate Professional Interview System initialized successfully');
+    
+    updateInterviewStatus('Ready to Start', 'bg-green-500');
+    updateSpeechStatus('Click "Start Interview" to begin your session', 'info');
+    
+    // Show initial notification
+    setTimeout(() => {
+      showNotification('MockMate Interview System ready! Click "Start Interview" when you\'re prepared.', 'info', 4000);
+    }, 1000);
+    
+  } catch (error) {
+    console.error('Interface initialization failed:', error);
+    showNotification('Failed to initialize interview system. Some features may not work properly.', 'error', 10000);
+    state.isInitialized = true;
+  }
+}
+
+// Cleanup function for when page is unloaded
+function cleanup() {
+  if (state.progressTimer) {
+    clearInterval(state.progressTimer);
+  }
+  
+  if (state.visualizerAnimationId) {
+    cancelAnimationFrame(state.visualizerAnimationId);
+  }
+  
+  if (state.mediaStream) {
+    state.mediaStream.getTracks().forEach(track => track.stop());
+  }
+  
   if (state.recognition && state.isListening) {
     state.recognition.stop();
   }
-});
-
-// Skip Question
-elements.skipBtn.addEventListener('click', () => {
-  if (confirm('Are you sure you want to skip this question?')) {
-    callAiBackend("I'd prefer to skip this question and move to the next one, please.");
-    showNotification('Question skipped. Moving to the next question.', 'info');
+  
+  if (state.audioCtx && state.audioCtx.state !== 'closed') {
+    state.audioCtx.close();
   }
-});
+}
 
-// Hints Button
-elements.hintsBtn.addEventListener('click', () => {
-  getHints();
-});
+// Additional utility functions
+function escapeHtml(unsafe) {
+  return unsafe
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#039;");
+}
 
-// Close Hints Modal
-elements.closeHintsModal.addEventListener('click', hideHintsModal);
-elements.closeHintsBtn.addEventListener('click', hideHintsModal);
+function generateSessionReport() {
+  const duration = state.startTime ? Math.floor((Date.now() - state.startTime) / 1000) : 0;
+  const avgConfidence = state.metrics?.confidenceScores?.length > 0 ? 
+    state.metrics.confidenceScores.reduce((a, b) => a + b) / state.metrics.confidenceScores.length : 0;
+  
+  return {
+    sessionId: state.sessionId,
+    duration: formatTime(duration),
+    questionsAsked: state.currentQuestion,
+    totalResponses: state.totalResponses,
+    averageWordsPerResponse: state.totalResponses > 0 ? Math.round(state.totalWords / state.totalResponses) : 0,
+    averageConfidence: Math.round(avgConfidence),
+    chatHistory: state.chatHistory,
+    timestamp: new Date().toISOString()
+  };
+}
 
-// Close modal when clicking outside
-elements.hintsModal.addEventListener('click', (e) => {
-  if (e.target === elements.hintsModal) {
-    hideHintsModal();
-  }
-});
-
-// Volume Control
-elements.volumeSlider.addEventListener('input', (e) => {
-  const volume = parseFloat(e.target.value);
-  elements.volumeDisplay.textContent = Math.round(volume * 100) + '%';
+// Enhanced error recovery
+function attemptRecovery() {
+  console.log('Attempting system recovery...');
   
-  if (elements.aiAudioElement) {
-    elements.aiAudioElement.volume = volume;
-  }
-});
-
-// Test Audio
-elements.testAudioBtn.addEventListener('click', () => {
-  const audioCtx = ensureAudioContext();
-  const oscillator = audioCtx.createOscillator();
-  const gainNode = audioCtx.createGain();
+  // Reset error counter
+  state.consecutiveErrors = 0;
   
-  oscillator.connect(gainNode);
-  gainNode.connect(audioCtx.destination);
+  // Reset UI elements
+  resetSpeechButton();
+  updateInterviewStatus(state.interviewActive ? 'Interview Active' : 'Ready to Start', 'bg-green-500');
   
-  oscillator.frequency.value = 440;
-  gainNode.gain.setValueAtTime(0, audioCtx.currentTime);
-  gainNode.gain.linearRampToValueAtTime(0.1, audioCtx.currentTime + 0.01);
-  gainNode.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 1);
-  
-  oscillator.start(audioCtx.currentTime);
-  oscillator.stop(audioCtx.currentTime + 1);
-  
-  showNotification('🔊 Test tone played! Adjust volume if needed.', 'info');
-});
-
-// Floating Panel Actions
-document.getElementById('practice-mode-btn')?.addEventListener('click', () => {
-  showNotification('🏋️ Practice mode - Generate additional questions for extra practice!', 'info');
-});
-
-document.getElementById('feedback-btn')?.addEventListener('click', () => {
-  window.open("{% url 'mock_interview:review_interview' session_id=session_id %}", '_blank');
-});
-
-document.getElementById('settings-btn')?.addEventListener('click', () => {
-  showNotification('⚙️ Settings panel coming soon - customize your interview experience!', 'info');
-});
-
-document.getElementById('help-btn')?.addEventListener('click', () => {
-  showNotification('❓ Help: Use spacebar for quick voice recording, H for hints, ESC to close modals', 'info');
-});
-
-/* =================== ENHANCED KEYBOARD SHORTCUTS =================== */
-
-document.addEventListener('keydown', (e) => {
-  // Prevent shortcuts when typing
-  if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') {
-    return;
-  }
-  
-  // Space bar to start/stop speaking
-  if (e.code === 'Space') {
-    e.preventDefault();
-    if (!state.isListening && !elements.speakBtn.disabled && !state.isPaused) {
-      elements.speakBtn.click();
-    } else if (state.isListening) {
-      elements.stopSpeakBtn.click();
-    }
-  }
-  
-  // Escape to close modals
-  if (e.code === 'Escape') {
-    hideHintsModal();
-  }
-  
-  // H for hints
-  if (e.code === 'KeyH' && !elements.hintsBtn.classList.contains('hidden')) {
-    elements.hintsBtn.click();
-  }
-  
-  // P for pause/resume
-  if (e.code === 'KeyP' && !elements.pauseBtn.classList.contains('hidden')) {
-    elements.pauseBtn.click();
-  }
-  
-  // S for skip question
-  if (e.code === 'KeyS' && !elements.skipBtn.classList.contains('hidden')) {
-    elements.skipBtn.click();
-  }
-});
-
-/* =================== ENHANCED INITIALIZATION =================== */
-
-document.addEventListener('DOMContentLoaded', () => {
-  // Initialize UI
-  updateProgress();
-  setupVisualizer();
-  
-  // Set initial volume
-  elements.volumeSlider.value = '0.8';
-  elements.volumeDisplay.textContent = '80%';
-  
-  // Load existing chat history
-  if (state.chatHistory.length > 0) {
-    elements.chatEmpty.remove();
-    state.chatHistory.forEach(msg => {
-      appendMessage(msg.role === 'model' ? 'model' : 'user', msg.parts[0].text);
-    });
-    
-    const questions = state.chatHistory.filter(msg => msg.role === 'model').length;
-    state.currentQuestion = Math.max(1, questions);
-    updateProgress();
-  }
-  
-  // Show welcome message
-  showNotification('🚀 Welcome to your AI Mock Interview! Click "Start Interview" when you\'re ready to begin.', 'info', 8000);
-  
-  // Set initial status
-  elements.interviewStatus.innerHTML = '<i class="fas fa-play-circle text-blue-500 mr-2"></i>Click "Start Interview" to begin';
-  
-  // Handle window resize for visualizer
-  window.addEventListener('resize', () => {
-    setupVisualizer();
-  });
-  
-  // Add helpful tooltips
-  elements.speakBtn.title = 'Press spacebar as shortcut';
-  elements.hintsBtn.title = 'Press H as shortcut';
-  elements.pauseBtn.title = 'Press P as shortcut';
-  elements.skipBtn.title = 'Press S as shortcut';
-});
-
-// Enhanced page visibility handling
-document.addEventListener('visibilitychange', () => {
-  if (document.hidden && state.isListening) {
-    console.log('Page hidden, stopping speech recognition');
-    if (state.recognition) {
-      state.recognition.stop();
-    }
-  }
-});
-
-// Prevent page refresh during interview
-window.addEventListener('beforeunload', (e) => {
-  if (state.interviewActive && state.startTime) {
-    e.preventDefault();
-    e.returnValue = 'Your interview is in progress. Are you sure you want to leave?';
-    return e.returnValue;
-  }
-});
-
-// Enhanced error handling
-window.addEventListener('error', (e) => {
-  console.error('Global error:', e.error);
+  // Re-enable controls
   if (state.interviewActive) {
-    showNotification('An unexpected error occurred. Please refresh if issues persist.', 'error');
+    elements.speakBtn.disabled = false;
+    elements.hintsBtn.classList.remove('hidden');
+  }
+  
+  showNotification('System recovered successfully. You can continue your interview.', 'success', 3000);
+}
+
+// Performance monitoring
+function logPerformanceMetrics() {
+  if (typeof performance !== 'undefined' && performance.mark) {
+    performance.mark('interview-system-ready');
+    
+    const entries = performance.getEntriesByType('measure');
+    if (entries.length > 0) {
+      console.log('Performance metrics:', entries.map(entry => ({
+        name: entry.name,
+        duration: Math.round(entry.duration) + 'ms'
+      })));
+    }
+  }
+}
+
+// Initialize when page loads
+document.addEventListener('DOMContentLoaded', () => {
+  console.log('Initializing MockMate Professional Interview System...');
+  
+  // Mark start time for performance monitoring
+  if (typeof performance !== 'undefined' && performance.mark) {
+    performance.mark('interview-init-start');
+  }
+  
+  try {
+    initializeInterface();
+    logPerformanceMetrics();
+  } catch (error) {
+    console.error('Failed to initialize interface:', error);
+    showNotification('Failed to initialize interview interface. Please refresh the page.', 'error');
   }
 });
+
+// Handle page unload
+window.addEventListener('beforeunload', (event) => {
+  cleanup();
+  
+  if (state.interviewActive && !state.interviewComplete) {
+    event.preventDefault();
+    event.returnValue = 'Your interview is still in progress. Are you sure you want to leave?';
+    return event.returnValue;
+  }
+});
+
+// Global functions for modal control (called from HTML)
+window.hideHintsModal = hideHintsModal;
+window.showHintsModal = showHintsModal;
+
+// Expose utility functions for debugging
+if (typeof window !== 'undefined') {
+  window.MockMateDebug = {
+    state,
+    generateSessionReport,
+    attemptRecovery,
+    logPerformanceMetrics,
+    resetSystem: () => {
+      cleanup();
+      location.reload();
+    }
+  };
+}
+
+// Service Worker registration for PWA capabilities (optional)
+if ('serviceWorker' in navigator && 'production' === '{{ settings.ENVIRONMENT }}') {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('/sw.js')
+      .then(registration => console.log('SW registered:', registration))
+      .catch(registrationError => console.log('SW registration failed:', registrationError));
+  });
+}
+
 </script>
 {% endblock %}

@@ -6,11 +6,13 @@ import io
 import logging
 from django.conf import settings
 from django.utils import timezone
+from django.utils.text import slugify
 from django.db import transaction
+from django.core.exceptions import ValidationError
 from typing import List, Dict, Any
 from .models import (
     TestCase, PracticeProblem, UserProblemStats, UserStats, 
-    Badge, UserBadge, PracticeSubmission
+    Badge, UserBadge, PracticeSubmission, Category, Tag
 )
 
 logger = logging.getLogger(__name__)
@@ -20,19 +22,19 @@ JDOODLE_CLIENT_ID = getattr(settings, 'JDOODLE_CLIENT_ID', '')
 JDOODLE_CLIENT_SECRET = getattr(settings, 'JDOODLE_CLIENT_SECRET', '')
 JDOODLE_API_URL = "https://api.jdoodle.com/v1/execute"
 
-# Language mapping for JDoodle
+# Language mapping for JDoodle - FIXED: Changed 'version' key
 LANGUAGE_MAPPING = {
-    'python3': {'language': 'python3', 'version': '0'},
-    'cpp17': {'language': 'cpp17', 'version': '0'},
-    'java': {'language': 'java', 'version': '3'},
-    'javascript': {'language': 'nodejs', 'version': '3'},
-    'csharp': {'language': 'csharp', 'version': '3'},
-    'go': {'language': 'go', 'version': '3'},
-    'rust': {'language': 'rust', 'version': '3'},
-    'php': {'language': 'php', 'version': '3'},
-    'ruby': {'language': 'ruby', 'version': '3'},
-    'kotlin': {'language': 'kotlin', 'version': '2'},
-    'swift': {'language': 'swift', 'version': '3'},
+    'python3': {'language': 'python3', 'versionIndex': '0'},
+    'cpp17': {'language': 'cpp17', 'versionIndex': '0'},
+    'java': {'language': 'java', 'versionIndex': '3'},
+    'javascript': {'language': 'nodejs', 'versionIndex': '3'},
+    'csharp': {'language': 'csharp', 'versionIndex': '3'},
+    'go': {'language': 'go', 'versionIndex': '3'},
+    'rust': {'language': 'rust', 'versionIndex': '3'},
+    'php': {'language': 'php', 'versionIndex': '3'},
+    'ruby': {'language': 'ruby', 'versionIndex': '3'},
+    'kotlin': {'language': 'kotlin', 'versionIndex': '2'},
+    'swift': {'language': 'swift', 'versionIndex': '3'},
 }
 
 class CodeExecutionService:
@@ -52,7 +54,7 @@ class CodeExecutionService:
             'script': code,
             'stdin': std_input,
             'language': lang_info['language'],
-            'versionIndex': lang_info['versionIndex']
+            'versionIndex': lang_info['versionIndex']  # FIXED: Now matches the dict key
         }
 
         try:
@@ -62,7 +64,7 @@ class CodeExecutionService:
 
             # Check for errors from the API itself (e.g., compilation)
             if 'error' in result and result['error']:
-                 return {
+                return {
                     'output': result.get('output', ''),
                     'memory': result.get('memory'),
                     'cpuTime': result.get('cpuTime'),
@@ -84,7 +86,66 @@ class CodeExecutionService:
             logger.error(f"An unexpected error occurred during code execution: {e}")
             return {'error': str(e), 'output': ''}
     
-    # --- NEW: Core logic for evaluating a submission against all test cases ---
+    @staticmethod
+    def run_against_test_cases(code: str, language: str, test_cases, time_limit: int = 5) -> List[Dict]:
+        """Run code against multiple test cases (for sample test runs)"""
+        results = []
+        
+        for test_case in test_cases:
+            execution_result = CodeExecutionService.run_code(
+                language, 
+                code, 
+                test_case.input_data
+            )
+            
+            # Handle compilation errors
+            if execution_result.get('is_compilation_error'):
+                results.append({
+                    "test_case_id": str(test_case.id),
+                    "description": test_case.description or "Test Case",
+                    "passed": False,
+                    "error": "Compilation Error",
+                    "error_message": execution_result.get('output', 'Compilation failed'),
+                    "input": test_case.input_data if test_case.is_sample else "[Hidden]",
+                    "expected_output": test_case.expected_output if test_case.is_sample else "[Hidden]",
+                    "actual_output": "",
+                    "execution_time": 0
+                })
+                break  # Stop on compilation error
+            
+            # Handle runtime errors
+            if execution_result.get('error'):
+                results.append({
+                    "test_case_id": str(test_case.id),
+                    "description": test_case.description or "Test Case",
+                    "passed": False,
+                    "error": "Runtime Error",
+                    "error_message": execution_result['error'],
+                    "input": test_case.input_data if test_case.is_sample else "[Hidden]",
+                    "expected_output": test_case.expected_output if test_case.is_sample else "[Hidden]",
+                    "actual_output": execution_result.get('output', ''),
+                    "execution_time": execution_result.get('cpuTime', 0)
+                })
+                continue
+            
+            # Compare outputs
+            actual_output = execution_result['output'].strip()
+            expected_output = test_case.expected_output.strip()
+            passed = actual_output == expected_output
+            
+            results.append({
+                "test_case_id": str(test_case.id),
+                "description": test_case.description or f"Test Case {test_case.order + 1}",
+                "passed": passed,
+                "input": test_case.input_data if test_case.is_sample else "[Hidden]",
+                "expected_output": expected_output if test_case.is_sample else "[Hidden]",
+                "actual_output": actual_output if test_case.is_sample else ("[Hidden]" if not passed else "[Correct]"),
+                "execution_time": execution_result.get('cpuTime', 0),
+                "memory": execution_result.get('memory', 0)
+            })
+        
+        return results
+    
     @staticmethod
     def evaluate_submission(submission: PracticeSubmission) -> Dict[str, Any]:
         """
@@ -96,7 +157,7 @@ class CodeExecutionService:
         
         if not test_cases.exists():
             return {
-                "status": "RUNTIME_ERROR",
+                "status": "INTERNAL_ERROR",
                 "message": "No test cases found for this problem.",
                 "passed_cases": 0,
                 "total_cases": 0,
@@ -132,10 +193,10 @@ class CodeExecutionService:
                 individual_results.append({
                     "case_number": i + 1,
                     "status": "Compilation Error",
-                    "input": test_case.input_data,
-                    "error_message": execution_result.get('output') # JDoodle puts compile errors in output
+                    "input": test_case.input_data if test_case.is_sample else "[Hidden]",
+                    "error_message": execution_result.get('output', 'Compilation failed')
                 })
-                break # Stop evaluation on compilation error
+                break  # Stop evaluation on compilation error
             
             # Handle runtime errors during execution
             if execution_result['error']:
@@ -143,10 +204,10 @@ class CodeExecutionService:
                 individual_results.append({
                     "case_number": i + 1,
                     "status": "Runtime Error",
-                    "input": test_case.input_data,
+                    "input": test_case.input_data if test_case.is_sample else "[Hidden]",
                     "error_message": execution_result['error']
                 })
-                break # Stop evaluation on first runtime error
+                break  # Stop evaluation on first runtime error
 
             # Compare outputs
             actual_output = execution_result['output']
@@ -155,9 +216,9 @@ class CodeExecutionService:
             case_result = {
                 "case_number": i + 1,
                 "is_sample": test_case.is_sample,
-                "input": test_case.input_data,
-                "expected_output": expected_output,
-                "actual_output": actual_output,
+                "input": test_case.input_data if test_case.is_sample else "[Hidden]",
+                "expected_output": expected_output if test_case.is_sample else "[Hidden]",
+                "actual_output": actual_output if test_case.is_sample else "[Hidden]",
             }
 
             if actual_output == expected_output:
@@ -168,9 +229,8 @@ class CodeExecutionService:
                 case_result["status"] = "FAILED"
             
             individual_results.append(case_result)
-        
-            # If a case fails, we can stop, but for providing full feedback, we continue.
-            # If you want to stop on the first failure, uncomment the following lines:
+            
+            # Optional: Stop on first failure for faster feedback
             # if overall_status == "WRONG_ANSWER":
             #     break
 
@@ -184,116 +244,141 @@ class CodeExecutionService:
         }
         return final_result
 
+
 class TestCaseService:
-    """Service for handling test case operations"""
     
     @staticmethod
-    def import_test_cases_from_csv(problem: PracticeProblem, csv_file) -> int:
-        """Import test cases from CSV file"""
+    def import_test_cases_from_csv(problem, csv_file):
+        """
+        Import test cases from CSV file for a specific problem.
+        Expected CSV columns: input_data, expected_output, is_sample, is_hidden, 
+                             description, explanation, difficulty_weight, order
+        """
+        try:
+            csv_file.seek(0)
+            content = csv_file.read().decode('utf-8')
+            reader = csv.DictReader(io.StringIO(content))
+            
+            created_count = 0
+            for row in reader:
+                TestCase.objects.create(
+                    problem=problem,
+                    input_data=row.get('input_data', '').strip(),
+                    expected_output=row.get('expected_output', '').strip(),
+                    is_sample=row.get('is_sample', 'FALSE').upper() == 'TRUE',
+                    is_hidden=row.get('is_hidden', 'TRUE').upper() == 'TRUE',
+                    description=row.get('description', ''),
+                    explanation=row.get('explanation', ''),
+                    difficulty_weight=int(row.get('difficulty_weight', 1)),
+                    order=int(row.get('order', 0))
+                )
+                created_count += 1
+            
+            return created_count
+            
+        except Exception as e:
+            raise ValidationError(f"Error importing test cases: {str(e)}")
+    
+    @staticmethod
+    def import_problems_from_csv(csv_file, created_by):
+        """
+        Import problems from CSV (problems only, without test cases).
+        For bulk problem upload without test cases.
+        """
         try:
             csv_file.seek(0)
             content = csv_file.read().decode('utf-8')
             reader = csv.DictReader(io.StringIO(content))
             
             imported_count = 0
-            with transaction.atomic():
-                # Clear existing test cases if any
-                problem.test_cases.all().delete()
+            
+            for row in reader:
+                # Check if problem already exists
+                slug = row.get('slug') or slugify(row.get('title', ''))
+                if PracticeProblem.objects.filter(slug=slug).exists():
+                    logger.warning(f"Problem with slug '{slug}' already exists, skipping...")
+                    continue
                 
-                for i, row in enumerate(reader):
-                    # Required fields
-                    input_data = row.get('input_data', '').strip()
-                    expected_output = row.get('expected_output', '').strip()
-                    
-                    if not input_data or not expected_output:
-                        continue
-                    
-                    # Optional fields with defaults
-                    is_sample = str(row.get('is_sample', 'False')).lower() in ['true', '1', 'yes']
-                    is_hidden = str(row.get('is_hidden', 'True')).lower() in ['true', '1', 'yes']
-                    description = row.get('description', f'Test Case {i+1}')
-                    difficulty_weight = int(row.get('difficulty_weight', 1))
-                    order = int(row.get('order', i))
-                    
-                    TestCase.objects.create(
-                        problem=problem,
-                        input_data=input_data,
-                        expected_output=expected_output,
-                        is_sample=is_sample,
-                        is_hidden=is_hidden,
-                        description=description,
-                        difficulty_weight=max(1, min(10, difficulty_weight)),
-                        order=order
+                # Parse tags and companies
+                tags_list = [tag.strip() for tag in row.get('tags', '').split(',') if tag.strip()]
+                companies = row.get('companies', '').strip()
+                
+                # Parse hints from JSON string or comma-separated
+                hints = row.get('hints', '')
+                try:
+                    hints_list = json.loads(hints) if hints else []
+                except:
+                    hints_list = [h.strip() for h in hints.split(',') if h.strip()]
+                
+                # Get or create category
+                category = None
+                category_name = row.get('category_name', '').strip()
+                if category_name:
+                    category, _ = Category.objects.get_or_create(
+                        name=category_name,
+                        defaults={'description': f'{category_name} problems'}
                     )
-                    imported_count += 1
                 
+                # Create problem
+                problem = PracticeProblem.objects.create(
+                    title=row.get('title'),
+                    slug=slug,
+                    difficulty=row.get('difficulty', 'EASY').upper(),
+                    category=category,
+                    companies=companies,
+                    statement=row.get('statement', ''),
+                    constraints=row.get('constraints', ''),
+                    hints=hints_list,
+                    approach=row.get('approach', ''),
+                    time_complexity=row.get('time_complexity', ''),
+                    space_complexity=row.get('space_complexity', ''),
+                    leetcode_url=row.get('leetcode_url', ''),
+                    hackerrank_url=row.get('hackerrank_url', ''),
+                    external_url=row.get('external_url', ''),
+                    time_limit=int(row.get('time_limit', 5)),
+                    memory_limit=int(row.get('memory_limit', 256)),
+                    is_premium=row.get('is_premium', 'FALSE').upper() == 'TRUE',
+                    is_private=row.get('is_private', 'FALSE').upper() == 'TRUE',
+                    status=row.get('status', 'DRAFT'),  # Start as DRAFT for review
+                    created_by=created_by
+                )
+                
+                # Add tags
+                for tag_name in tags_list:
+                    tag, _ = Tag.objects.get_or_create(name=tag_name)
+                    problem.tags.add(tag)
+                
+                imported_count += 1
+                logger.info(f"Imported problem: {problem.title}")
+            
             return imported_count
             
         except Exception as e:
-            logger.error(f"Error importing test cases from CSV: {str(e)}")
-            raise
-    
-    @staticmethod
-    def import_problems_from_csv(csv_file, created_by_user) -> int:
-        """Import problems from CSV file"""
-        try:
-            csv_file.seek(0)
-            content = csv_file.read().decode('utf-8')
-            reader = csv.DictReader(io.StringIO(content))
-            
-            imported_count = 0
-            with transaction.atomic():
-                for row in reader:
-                    title = row.get('title', '').strip()
-                    if not title:
-                        continue
-                    
-                    problem = PracticeProblem.objects.create(
-                        title=title,
-                        difficulty=row.get('difficulty', 'EASY').upper(),
-                        statement=row.get('statement', ''),
-                        constraints=row.get('constraints', ''),
-                        companies=row.get('companies', ''),
-                        time_complexity=row.get('time_complexity', ''),
-                        space_complexity=row.get('space_complexity', ''),
-                        time_limit=int(row.get('time_limit', 5)),
-                        memory_limit=int(row.get('memory_limit', 256)),
-                        created_by=created_by_user,
-                        status='PENDING_APPROVAL'
-                    )
-                    imported_count += 1
-                
-            return imported_count
-            
-        except Exception as e:
-            logger.error(f"Error importing problems from CSV: {str(e)}")
-            raise
+            raise ValidationError(f"Error importing problems: {str(e)}")
     
     @staticmethod
     def update_user_problem_stats(user, problem, submission, status):
-        """Update user problem statistics after submission"""
-        try:
-            user_problem_stats, created = UserProblemStats.objects.get_or_create(
-                user=user,
-                problem=problem
-            )
-            
-            user_problem_stats.is_attempted = True
-            user_problem_stats.total_attempts += 1
-            
-            if status == 'ACCEPTED' and not user_problem_stats.is_solved:
+        """Update user statistics after submission"""
+        user_problem_stats, created = UserProblemStats.objects.get_or_create(
+            user=user,
+            problem=problem
+        )
+        
+        user_problem_stats.is_attempted = True
+        user_problem_stats.total_attempts += 1
+        
+        if status == 'ACCEPTED':
+            if not user_problem_stats.is_solved:
                 user_problem_stats.is_solved = True
                 user_problem_stats.first_solved_at = timezone.now()
                 
-                # Update problem statistics
-                problem.accepted_submissions = problem.submissions.filter(status='ACCEPTED').count()
-                
                 # Update user overall stats
-                user_stats, created = UserStats.objects.get_or_create(user=user)
+                user_stats, _ = UserStats.objects.get_or_create(user=user)
                 user_stats.problems_solved += 1
                 user_stats.accepted_submissions += 1
+                user_stats.total_submissions += 1
                 
-                # Update difficulty-specific stats
+                # Update difficulty-specific counts
                 if problem.difficulty == 'EASY':
                     user_stats.easy_solved += 1
                 elif problem.difficulty == 'MEDIUM':
@@ -301,25 +386,40 @@ class TestCaseService:
                 elif problem.difficulty == 'HARD':
                     user_stats.hard_solved += 1
                 
-                # Update streak
                 user_stats.update_streak()
                 user_stats.save()
+                
+                # Award badges
+                BadgeService.check_and_award_badges(user)
+            else:
+                # Still count the submission even if already solved
+                user_stats, _ = UserStats.objects.get_or_create(user=user)
+                user_stats.total_submissions += 1
+                user_stats.save()
             
-            # Update best submission if applicable
-            if not user_problem_stats.best_submission or submission.score > user_problem_stats.best_submission.score:
-                user_problem_stats.best_submission = submission
-                user_problem_stats.best_runtime = submission.total_runtime or 0
-                user_problem_stats.best_memory = submission.peak_memory or 0
-                user_problem_stats.best_score = submission.score
+            # Update best submission
+            if submission.execution_time:
+                if not user_problem_stats.best_runtime or submission.execution_time < user_problem_stats.best_runtime:
+                    user_problem_stats.best_runtime = submission.execution_time
+                    user_problem_stats.best_submission = submission
             
-            user_problem_stats.save()
-            
-            # Update problem statistics
-            problem.total_submissions = problem.submissions.count()
-            problem.save()
-            
-        except Exception as e:
-            logger.error(f"Error updating user problem stats: {str(e)}")
+            if submission.memory_used:
+                if not user_problem_stats.best_memory or submission.memory_used < user_problem_stats.best_memory:
+                    user_problem_stats.best_memory = submission.memory_used
+        else:
+            # Failed submission - still count it
+            user_stats, _ = UserStats.objects.get_or_create(user=user)
+            user_stats.total_submissions += 1
+            user_stats.save()
+        
+        user_problem_stats.save()
+        
+        # Update problem statistics
+        problem.total_submissions += 1
+        if status == 'ACCEPTED':
+            problem.accepted_submissions += 1
+        problem.save()
+
 
 class BadgeService:
     """Service for handling badge awards"""
@@ -375,6 +475,7 @@ class BadgeService:
                 user_stats = UserStats.objects.get(user=user)
                 user_stats.total_points += 10  # Base points for badge
                 user_stats.save()
+                logger.info(f"Awarded badge '{badge_name}' to user {user.username}")
                 return True
             return False
             
@@ -384,6 +485,7 @@ class BadgeService:
         except Exception as e:
             logger.error(f"Error awarding badge: {str(e)}")
             return False
+
 
 class AnalyticsService:
     """Service for analytics and insights"""
@@ -407,7 +509,7 @@ class AnalyticsService:
                 language_stats[lang] = language_stats.get(lang, 0) + 1
             
             # Recent activity
-            recent_activity = submissions.order_by('-submission_time')[:10]
+            recent_activity = submissions.order_by('-submitted_at')[:10]
             
             return {
                 'completion_rate': completion_rate,

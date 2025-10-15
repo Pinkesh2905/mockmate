@@ -1,0 +1,38 @@
+# render.yaml
+# This file defines the services for your Django project on Render.
+
+services:
+  # ----------------- #
+  #  PostgreSQL DB    #
+  # ----------------- #
+  - type: psql
+    name: MockMateDB # You can name your database anything
+    plan: free # 'free' tier is great for development/small projects
+    # version: "15" # Optional: specify a PostgreSQL version
+
+  # ----------------- #
+  #  Django Web App   #
+  # ----------------- #
+  - type: web
+    name: mockmate-web
+    plan: free # 'free' tier is great for development/small projects
+    env: python
+    buildCommand: "./build.sh"
+    startCommand: "gunicorn mockmate01.wsgi:application"
+    envVars:
+      - key: DATABASE_URL
+        fromService:
+          type: psql
+          name: MockMateDB # Must match the name of the database service above
+          property: connectionString
+      - key: SECRET_KEY
+        generateValue: true # Render will generate a secure secret key
+      - key: WEB_CONCURRENCY
+        value: 4
+      - key: PYTHON_VERSION
+        value: 3.11.4 # Specify your Python version
+      # Add your JDOODLE API keys here
+      - key: JDOODLE_CLIENT_ID
+        value: "YOUR_JDOODLE_CLIENT_ID"
+      - key: JDOODLE_CLIENT_SECRET
+        value: "YOUR_JDOODLE_CLIENT_SECRET"

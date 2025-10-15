@@ -1,29 +1,20 @@
 {
-  "devDependencies": {
-    "@tailwindcss/typography": "^0.5.16",
-    "autoprefixer": "^10.4.21",
-    "postcss": "^8.5.6",
-    "tailwindcss": "^4.1.11",
-    "tailwindcss-cli": "^0.1.2"
-  },
-  "name": "mockmate01",
+  "name": "mockmate",
   "version": "1.0.0",
-  "description": "",
+  "description": "A comprehensive learning and practice platform.",
   "main": "index.js",
-  "dependencies": {
-    "cssesc": "^3.0.0",
-    "lodash.castarray": "^4.4.0",
-    "lodash.isplainobject": "^4.0.6",
-    "lodash.merge": "^4.6.2",
-    "postcss-selector-parser": "^6.0.10",
-    "util-deprecate": "^1.0.2"
-  },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "build": "node_modules\\.bin\\tailwindcss.cmd -i ./input.css -o ./static/css/theme.css --watch"
+    "build": "tailwind build -i input.css -o core/static/css/theme.css"
   },
-  "keywords": [],
-  "author": "",
+  "keywords": [
+    "django",
+    "tailwind",
+    "education"
+  ],
+  "author": "Pinkesh",
   "license": "ISC",
-  "type": "commonjs"
+  "dependencies": {
+    "tailwindcss": "^3.4.1"
+  }
 }
